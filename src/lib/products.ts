@@ -58,7 +58,7 @@ export const products: Product[] = [
     category: "Difusores",
     price: 119.0,
     image: p4,
-    short: "Aroma contínuo por até 90 dias com varetas de rattan.",
+    short: "Aroma contínuo por até 9 dias com varetas de rattan.",
     description:
       "Difusor de varetas com fragrância concentrada. Liberação suave e contínua, ideal para espaços íntimos como quartos e salas de leitura.",
     scents: ["Baunilha", "Madeira", "Flor de Cerejeira"],

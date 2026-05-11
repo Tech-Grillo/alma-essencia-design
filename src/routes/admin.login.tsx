@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Logo } from "@/components/Logo";
 import heroImg from "@/assets/hero.jpg";
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
@@ -18,7 +17,6 @@ function AdminLogin() {
 
       <div className="relative w-full max-w-md rounded-[2rem] bg-card/90 backdrop-blur-xl border border-border shadow-bloom p-10">
         <div className="flex flex-col items-center text-center mb-8">
-          <Logo />
           <h1 className="mt-7 font-serif text-3xl">Área Administrativa</h1>
           <p className="mt-2 text-sm text-muted-foreground">Acesso restrito à gerência.</p>
         </div>

@@ -1,5 +1,4 @@
 import { Instagram, Facebook, MessageCircle } from "lucide-react";
-import { Logo } from "./Logo";
 import { Link } from "@tanstack/react-router";
 import { whatsappLink } from "@/lib/products";
 
@@ -10,9 +9,6 @@ export function Footer() {
       <div className="bg-chocolate text-cream/90">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid md:grid-cols-3 gap-12">
           <div>
-            <div className="[&_*]:!text-cream">
-              <Logo />
-            </div>
             <p className="mt-6 font-serif italic text-cream/70 leading-relaxed">
               Pequenos rituais que perfumam a casa e acalmam a alma. Feitos à mão, com tempo e cuidado.
             </p>

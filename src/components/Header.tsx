@@ -1,16 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
 import { useState } from "react";
-import { Logo } from "./Logo";
 import { useTheme } from "@/lib/theme";
 import { categories } from "@/lib/products";
 
 const nav = [
   { to: "/", label: "Home" },
-  { to: "/quem-somos", label: "Quem Somos" },
+  { to: "/quem-somos", label: "Quem Somos", },
   { to: "/produtos", label: "Produtos" },
   { to: "/contato", label: "Contato" },
 ];
+
+
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -28,7 +29,9 @@ export function Header() {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <Link to="/"><Logo /></Link>
+            <Link to="/" className="text-lg font-semibold uppercase tracking-[0.1em] text-foreground/90 hover:text-caramel-deep transition-colors">
+              Alma EssênciAA
+            </Link>
           </div>
 
           <nav className="hidden md:flex items-center gap-10">
@@ -72,7 +75,9 @@ export function Header() {
           className={`absolute left-0 top-0 h-full w-[88%] max-w-sm bg-background shadow-bloom p-8 transition-transform duration-500 ${open ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="flex items-center justify-between mb-10">
-            <Logo />
+            <Link to="/" className="font-serif text-xl uppercase tracking-[0.12em] text-foreground/90">
+              Alma Essência
+            </Link>
             <button onClick={() => setOpen(false)} className="rounded-full p-2 hover:bg-secondary">
               <X className="h-5 w-5" />
             </button>
