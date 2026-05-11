@@ -82,7 +82,7 @@ function ProductPage() {
             <div className="mb-7">
               <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Aroma</p>
               <div className="flex flex-wrap gap-2">
-                {product.scents.map((s) => (
+                {product.scents.map((s: string) => (
                   <button
                     key={s}
                     onClick={() => setScent(s)}
@@ -100,7 +100,7 @@ function ProductPage() {
             <div className="mb-7">
               <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Tamanho</p>
               <div className="inline-flex p-1 rounded-full bg-secondary">
-                {product.sizes.map((s) => (
+                {product.sizes.map((s: string) => (
                   <button
                     key={s}
                     onClick={() => setSize(s)}
