@@ -124,14 +124,16 @@ function Home() {
             </div>
             <h2 className="font-serif text-4xl md:text-5xl mb-4">Nos encontre</h2>
             <p className="text-muted-foreground leading-relaxed mb-2">
-              Rua das Acácias, 128 — Vila Madalena<br />São Paulo · SP
+              BAIRRO DE ICARAÍ <br /> <span className="detalhe"  style={{ color: "var(--caramel-deep)" }}>FEIRA - CAMPO DE SÃO BENTO</span><br />RIO DE JANEIRO · RJ
             </p>
-            <p className="text-muted-foreground text-sm">Terça a sábado · 10h às 18h</p>
+            <p className="text-muted-foreground text-sm" style={{ fontFamily: "Apple Chancery, cursive", fontSize: "1.6em", textAlign: "center", color: "var(--caramel-deep)" }}>
+              Domingos · 09h às 15h
+            </p>
           </div>
           <div className="aspect-[4/3] md:aspect-auto">
             <iframe
               title="Mapa da loja"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=-46.695%2C-23.555%2C-46.685%2C-23.545&layer=mapnik"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-43.1135%2C-22.9091%2C-43.1015%2C-22.8991&layer=mapnik&marker=-22.9041%2C-43.1075"
               className="w-full h-full min-h-[300px] border-0 grayscale-[20%]"
               loading="lazy"
             />

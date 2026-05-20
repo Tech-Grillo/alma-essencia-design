@@ -3,9 +3,10 @@ import { Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { categories } from "@/lib/products";
+import logo from "@/assets/logo_da_marca.jpg";
 
 const nav = [
-  { to: "/", label: "Home" },
+  { to: "/", label: "Início" },
   { to: "/quem-somos", label: "Quem Somos", },
   { to: "/produtos", label: "Produtos" },
   { to: "/contato", label: "Contato" },
@@ -29,9 +30,10 @@ export function Header() {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <Link to="/" className="text-lg font-semibold uppercase tracking-[0.1em] text-foreground/90 hover:text-caramel-deep transition-colors">
-              Alma EssênciAA
-            </Link>
+            <div id="logo1" className="flex items-center justify-center">
+              <img src={logo} alt="Alma e Essência" className="h-10 w-10 rounded-full shadow-sm object-cover" />
+            </div>
+           
           </div>
 
           <nav className="hidden md:flex items-center gap-10">

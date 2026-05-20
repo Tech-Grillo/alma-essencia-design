@@ -13,12 +13,12 @@ export function ProductCard({ product }: { product: Product }) {
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
       </div>
-      <div className="p-6">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 mb-2">
+      <div className="p-6 pb-16">
+        <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 mb-2 text-center">
           {product.category}
         </p>
-        <h3 className="font-serif text-2xl leading-tight mb-1">{product.name}</h3>
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.short}</p>
+        <h3 className="font-serif text-2xl leading-tight mb-1 text-center">{product.name}</h3>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 text-center">{product.short}</p>
 
         <div className="flex flex-wrap gap-1.5 mb-5">
           {product.scents.slice(0, 3).map((s) => (
