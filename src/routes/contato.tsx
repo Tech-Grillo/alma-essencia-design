@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GoogleMap } from "@/components/GoogleMap";
 import { whatsappLink } from "@/lib/products";
 import { Instagram, Mail, MapPin, MessageCircle } from "lucide-react";
 
@@ -16,7 +17,7 @@ function Contact() {
   return (
     <div className="min-h-screen">
       <Header />
-      <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24">
+      <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
           <p className="font-script text-3xl text-caramel-deep">— Conecte-se</p>
           <h1 className="font-serif text-5xl md:text-6xl">Fale com a gente</h1>
@@ -25,7 +26,7 @@ function Contact() {
 
         <div className="grid md:grid-cols-3 gap-5 mb-12">
           {[
-            { icon: MessageCircle, label: "WhatsApp", value: "(11) 99999-9999", href: whatsappLink("Olá!") },
+            { icon: MessageCircle, label: "WhatsApp", value: "(21) 989794503", href: whatsappLink("Olá!") },
             { icon: Mail, label: "E-mail", value: "ola@almaeessencia.com", href: "mailto:ola@almaeessencia.com" },
             { icon: Instagram, label: "Instagram", value: "@almaeessencia", href: "#" },
           ].map((c) => (
@@ -42,12 +43,7 @@ function Contact() {
             <MapPin className="h-5 w-5 text-caramel-deep" />
             <p className="font-serif text-lg">Rua das Acácias, 128 — Vila Madalena, São Paulo</p>
           </div>
-          <iframe
-            title="Mapa"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=-46.695%2C-23.555%2C-46.685%2C-23.545&layer=mapnik"
-            className="w-full h-80 border-0"
-            loading="lazy"
-          />
+          <GoogleMap lat={-23.559} lng={-46.695} title="Alma e Essência - São Paulo" className="w-full h-80" />
         </div>
       </section>
       <Footer />

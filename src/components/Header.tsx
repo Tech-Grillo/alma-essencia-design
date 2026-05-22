@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
+import { Menu, Moon, ShoppingCart, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { categories } from "@/lib/products";
 import logo from "@/assets/logo_da_marca.jpg";
+
 
 const nav = [
   { to: "/", label: "Início" },
@@ -11,6 +12,9 @@ const nav = [
   { to: "/produtos", label: "Produtos" },
   { to: "/contato", label: "Contato" },
 ];
+
+
+
 
 
 
@@ -39,11 +43,12 @@ export function Header() {
           <nav className="hidden md:flex items-center gap-10">
             {nav.map((n) => (
               <Link
+                id="inicio"
                 key={n.to}
                 to={n.to}
                 activeOptions={{ exact: n.to === "/" }}
-                activeProps={{ className: "text-caramel-deep" }}
-                className="text-sm tracking-wide uppercase text-foreground/75 hover:text-caramel-deep transition-colors"
+                activeProps={{ className: "text-lg font-semibold text-chocolate dark:text-white bg-chocolate/10 dark:bg-chocolate/30 rounded-full px-4 py-2" }}
+                className="text-lg font-semibold tracking-wide uppercase text-chocolate dark:text-white px-4 py-2 rounded-full transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
               >
                 {n.label}
               </Link>
@@ -59,7 +64,7 @@ export function Header() {
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </button>
             <button aria-label="Carrinho" className="relative rounded-full p-2.5 hover:bg-secondary transition-colors">
-              <ShoppingBag className="h-4 w-4" />
+              <ShoppingCart className="h-4 w-4" />
               <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] rounded-full bg-rose text-foreground flex items-center justify-center font-medium">
                 0
               </span>
@@ -92,9 +97,10 @@ export function Header() {
             {nav.map((n) => (
               <li key={n.to}>
                 <Link
+                  id="inicio"
                   to={n.to}
                   onClick={() => setOpen(false)}
-                  className="font-serif text-2xl text-foreground hover:text-caramel-deep"
+                  className="font-serif text-2xl font-semibold text-chocolate dark:text-white px-4 py-3 rounded-full block transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
                 >
                   {n.label}
                 </Link>

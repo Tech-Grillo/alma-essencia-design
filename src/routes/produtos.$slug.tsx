@@ -42,7 +42,7 @@ function ProductPage() {
     <div className="min-h-screen">
       <Header />
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 py-10">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10 py-10 animate-fade-in-up">
         <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-caramel-deep mb-8">
           <ChevronLeft className="h-4 w-4" /> Voltar
         </Link>

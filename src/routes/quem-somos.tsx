@@ -15,7 +15,7 @@ function About() {
   return (
     <div className="min-h-screen">
       <Header />
-      <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24">
+      <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
           <p className="font-script text-3xl text-caramel-deep">— Nossa história</p>
           <h1 className="font-serif text-5xl md:text-6xl mt-1">Pequeno, feito com tempo.</h1>

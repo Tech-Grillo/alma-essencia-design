@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products } from "@/lib/products";
+import { GoogleMap } from "@/components/GoogleMap";
 import heroImg from "@/assets/hero.jpg";
 import aboutImg from "@/assets/about.jpg";
 import { MapPin, Sparkles } from "lucide-react";
@@ -20,8 +21,8 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-warm opacity-80" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10 pt-16 pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-14 items-center">
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-caramel-deep mb-8 border border-border">
+          <div className="relative z-10 animate-slide-in-left">
+            <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-8 border border-border">
               <Sparkles className="h-3 w-3" /> Artesanal · Natural
             </div>
             <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-foreground">
@@ -34,7 +35,7 @@ function Home() {
             <div className="mt-10 flex items-center gap-4">
               <Link
                 to="/produtos"
-                className="rounded-full bg-gradient-caramel text-primary-foreground px-8 py-4 shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all text-sm uppercase tracking-[0.2em]"
+                className="rounded-full bg-gradient-caramel text-primary-foreground px-8 py-4 shadow-soft hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-sm uppercase tracking-[0.5em]"
               >
                 Explorar Produtos
               </Link>
@@ -44,7 +45,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative animate-slide-in-right">
             <div className="absolute -inset-6 bg-rose/40 rounded-[3rem] rotate-3 blur-2xl" />
             <img
               src={heroImg}
@@ -71,7 +72,7 @@ function Home() {
       </section>
 
       {/* ABOUT */}
-      <section className="mx-auto max-w-7xl px-6 lg:px-10 py-24 lg:py-32 grid lg:grid-cols-2 gap-16 items-center">
+      <section className="mx-auto max-w-7xl px-6 lg:px-10 py-24 lg:py-32 grid lg:grid-cols-2 gap-16 items-center animate-fade-in-up">
         <div className="relative">
           <img
             src={aboutImg}
@@ -103,7 +104,7 @@ function Home() {
       </section>
 
       {/* FEATURED PRODUCTS */}
-      <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24">
+      <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep mb-3">Destaques</p>
           <h2 className="font-serif text-4xl md:text-5xl">Pequenos rituais favoritos</h2>
@@ -115,7 +116,7 @@ function Home() {
       </section>
 
       {/* LOCATION */}
-      <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24">
+      <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="rounded-[2.5rem] overflow-hidden border border-border bg-card shadow-soft grid md:grid-cols-2">
           <div className="p-10 md:p-14 flex flex-col justify-center">
             <div className="inline-flex items-center gap-2 text-caramel-deep mb-4">
@@ -126,17 +127,12 @@ function Home() {
             <p className="text-muted-foreground leading-relaxed mb-2">
               BAIRRO DE ICARAÍ <br /> <span className="detalhe"  style={{ color: "var(--caramel-deep)" }}>FEIRA - CAMPO DE SÃO BENTO</span><br />RIO DE JANEIRO · RJ
             </p>
-            <p className="text-muted-foreground text-sm" style={{ fontFamily: "Apple Chancery, cursive", fontSize: "1.6em", textAlign: "center", color: "var(--caramel-deep)" }}>
+            <p className="font-serif text-muted-foreground text-sm" style={{ fontSize: "1.6em", textAlign: "center", color: "var(--caramel-deep)" }}>
               Domingos · 09h às 15h
             </p>
           </div>
           <div className="aspect-[4/3] md:aspect-auto">
-            <iframe
-              title="Mapa da loja"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=-43.1135%2C-22.9091%2C-43.1015%2C-22.8991&layer=mapnik&marker=-22.9041%2C-43.1075"
-              className="w-full h-full min-h-[300px] border-0 grayscale-[20%]"
-              loading="lazy"
-            />
+            <GoogleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" />
           </div>
         </div>
       </section>

@@ -20,7 +20,7 @@ function ProductsList() {
   return (
     <div className="min-h-screen">
       <Header />
-      <section className="mx-auto max-w-7xl px-6 lg:px-10 pt-12 pb-20">
+      <section className="mx-auto max-w-7xl px-6 lg:px-10 pt-12 pb-20 animate-fade-in-up">
         <div className="text-center mb-12">
           <p className="font-script text-3xl text-caramel-deep">— Coleção</p>
           <h1 className="font-serif text-5xl md:text-6xl">Nossos produtos</h1>
