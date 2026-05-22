@@ -127,7 +127,7 @@ function Home() {
             <p className="text-muted-foreground leading-relaxed mb-2">
               BAIRRO DE ICARAÍ <br /> <span className="detalhe"  style={{ color: "var(--caramel-deep)" }}>FEIRA - CAMPO DE SÃO BENTO</span><br />RIO DE JANEIRO · RJ
             </p>
-            <p className="font-serif text-muted-foreground text-sm" style={{ fontSize: "1.6em", textAlign: "center", color: "var(--caramel-deep)" }}>
+            <p className="font-serif text-muted-foreground text-sm" style={{ fontSize: "1.4em", color: "var(--caramel-deep)" }}>
               Domingos · 09h às 15h
             </p>
           </div>
