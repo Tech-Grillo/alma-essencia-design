@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
-import { type Product, whatsappLink } from "@/lib/products";
+import { ShoppingBag } from "lucide-react";
+import { type Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
@@ -18,11 +18,16 @@ export function ProductCard({ product }: { product: Product }) {
           {product.category}
         </p>
         <h3 className="font-serif text-2xl leading-tight mb-1 text-center">{product.name}</h3>
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 text-center">{product.short}</p>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 text-center">
+          {product.short}
+        </p>
 
         <div className="flex flex-wrap gap-1.5 mb-5">
           {product.scents.slice(0, 3).map((s) => (
-            <span key={s} className="text-[11px] rounded-full px-2.5 py-1 bg-rose/40 text-foreground/80">
+            <span
+              key={s}
+              className="text-[11px] rounded-full px-2.5 py-1 bg-rose/40 text-foreground/80"
+            >
               {s}
             </span>
           ))}
@@ -42,11 +47,10 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <a
-          href={whatsappLink(`Olá! Tenho interesse no produto: ${product.name}`)}
-          target="_blank" rel="noreferrer"
-          className="absolute left-0 right-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-whatsapp text-white text-sm py-3 flex items-center justify-center gap-2 font-medium"
+          href={product.purchaseLink}
+          className="absolute left-0 right-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 text-white text-sm py-3 flex items-center justify-center gap-2 font-medium bg-rose rounded-tl-3xl rounded-tr-3xl"
         >
-          <MessageCircle className="h-4 w-4" /> Comprar pelo WhatsApp
+          <ShoppingBag className="h-4 w-4" /> Comprar
         </a>
       </div>
     </article>

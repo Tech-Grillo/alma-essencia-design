@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products, whatsappLink } from "@/lib/products";
-import { useState } from "react";
+import { type MouseEvent, useEffect, useState } from "react";
 import { ChevronLeft, Minus, Plus, Star } from "lucide-react";
 
 export const Route = createFileRoute("/produtos/$slug")({
@@ -35,6 +35,23 @@ function ProductPage() {
   const [qty, setQty] = useState(1);
 
   const related = products.filter((p) => p.slug !== product.slug);
+  const scrollToPurchase = (event?: MouseEvent<HTMLAnchorElement>) => {
+    event?.preventDefault();
+
+    document.getElementById("comprar")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    window.history.replaceState(null, "", product.purchaseLink);
+  };
+
+  useEffect(() => {
+    if (window.location.hash !== "#comprar") return;
+
+    window.setTimeout(() => {
+      scrollToPurchase();
+    }, 100);
+  }, [product.purchaseLink]);
 
   const message = `Olá! Quero comprar: ${product.name} (${scent}, ${size}) — Quantidade: ${qty}`;
 
@@ -72,14 +89,20 @@ function ProductPage() {
               ))}
               <span className="text-sm text-muted-foreground ml-2">(48 avaliações)</span>
             </div>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">{product.description}</p>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-4">{product.description}</p>
+            <a
+              href={product.purchaseLink}
+              className="inline-flex text-sm font-medium text-caramel-deep underline underline-offset-4 hover:text-foreground transition-colors mb-8"
+            >
+              Ir para a compra do produto
+            </a>
 
             <p className="font-serif text-3xl text-caramel-deep mb-8">
               R$ {(product.price * qty).toFixed(2).replace(".", ",")}
             </p>
 
             {/* Scent */}
-            <div className="mb-7">
+            <div id="comprar" className="mb-7 scroll-mt-28">
               <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Aroma</p>
               <div className="flex flex-wrap gap-2">
                 {product.scents.map((s: string) => (
@@ -161,3 +184,4 @@ function ProductPage() {
     </div>
   );
 }
+

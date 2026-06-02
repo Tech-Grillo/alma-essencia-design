@@ -81,7 +81,7 @@
   --chocolate: oklch(0.28 0.04 35);
   --whatsapp: oklch(0.7 0.16 145);
 
-  --shadow-soft: 0 10px 30px -12px oklch(0.55 0.07 50 / 0.18);
+  --shadow-soft: 0 10px 30px -12px oklch(42.42% 0.1909 331.186 / 0.226);
   --shadow-bloom: 0 20px 60px -20px oklch(0.72 0.07 55 / 0.25);
   --gradient-warm: linear-gradient(135deg, oklch(0.95 0.02 25), oklch(0.93 0.03 55));
   --gradient-caramel: linear-gradient(135deg, oklch(0.78 0.07 55), oklch(0.65 0.08 45));

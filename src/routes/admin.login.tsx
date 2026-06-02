@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import heroImg from "@/assets/hero.jpg";
+import heroImg from "@/assets/imagens_inicio/hero.jpg";
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 

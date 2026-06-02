@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import aboutImg from "@/assets/about.jpg";
+import aboutImg from "@/assets/imagens_inicio/about.jpg";
 
 export const Route = createFileRoute("/quem-somos")({
   component: About,
@@ -27,17 +27,17 @@ function About() {
             Tudo começou numa cozinha pequena, com cera derretendo numa panela e o cheiro de lavanda invadindo a casa.
           </p>
           <p>
-            A Alma e Essência é um pequeno negócio familiar que nasceu do desejo de transformar
-            momentos simples em rituais de cuidado. Nossas velas, sabonetes e brumas são feitos
-            em pequenos lotes, com ingredientes naturais e muito carinho.
+            A Alma e Essência é um pequeno negócio que nasceu do desejo de transformar
+            momentos simples em rituais de cuidado. Nossos proutos são feitos
+            com ingredientes naturais e muito carinho.
           </p>
           <p>
             Acreditamos que o autocuidado é um gesto pequeno, repetido todos os dias — acender
-            uma vela ao final da tarde, sentir o aroma de um sabonete no banho, perfumar o quarto
-            antes de dormir.
+            uma vela ao final da tarde, sentir o aroma de um sabonete no banho, perfumar o quarto com um 
+            home spray antes de dormir.
           </p>
           <p className="font-script text-3xl text-caramel-deep text-center pt-6">
-            Com amor,<br />Família Alma e Essência
+            Com amor,<br />Alma e Essência
           </p>
         </div>
       </section>

@@ -11,6 +11,7 @@ export type Product = {
   image: string;
   short: string;
   description: string;
+  purchaseLink: string;
   scents: string[];
   sizes: string[];
 };
@@ -25,6 +26,7 @@ export const products: Product[] = [
     short: "Cera de soja natural, queima limpa por até 40 horas.",
     description:
       "Vela artesanal feita com cera de soja 100% natural e óleos essenciais puros. Acende rituais de calma e perfuma o ambiente com delicadeza.",
+    purchaseLink: "/produtos/vela-aromatica-lavanda#comprar",
     scents: ["Lavanda", "Baunilha", "Rosa", "Eucalipto"],
     sizes: ["P", "M", "G"],
   },
@@ -37,6 +39,7 @@ export const products: Product[] = [
     short: "Glicerina pura com pétalas de rosa para um banho ritual.",
     description:
       "Sabonete artesanal nutritivo, com glicerina vegetal e óleos botânicos. Perfuma a pele e transforma o banho em um momento de cuidado.",
+    purchaseLink: "/produtos/sabonete-rosa#comprar",
     scents: ["Rosa", "Jasmim", "Camélia"],
     sizes: ["100g", "150g"],
   },
@@ -49,6 +52,7 @@ export const products: Product[] = [
     short: "Bruma perfumada para tecidos e ambientes.",
     description:
       "Bruma aromática feita com extratos botânicos e álcool de cereais. Perfuma tecidos, cortinas e ambientes com frescor sereno.",
+    purchaseLink: "/produtos/home-spray-eucalipto#comprar",
     scents: ["Eucalipto", "Capim-Limão", "Hortelã"],
     sizes: ["120ml", "240ml"],
   },
@@ -61,6 +65,7 @@ export const products: Product[] = [
     short: "Aroma contínuo por até 9 dias com varetas de rattan.",
     description:
       "Difusor de varetas com fragrância concentrada. Liberação suave e contínua, ideal para espaços íntimos como quartos e salas de leitura.",
+    purchaseLink: "/produtos/difusor-baunilha#comprar",
     scents: ["Baunilha", "Madeira", "Flor de Cerejeira"],
     sizes: ["120ml", "250ml"],
   },
@@ -75,7 +80,7 @@ export const categories = [
   "Kits",
 ];
 
-export const WHATSAPP_NUMBER = "5511999999999";
+export const WHATSAPP_NUMBER = "+55 (21) 98716-3045";
 
 export function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;

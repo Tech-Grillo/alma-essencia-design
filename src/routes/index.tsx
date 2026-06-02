@@ -4,8 +4,8 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products } from "@/lib/products";
 import { GoogleMap } from "@/components/GoogleMap";
-import heroImg from "@/assets/hero.jpg";
-import aboutImg from "@/assets/about.jpg";
+import heroImg from "@/assets/imagens_inicio/hero.jpg";
+import aboutImg from "@/assets/imagens_inicio/about.jpg";
 import { MapPin, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({

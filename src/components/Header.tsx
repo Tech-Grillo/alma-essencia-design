@@ -3,7 +3,8 @@ import { Menu, Moon, ShoppingCart, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { categories } from "@/lib/products";
-import logo from "@/assets/logo_transparente.png";
+import logo from "@/assets/imagens_inicio/logo_transparente.png";
+
 
 
 const nav = [
