@@ -1,7 +1,7 @@
-import p1 from "@/assets/p1.jpg";
-import p2 from "@/assets/p2.jpg";
-import p3 from "@/assets/p3.jpg";
-import p4 from "@/assets/p4.jpg";
+import p1 from "@/assets/imagens_produtos/p1.jpg";
+import p2 from "@/assets/imagens_produtos/p2.jpg";
+import p3 from "@/assets/imagens_produtos/p3.jpg";
+import p4 from "@/assets/imagens_produtos/p4.jpg";
 
 export type Product = {
   slug: string;

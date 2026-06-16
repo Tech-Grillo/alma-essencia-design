@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, Moon, ShoppingCart, Sun, X } from "lucide-react";
+import * as Icons from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { categories } from "@/lib/products";
@@ -33,7 +33,7 @@ export function Header() {
               aria-label="Abrir menu"
               className="rounded-full p-2 hover:bg-secondary transition-colors"
             >
-              <Menu className="h-5 w-5" />
+              <Icons.Menu className="h-5 w-5" />
             </button>
             <Link id="logo1" to="/" aria-label="Voltar para o início" className="flex items-center justify-center">
               <img src={logo} alt="Alma e Essência" className="h-10 w-10 rounded-full shadow-sm object-cover" />
@@ -41,7 +41,7 @@ export function Header() {
            
           </div>
 
-          <nav className="hidden md:flex items-center gap-10">
+          <nav className="hidden md:flex items-center gap-6">
             {nav.map((n) => (
               <Link
                 id="inicio"
@@ -62,10 +62,10 @@ export function Header() {
               aria-label="Alternar tema"
               className="rounded-full p-2.5 hover:bg-secondary transition-colors"
             >
-              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              {theme === "light" ? <Icons.Moon className="h-4 w-4" /> : <Icons.Sun className="h-4 w-4" />}
             </button>
             <button aria-label="Carrinho" className="relative rounded-full p-2.5 hover:bg-secondary transition-colors">
-              <ShoppingCart className="h-4 w-4" />
+              <Icons.ShoppingCart className="h-4 w-4" />
               <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] rounded-full bg-rose text-foreground flex items-center justify-center font-medium">
                 0
               </span>
@@ -87,7 +87,7 @@ export function Header() {
               Alma Essência
             </Link>
             <button onClick={() => setOpen(false)} className="rounded-full p-2 hover:bg-secondary">
-              <X className="h-5 w-5" />
+              <Icons.X className="h-5 w-5" />
             </button>
           </div>
 
@@ -107,6 +107,16 @@ export function Header() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                id="admin-login"
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className="font-serif text-2xl font-semibold text-foreground px-4 py-3 rounded-full block bg-rose/10 text-rose transition-all hover:bg-rose/20 hover:text-rose-deep"
+              >
+                Login
+              </Link>
+            </li>
           </ul>
 
           <p className="font-serif text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">

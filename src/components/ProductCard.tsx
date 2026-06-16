@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag } from "lucide-react";
+import * as Icons from "lucide-react";
 import { type Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: Product }) {
           href={product.purchaseLink}
           className="absolute left-0 right-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 text-white text-sm py-3 flex items-center justify-center gap-2 font-medium bg-rose rounded-tl-3xl rounded-tr-3xl"
         >
-          <ShoppingBag className="h-4 w-4" /> Comprar
+          <Icons.ShoppingBag className="h-4 w-4" /> Comprar
         </a>
       </div>
     </article>

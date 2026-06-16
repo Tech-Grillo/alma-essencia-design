@@ -6,7 +6,7 @@ import { products } from "@/lib/products";
 import { GoogleMap } from "@/components/GoogleMap";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
-import { MapPin, Sparkles } from "lucide-react";
+import * as Icons from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -23,7 +23,7 @@ function Home() {
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10 pt-16 pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-14 items-center">
           <div className="relative z-10 animate-slide-in-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-8 border border-border">
-              <Sparkles className="h-3 w-3" /> Artesanal · Natural
+              <Icons.Sparkles className="h-3 w-3" /> Artesanal · Natural
             </div>
             <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-foreground">
               Feito com <em className="font-script text-caramel-deep not-italic">amor</em>,<br />
@@ -107,7 +107,7 @@ function Home() {
       <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep mb-3">Destaques</p>
-          <h2 className="font-serif text-4xl md:text-5xl">Pequenos rituais favoritos</h2>
+          <h2 className="font-serif text-4xl md:text-5xl">Produtos favoritos</h2>
           <div className="botanical-divider mt-6"><span>❀</span></div>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-7">
@@ -119,8 +119,8 @@ function Home() {
       <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="rounded-[2.5rem] overflow-hidden border border-border bg-card shadow-soft grid md:grid-cols-2">
           <div className="p-10 md:p-14 flex flex-col justify-center">
-            <div className="inline-flex items-center gap-2 text-caramel-deep mb-4">
-              <MapPin className="h-5 w-5" />
+              <div className="inline-flex items-center gap-2 text-caramel-deep mb-4">
+              <Icons.MapPin className="h-5 w-5" />
               <span className="text-xs uppercase tracking-[0.3em]">Visite-nos</span>
             </div>
             <h2 className="font-serif text-4xl md:text-5xl mb-4">Nos encontre</h2>

@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products, whatsappLink } from "@/lib/products";
 import { type MouseEvent, useEffect, useState } from "react";
-import { ChevronLeft, Minus, Plus, Star } from "lucide-react";
+import * as Icons from "lucide-react";
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: ProductPage,
@@ -60,8 +60,8 @@ function ProductPage() {
       <Header />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-10 animate-fade-in-up">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-caramel-deep mb-8">
-          <ChevronLeft className="h-4 w-4" /> Voltar
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-caramel-deep mb-8">
+          <Icons.ChevronLeft className="h-4 w-4" /> Voltar
         </Link>
 
         <div className="grid lg:grid-cols-2 gap-14">
@@ -85,7 +85,7 @@ function ProductPage() {
             <h1 className="font-serif text-5xl mb-3">{product.name}</h1>
             <div className="flex items-center gap-2 mb-5">
               {[1,2,3,4,5].map((i) => (
-                <Star key={i} className={`h-4 w-4 ${i <= 4 ? "fill-caramel text-caramel" : "text-muted-foreground"}`} />
+                <Icons.Star key={i} className={`h-4 w-4 ${i <= 4 ? "fill-caramel text-caramel" : "text-muted-foreground"}`} />
               ))}
               <span className="text-sm text-muted-foreground ml-2">(48 avaliações)</span>
             </div>
@@ -140,11 +140,11 @@ function ProductPage() {
               <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Quantidade</p>
               <div className="inline-flex items-center rounded-full border border-border bg-card">
                 <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3 hover:text-caramel-deep">
-                  <Minus className="h-4 w-4" />
+                  <Icons.Minus className="h-4 w-4" />
                 </button>
                 <span className="w-10 text-center font-serif text-lg">{qty}</span>
                 <button onClick={() => setQty((q) => q + 1)} className="p-3 hover:text-caramel-deep">
-                  <Plus className="h-4 w-4" />
+                  <Icons.Plus className="h-4 w-4" />
                 </button>
               </div>
             </div>

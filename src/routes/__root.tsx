@@ -10,6 +10,8 @@ import {
 
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/lib/theme";
+import HelpBot from "@/components/HelpBot";
+import CartProvider from "@/lib/cart";
 
 function NotFoundComponent() {
   return (
@@ -127,7 +129,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <Outlet />
+        <CartProvider>
+          <Outlet />
+          <HelpBot />
+        </CartProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

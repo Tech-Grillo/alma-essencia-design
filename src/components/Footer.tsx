@@ -1,4 +1,4 @@
-import { Instagram, Facebook, MessageCircle } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { whatsappLink } from "@/lib/products";
 
@@ -28,10 +28,10 @@ export function Footer() {
             <p className="font-serif uppercase tracking-[0.3em] text-xs text-rose mb-5">Conecte-se</p>
             <div className="flex items-center gap-3 mb-6">
               <a href="#" aria-label="Instagram" className="rounded-full p-2.5 border border-cream/20 hover:bg-rose/20 transition">
-                <Instagram className="h-4 w-4" />
+                <Icons.Instagram className="h-4 w-4" />
               </a>
               <a href="#" aria-label="Facebook" className="rounded-full p-2.5 border border-cream/20 hover:bg-rose/20 transition">
-                <Facebook className="h-4 w-4" />
+                <Icons.Facebook className="h-4 w-4" />
               </a>
             </div>
             <a
@@ -39,7 +39,7 @@ export function Footer() {
               target="_blank" rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-whatsapp text-white px-5 py-2.5 text-sm hover:opacity-90 transition"
             >
-              <MessageCircle className="h-4 w-4" /> Falar no WhatsApp
+              <Icons.MessageCircle className="h-4 w-4" /> Falar no WhatsApp
             </a>
           </div>
         </div>
