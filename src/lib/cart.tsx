@@ -13,12 +13,12 @@ export type CartItem = {
 type CartContextType = {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (slug: string) => void;
-  updateQuantity: (slug: string, quantity: number) => void;
+  removeItem: (slug: string, size?: string | null) => void;
+  updateQuantity: (slug: string, size: string | null, quantity: number) => void;
   clearCart: () => void;
   getTotal: () => number;
   getCount: () => number;
-  isInCart: (slug: string) => boolean;
+  isInCart: (slug: string, size?: string | null) => boolean;
 };
 
 const CART_KEY = "cart_v1";
@@ -65,14 +65,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const removeItem = React.useCallback((slug: string) => {
-    setItems((prev) => prev.filter((i) => i.slug !== slug));
+  const removeItem = React.useCallback((slug: string, size?: string | null) => {
+    setItems((prev) => prev.filter((i) => !(i.slug === slug && i.size === (size ?? null))));
   }, []);
 
-  const updateQuantity = React.useCallback((slug: string, quantity: number) => {
+  const updateQuantity = React.useCallback((slug: string, size: string | null, quantity: number) => {
     setItems((prev) =>
       prev
-        .map((i) => (i.slug === slug ? { ...i, quantity: Math.max(0, quantity) } : i))
+        .map((i) =>
+          i.slug === slug && i.size === size ? { ...i, quantity: Math.max(0, quantity) } : i
+        )
         .filter((i) => i.quantity > 0)
     );
   }, []);
@@ -86,7 +88,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const getCount = React.useCallback(() => items.reduce((s, i) => s + i.quantity, 0), [items]);
 
-  const isInCart = React.useCallback((slug: string) => items.some((i) => i.slug === slug), [items]);
+  const isInCart = React.useCallback(
+    (slug: string, size?: string | null) => items.some((i) => i.slug === slug && i.size === (size ?? null)),
+    [items]
+  );
 
   const value: CartContextType = React.useMemo(
     () => ({ items, addItem, removeItem, updateQuantity, clearCart, getTotal, getCount, isInCart }),
@@ -103,7 +108,10 @@ export function useCart() {
 }
 
 export function productToCartItem(p: Product, size?: string, quantity = 1): Omit<CartItem, "quantity"> {
-  return { slug: p.slug, name: p.name, price: p.price, image: p.image, size: size ?? null };
+  // find size price if available
+  const sizeObj = p.sizes?.find((s: any) => s.label === size);
+  const price = sizeObj ? sizeObj.price : p.price;
+  return { slug: p.slug, name: p.name, price, image: p.image, size: size ?? null };
 }
 
 export default CartProvider;

@@ -1,8 +1,9 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products, whatsappLink } from "@/lib/products";
+import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useState } from "react";
 import * as Icons from "lucide-react";
 
@@ -29,10 +30,17 @@ export const Route = createFileRoute("/produtos/$slug")({
 });
 
 function ProductPage() {
+  const navigate = useNavigate();
   const { product } = Route.useLoaderData();
+  const { addItem } = useCart();
   const [scent, setScent] = useState(product.scents[0]);
-  const [size, setSize] = useState(product.sizes[0]);
+  const [size, setSize] = useState(product.sizes[0].label);
   const [qty, setQty] = useState(1);
+
+  const handleAddToCart = () => {
+    addItem(productToCartItem(product, size), qty);
+    navigate({ to: "/carrinho" });
+  };
 
   const related = products.filter((p) => p.slug !== product.slug);
   const scrollToPurchase = (event?: MouseEvent<HTMLAnchorElement>) => {
@@ -98,7 +106,7 @@ function ProductPage() {
             </a>
 
             <p className="font-serif text-3xl text-caramel-deep mb-8">
-              R$ {(product.price * qty).toFixed(2).replace(".", ",")}
+              R$ {( (product.sizes.find((s: any) => s.label === size)?.price ?? product.price) * qty ).toFixed(2).replace(".", ",")}
             </p>
 
             {/* Scent */}
@@ -123,30 +131,39 @@ function ProductPage() {
             <div className="mb-7">
               <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Tamanho</p>
               <div className="inline-flex p-1 rounded-full bg-secondary">
-                {product.sizes.map((s: string) => (
+                {product.sizes.map((s: any) => (
                   <button
-                    key={s}
-                    onClick={() => setSize(s)}
+                    key={s.label}
+                    onClick={() => setSize(s.label)}
                     className={`rounded-full px-6 py-2 text-sm transition-all ${
-                      size === s ? "bg-background shadow-soft text-foreground" : "text-muted-foreground"
+                      size === s.label ? "bg-background shadow-soft text-foreground" : "text-muted-foreground"
                     }`}
-                  >{s}</button>
+                  >{s.label}</button>
                 ))}
               </div>
             </div>
 
             {/* Qty */}
-            <div className="mb-9">
-              <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Quantidade</p>
-              <div className="inline-flex items-center rounded-full border border-border bg-card">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3 hover:text-caramel-deep">
-                  <Icons.Minus className="h-4 w-4" />
-                </button>
-                <span className="w-10 text-center font-serif text-lg">{qty}</span>
-                <button onClick={() => setQty((q) => q + 1)} className="p-3 hover:text-caramel-deep">
-                  <Icons.Plus className="h-4 w-4" />
-                </button>
+            <div className="mb-9 flex items-end gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Quantidade</p>
+                <div className="inline-flex items-center rounded-full border border-border bg-card">
+                  <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3 hover:text-caramel-deep">
+                    <Icons.Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-10 text-center font-serif text-lg">{qty}</span>
+                  <button onClick={() => setQty((q) => q + 1)} className="p-3 hover:text-caramel-deep">
+                    <Icons.Plus className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="rounded-full px-6 py-3 text-sm bg-rose text-white hover:bg-rose/90 transition-colors font-medium opacity-90 hover:opacity-100 shadow-soft hover:shadow-bloom"
+              >
+                Adicionar ao carrinho
+              </button>
             </div>
 
             <a

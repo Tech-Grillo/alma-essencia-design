@@ -110,14 +110,14 @@ function Calendar({
         },
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
-            return <Icons.ChevronLeftIcon className={cn("size-4", className)} {...props} />;
+            return <Icons.ChevronLeft className={cn("size-4", className)} {...props} />;
           }
 
           if (orientation === "right") {
-            return <Icons.ChevronRightIcon className={cn("size-4", className)} {...props} />;
+            return <Icons.ChevronRight className={cn("size-4", className)} {...props} />;
           }
 
-          return <Icons.ChevronDownIcon className={cn("size-4", className)} {...props} />;
+          return <Icons.ChevronDown className={cn("size-4", className)} {...props} />;
         },
         DayButton: CalendarDayButton,
         WeekNumber: ({ children, ...props }) => {

@@ -29,13 +29,30 @@ function Contact() {
             { icon: Icons.MessageCircle, label: "WhatsApp", value: "(21) 989794503", href: whatsappLink("Olá!") },
             { icon: Icons.Mail, label: "E-mail", value: "ola@almaeessencia.com", href: "mailto:ola@almaeessencia.com" },
             { icon: Icons.Instagram, label: "Instagram", value: "@almaeessencia", href: "#" },
-          ].map((c) => (
-            <a key={c.label} href={c.href} target="_blank" rel="noreferrer" className="rounded-3xl bg-card border border-border p-7 hover:shadow-bloom hover:-translate-y-1 transition-all">
-              <c.icon className="h-6 w-6 text-caramel-deep mb-4" />
-              <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">{c.label}</p>
-              <p className="font-serif text-xl">{c.value}</p>
-            </a>
-          ))}
+          ].map((c) => {
+            const Icon = c.icon;
+            if (!Icon) {
+              // log helpful debug info during SSR/dev
+              try {
+                console.error(`Missing icon for contato entry: ${c.label}`, c);
+              } catch {}
+              return (
+                <a key={c.label} href={c.href} target="_blank" rel="noreferrer" className="rounded-3xl bg-card border border-border p-7 hover:shadow-bloom hover:-translate-y-1 transition-all">
+                  <div className="h-6 w-6 mb-4" />
+                  <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">{c.label}</p>
+                  <p className="font-serif text-xl">{c.value}</p>
+                </a>
+              );
+            }
+
+            return (
+              <a key={c.label} href={c.href} target="_blank" rel="noreferrer" className="rounded-3xl bg-card border border-border p-7 hover:shadow-bloom hover:-translate-y-1 transition-all">
+                <Icon className="h-6 w-6 text-caramel-deep mb-4" />
+                <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">{c.label}</p>
+                <p className="font-serif text-xl">{c.value}</p>
+              </a>
+            );
+          })}
         </div>
 
         <div className="rounded-[2rem] overflow-hidden border border-border">

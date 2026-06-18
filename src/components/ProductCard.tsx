@@ -5,13 +5,19 @@ import { type Product } from "@/lib/products";
 export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="group relative rounded-3xl bg-card border border-border/60 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-bloom">
-      <div className="aspect-square overflow-hidden bg-secondary/40">
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+      <div className="relative aspect-square overflow-hidden bg-secondary/40">
+        <Link
+          to="/produtos/$slug"
+          params={{ slug: product.slug }}
+          className="block h-full w-full"
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        </Link>
       </div>
       <div className="p-6 pb-16">
         <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 mb-2 text-center">
@@ -33,9 +39,9 @@ export function ProductCard({ product }: { product: Product }) {
           ))}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <span className="font-serif text-xl text-caramel-deep">
-            R$ {product.price.toFixed(2).replace(".", ",")}
+            R$ {Math.min(...product.sizes.map((s: any) => s.price)).toFixed(2).replace(".", ",")}
           </span>
           <Link
             to="/produtos/$slug"

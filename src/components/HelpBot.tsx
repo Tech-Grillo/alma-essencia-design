@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import * as Icons from "lucide-react";
+import { X, MessageCircle } from "lucide-react";
 
 export default function HelpBot() {
   const [open, setOpen] = useState(false);
@@ -11,7 +11,7 @@ export default function HelpBot() {
     { to: "/quem-somos", label: "Quem Somos", desc: "Nossa história" },
     { to: "/contato", label: "Contato", desc: "Fale conosco" },
     { to: "/carrinho", label: "Carrinho", desc: "Ver itens no carrinho" },
-    { to: "/admin", label: "Admin", desc: "Área administrativa (login)" },
+    
   ];
 
   return (
@@ -22,7 +22,7 @@ export default function HelpBot() {
         onClick={() => setOpen((s) => !s)}
         className="fixed z-50 right-6 bottom-6 inline-flex items-center justify-center rounded-full bg-rose/90 hover:bg-rose text-white h-14 w-14 shadow-lg"
       >
-        {open ? <Icons.X className="h-6 w-6" /> : <Icons.Chat className="h-6 w-6" />}
+        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </button>
 
       {/* Panel */}

@@ -27,10 +27,11 @@ export function Footer() {
           <div>
             <p className="font-serif uppercase tracking-[0.3em] text-xs text-rose mb-5">Conecte-se</p>
             <div className="flex items-center gap-3 mb-6">
-              <a href="#" aria-label="Instagram" className="rounded-full p-2.5 border border-cream/20 hover:bg-rose/20 transition">
+              <a href="https://www.instagram.com/alma_e_essencia/
+" aria-label="Instagram" className="rounded-full p-2.5 border border-cream/20 hover:bg-rose/20 transition">
                 <Icons.Instagram className="h-4 w-4" />
               </a>
-              <a href="#" aria-label="Facebook" className="rounded-full p-2.5 border border-cream/20 hover:bg-rose/20 transition">
+              <a href="https://www.facebook.com/almaeessencia" aria-label="Facebook" className="rounded-full p-2.5 border border-cream/20 hover:bg-rose/20 transition">
                 <Icons.Facebook className="h-4 w-4" />
               </a>
             </div>

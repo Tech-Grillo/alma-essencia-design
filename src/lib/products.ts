@@ -3,17 +3,19 @@ import p2 from "@/assets/imagens_produtos/p2.jpg";
 import p3 from "@/assets/imagens_produtos/p3.jpg";
 import p4 from "@/assets/imagens_produtos/p4.jpg";
 
-export type Product = {
+export type SizeOption = { label: string; price: number };
+
+export type Product = { 
   slug: string;
   name: string;
   category: string;
-  price: number;
+  price: number; // fallback / default price
   image: string;
   short: string;
   description: string;
   purchaseLink: string;
   scents: string[];
-  sizes: string[];
+  sizes: SizeOption[];
 };
 
 export const products: Product[] = [
@@ -21,6 +23,7 @@ export const products: Product[] = [
     slug: "vela-aromatica-lavanda",
     name: "Vela Aromática de Soja",
     category: "Velas",
+    // price kept as medium size price
     price: 79.9,
     image: p1,
     short: "Cera de soja natural, queima limpa por até 40 horas.",
@@ -28,7 +31,11 @@ export const products: Product[] = [
       "Vela artesanal feita com cera de soja 100% natural e óleos essenciais puros. Acende rituais de calma e perfuma o ambiente com delicadeza.",
     purchaseLink: "/produtos/vela-aromatica-lavanda#comprar",
     scents: ["Lavanda", "Baunilha", "Rosa", "Eucalipto"],
-    sizes: ["P", "M", "G"],
+    sizes: [
+      { label: "Pequeno", price: 59.9 },
+      { label: "Médio", price: 79.9 },
+      { label: "Grande", price: 99.9 },
+    ],
   },
   {
     slug: "sabonete-rosa",
@@ -41,7 +48,11 @@ export const products: Product[] = [
       "Sabonete artesanal nutritivo, com glicerina vegetal e óleos botânicos. Perfuma a pele e transforma o banho em um momento de cuidado.",
     purchaseLink: "/produtos/sabonete-rosa#comprar",
     scents: ["Rosa", "Jasmim", "Camélia"],
-    sizes: ["100g", "150g"],
+    sizes: [
+      { label: "Pequeno", price: 22.0 },
+      { label: "Médio", price: 32.0 },
+      { label: "Grande", price: 42.0 },
+    ],
   },
   {
     slug: "home-spray-eucalipto",
@@ -54,7 +65,11 @@ export const products: Product[] = [
       "Bruma aromática feita com extratos botânicos e álcool de cereais. Perfuma tecidos, cortinas e ambientes com frescor sereno.",
     purchaseLink: "/produtos/home-spray-eucalipto#comprar",
     scents: ["Eucalipto", "Capim-Limão", "Hortelã"],
-    sizes: ["120ml", "240ml"],
+    sizes: [
+      { label: "Pequeno", price: 44.5 },
+      { label: "Médio", price: 64.5 },
+      { label: "Grande", price: 84.5 },
+    ],
   },
   {
     slug: "difusor-baunilha",
@@ -67,7 +82,11 @@ export const products: Product[] = [
       "Difusor de varetas com fragrância concentrada. Liberação suave e contínua, ideal para espaços íntimos como quartos e salas de leitura.",
     purchaseLink: "/produtos/difusor-baunilha#comprar",
     scents: ["Baunilha", "Madeira", "Flor de Cerejeira"],
-    sizes: ["120ml", "250ml"],
+    sizes: [
+      { label: "Pequeno", price: 89.0 },
+      { label: "Médio", price: 119.0 },
+      { label: "Grande", price: 149.0 },
+    ],
   },
 ];
 

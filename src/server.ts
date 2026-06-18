@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { touchVisitor, getActiveVisitors, cleanupVisitors } from "./lib/visitors";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -69,8 +70,47 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const url = new URL(request.url);
+
+      // simple API endpoint to expose active visitors count
+      if (url.pathname === "/api/visitors") {
+        // cleanup old entries occasionally
+        cleanupVisitors();
+        const count = await getActiveVisitors();
+        return new Response(JSON.stringify({ count }), {
+          status: 200,
+          headers: { "content-type": "application/json; charset=utf-8" },
+        });
+      }
+
+      // mark visitor by cookie
+      const cookieHeader = request.headers.get("cookie") || "";
+      const match = cookieHeader.match(/(?:^|;)\s*visitor_id=([^;]+)/);
+      let visitorId = match ? match[1] : null;
+      let needSetCookie = false;
+      if (!visitorId) {
+        visitorId = `v_${Date.now()}_${Math.floor(Math.random() * 1e9)}`;
+        needSetCookie = true;
+      }
+      // touch visitor for activity
+      touchVisitor(visitorId);
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
+
+      // attach Set-Cookie if new visitor id
+      if (needSetCookie) {
+        const newHeaders = new Headers(response.headers);
+        // 1 year
+        newHeaders.set("Set-Cookie", `visitor_id=${visitorId}; Path=/; Max-Age=31536000; HttpOnly`);
+        const cloned = new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: newHeaders,
+        });
+        return await normalizeCatastrophicSsrResponse(cloned);
+      }
+
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);

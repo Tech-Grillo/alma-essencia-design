@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme";
+import { useCart } from "@/lib/cart";
 import { categories } from "@/lib/products";
 import logo from "@/assets/imagens_inicio/logo_transparente.png";
 
@@ -22,6 +23,7 @@ const nav = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const { theme, toggle } = useTheme();
+  const { getCount } = useCart();
 
   return (
     <>
@@ -64,12 +66,14 @@ export function Header() {
             >
               {theme === "light" ? <Icons.Moon className="h-4 w-4" /> : <Icons.Sun className="h-4 w-4" />}
             </button>
-            <button aria-label="Carrinho" className="relative rounded-full p-2.5 hover:bg-secondary transition-colors">
+            <Link to="/carrinho" aria-label="Carrinho" className="relative rounded-full p-2.5 hover:bg-secondary transition-colors">
               <Icons.ShoppingCart className="h-4 w-4" />
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] rounded-full bg-rose text-foreground flex items-center justify-center font-medium">
-                0
-              </span>
-            </button>
+              {getCount() > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] rounded-full bg-rose text-foreground flex items-center justify-center font-medium">
+                  {getCount()}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </header>
@@ -108,14 +112,7 @@ export function Header() {
               </li>
             ))}
             <li>
-              <Link
-                id="admin-login"
-                to="/admin"
-                onClick={() => setOpen(false)}
-                className="font-serif text-2xl font-semibold text-foreground px-4 py-3 rounded-full block bg-rose/10 text-rose transition-all hover:bg-rose/20 hover:text-rose-deep"
-              >
-                Login
-              </Link>
+             
             </li>
           </ul>
 

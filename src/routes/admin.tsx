@@ -16,12 +16,38 @@ function AdminDashboard() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
+  const [visitorsCount, setVisitorsCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("adminAuth") === "true") {
       setAuthenticated(true);
     }
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    let timer: number | undefined;
+
+    async function fetchVisitors() {
+      try {
+        const res = await fetch('/api/visitors');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (mounted) setVisitorsCount(typeof data.count === 'number' ? data.count : null);
+      } catch (e) {
+        // ignore
+      } finally {
+        timer = window.setTimeout(fetchVisitors, 5000);
+      }
+    }
+
+    if (authenticated) fetchVisitors();
+
+    return () => {
+      mounted = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [authenticated]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,8 +168,8 @@ function AdminDashboard() {
 
           <div className="rounded-2xl bg-card border border-border p-6">
             <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-2">Visitantes</h2>
-            <p className="font-serif text-3xl">-</p>
-            <p className="text-xs text-muted-foreground mt-2">Dados em desenvolvimento</p>
+            <p className="font-serif text-3xl">{visitorsCount ?? "-"}</p>
+            <p className="text-xs text-muted-foreground mt-2">Dados em tempo real (atualiza a cada 5s)</p>
           </div>
 
           <div className="rounded-2xl bg-card border border-border p-6">
