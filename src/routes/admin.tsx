@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useState } from "react";
 import { validateAdminLogin } from "@/lib/admin-credentials";
-import { categories, getAllProducts, saveCustomProduct } from "@/lib/products";
+import { categories, getAllProducts, getAllCategories, saveCustomProduct, updateProduct, deleteProduct } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
 
 export const Route = createFileRoute("/admin")({
@@ -23,13 +24,17 @@ function AdminDashboard() {
   const [productCategory, setProductCategory] = useState(categories[0]);
   const [newCategory, setNewCategory] = useState("");
   const [productPrice, setProductPrice] = useState("");
-  const [productImage, setProductImage] = useState("");
-  const [productImageName, setProductImageName] = useState("");
+  const [productImages, setProductImages] = useState<string[]>([]);
+  const [productImageNames, setProductImageNames] = useState<string[]>([]);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [productShort, setProductShort] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productScents, setProductScents] = useState("");
   const [productError, setProductError] = useState("");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("todas");
 
   useEffect(() => {
     if (localStorage.getItem("adminAuth") === "true") {
@@ -88,24 +93,78 @@ function AdminDashboard() {
     setErro("");
   };
 
-  const handleProductImageFile = (file?: File) => {
+  const handleProductImageFile = (files?: FileList | null) => {
     setProductError("");
 
-    if (!file) return;
+    if (!files || files.length === 0) return;
 
-    if (!file.type.startsWith("image/")) {
-      setProductError("Escolha um arquivo de imagem valido.");
+    const compressImage = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const maxSize = 800;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height && width > maxSize) {
+              height = (height * maxSize) / width;
+              width = maxSize;
+            } else if (height > maxSize) {
+              width = (width * maxSize) / height;
+              height = maxSize;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              reject(new Error("Failed to get canvas context"));
+              return;
+            }
+
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", 0.8));
+          };
+          img.onerror = () => reject(new Error("Failed to load image"));
+          img.src = e.target?.result as string;
+        };
+        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    const processFiles = Array.from(files);
+    const invalidFile = processFiles.find((file) => !file.type.startsWith("image/"));
+    if (invalidFile) {
+      setProductError("Escolha apenas arquivos de imagem validos.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setProductImage(reader.result);
-        setProductImageName(file.name);
-      }
-    };
-    reader.readAsDataURL(file);
+    Promise.all(processFiles.map((file) => compressImage(file)))
+      .then((base64Array) => {
+        setProductImages((prev) => [...prev, ...base64Array]);
+        setProductImageNames((prev) => [...prev, ...processFiles.map((file) => file.name)]);
+      })
+      .catch(() => {
+        setProductError("Erro ao processar imagens. Tente novamente.");
+      });
+  };
+
+  const resetNewProductForm = () => {
+    setProductName("");
+    setProductCategory(categories[0]);
+    setNewCategory("");
+    setProductPrice("");
+    setProductImages([]);
+    setProductImageNames([]);
+    setProductShort("");
+    setProductDescription("");
+    setProductScents("");
+    setProductError("");
   };
 
   const handleNewProductSubmit = (e: React.FormEvent) => {
@@ -129,7 +188,7 @@ function AdminDashboard() {
       name: productName.trim(),
       category,
       price,
-      image: productImage.trim() || heroImg,
+      images: productImages.length > 0 ? productImages : [heroImg],
       short: productShort.trim() || "Produto artesanal Alma e Essencia.",
       description: productDescription.trim() || productShort.trim() || "Produto artesanal cadastrado pela area administrativa.",
       scents: scents.length > 0 ? scents : ["Essencia especial"],
@@ -137,7 +196,61 @@ function AdminDashboard() {
     });
 
     setProductCount(getAllProducts().length);
-    window.location.assign(`/produtos?categoria=${encodeURIComponent(savedProduct.category)}`);
+    resetNewProductForm();
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct({ ...product });
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setProductError("");
+
+    if (!editingProduct) return;
+
+    const category = editingProduct.category;
+    const price = editingProduct.price;
+
+    if (!editingProduct.name.trim() || !category || !price || price <= 0) {
+      setProductError("Preencha nome, categoria e preco corretamente.");
+      return;
+    }
+
+    const scents = editingProduct.scents && editingProduct.scents.length > 0
+      ? editingProduct.scents
+      : ["Essencia especial"];
+
+    const updated = updateProduct({
+      ...editingProduct,
+      scents,
+      sizes: editingProduct.sizes && editingProduct.sizes.length > 0
+        ? editingProduct.sizes
+        : [{ label: "Unico", price }],
+    });
+
+    setEditingProduct(null);
+    setProductCount(getAllProducts().length);
+  };
+
+  const handleDeleteProduct = () => {
+    if (!deletingSlug) return;
+    deleteProduct(deletingSlug);
+    setDeletingSlug(null);
+    setProductCount(getAllProducts().length);
+  };
+
+  const startEdit = (product: Product) => {
+    setEditingProduct({ ...product });
+  };
+
+  const cancelEdit = () => {
+    setEditingProduct(null);
+  };
+
+  const updateEditingField = (field: keyof Product, value: string | number | string[]) => {
+    if (!editingProduct) return;
+    setEditingProduct({ ...editingProduct, [field]: value });
   };
 
   const newProductForm = (
@@ -185,6 +298,7 @@ function AdminDashboard() {
             placeholder="Use se quiser criar outra categoria"
           />
         </label>
+        
 
         <label className="space-y-2">
           <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco</span>
@@ -203,8 +317,9 @@ function AdminDashboard() {
             id="product-image-upload"
             type="file"
             accept="image/*"
+            multiple
             className="sr-only"
-            onChange={(e) => handleProductImageFile(e.target.files?.[0])}
+            onChange={(e) => handleProductImageFile(e.target.files)}
           />
           <label
             htmlFor="product-image-upload"
@@ -216,29 +331,34 @@ function AdminDashboard() {
             onDrop={(e) => {
               e.preventDefault();
               setIsDraggingImage(false);
-              handleProductImageFile(e.dataTransfer.files?.[0]);
+              handleProductImageFile(e.dataTransfer.files);
             }}
             className={`flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition ${
               isDraggingImage ? "border-caramel bg-rose/20 shadow-bloom" : "border-border bg-background hover:border-caramel/70 hover:bg-secondary/50"
             }`}
           >
-            {productImage ? (
+            {productImages.length > 0 ? (
               <div className="grid w-full gap-5 md:grid-cols-[180px_1fr] md:text-left">
-                <img
-                  src={productImage}
-                  alt="Previa do produto"
-                  className="h-44 w-full rounded-2xl object-cover shadow-soft md:w-44"
-                />
+                <div className="flex gap-2 overflow-x-auto md:flex-col md:w-44">
+                  {productImages.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Previa ${idx + 1}`}
+                      className="h-20 w-20 flex-shrink-0 rounded-xl object-cover shadow-soft md:h-44 md:w-full"
+                    />
+                  ))}
+                </div>
                 <div className="flex flex-col justify-center">
-                  <p className="text-xl font-bold text-foreground">{productImageName || "Imagem selecionada"}</p>
-                  <p className="mt-2 text-base font-semibold text-muted-foreground">Arraste outra imagem aqui ou clique para trocar.</p>
+                  <p className="text-xl font-bold text-foreground">{productImages.length} imagem(ns) selecionada(s)</p>
+                  <p className="mt-2 text-base font-semibold text-muted-foreground">Arraste mais imagens aqui ou clique para adicionar.</p>
                 </div>
               </div>
             ) : (
               <>
                 <Icons.UploadCloud className="h-12 w-12 text-caramel-deep" />
-                <p className="mt-4 text-xl font-bold text-foreground">Arraste a imagem aqui</p>
-                <p className="mt-2 text-base font-semibold text-muted-foreground">ou clique para escolher um arquivo do computador</p>
+                <p className="mt-4 text-xl font-bold text-foreground">Arraste as imagens aqui</p>
+                <p className="mt-2 text-base font-semibold text-muted-foreground">ou clique para escolher arquivos do computador</p>
               </>
             )}
           </label>
@@ -409,6 +529,404 @@ function AdminDashboard() {
         </div>
 
         {newProductForm}
+
+        <ProductManagementSection
+          products={getAllProducts()}
+          categories={getAllCategories()}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+          onEdit={startEdit}
+          onDelete={(slug) => setDeletingSlug(slug)}
+        />
+      </div>
+
+      {editingProduct && (
+        <EditProductModal
+          product={editingProduct}
+          categories={getAllCategories()}
+          onSave={handleEditSubmit}
+          onCancel={cancelEdit}
+          onChange={updateEditingField}
+          error={productError}
+        />
+      )}
+
+      {deletingSlug && (
+        <DeleteConfirmModal
+          productName={getAllProducts().find(p => p.slug === deletingSlug)?.name || ""}
+          onConfirm={handleDeleteProduct}
+          onCancel={() => setDeletingSlug(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function ProductManagementSection({
+  products,
+  categories,
+  searchTerm,
+  setSearchTerm,
+  filterCategory,
+  setFilterCategory,
+  onEdit,
+  onDelete,
+}: {
+  products: Product[];
+  categories: string[];
+  searchTerm: string;
+  setSearchTerm: (v: string) => void;
+  filterCategory: string;
+  setFilterCategory: (v: string) => void;
+  onEdit: (product: Product) => void;
+  onDelete: (slug: string) => void;
+}) {
+  const filtered = products.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === "todas" || product.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  return (
+    <div className="mt-12 rounded-2xl bg-card border border-border p-8">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="h-11 w-11 rounded-full bg-rose/30 flex items-center justify-center text-caramel-deep">
+          <Icons.List className="h-5 w-5" />
+        </div>
+        <div>
+          <h2 className="font-serif text-3xl font-bold">Gerenciar Produtos</h2>
+          <p className="text-base font-semibold text-muted-foreground">Edite ou exclua produtos existentes.</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Buscar produto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-2xl bg-background border border-border px-5 py-3 text-base font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+          />
+        </div>
+        <div>
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="w-full md:w-64 rounded-2xl bg-background border border-border px-5 py-3 text-base font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+          >
+            <option value="todas">Todas categorias</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="text-center text-muted-foreground py-8">Nenhum produto encontrado.</p>
+      ) : (
+        <div className="space-y-4">
+          {filtered.map((product) => (
+            <div
+              key={product.slug}
+              className="flex flex-col md:flex-row md:items-center gap-4 p-4 rounded-2xl bg-background border border-border hover:border-caramel/50 transition"
+            >
+              <img
+                src={product.images[0] || "/src/assets/imagens_inicio/hero.jpg"}
+                alt={product.name}
+                className="h-20 w-20 rounded-xl object-cover shadow-soft"
+              />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-serif text-xl font-bold truncate">{product.name}</h3>
+                <p className="text-sm text-muted-foreground">{product.category}</p>
+                <p className="text-lg font-bold text-caramel-deep mt-1">
+                  R$ {product.price.toFixed(2).replace(".", ",")}
+                </p>
+              </div>
+              <div className="flex gap-2 md:gap-3">
+                <button
+                  onClick={() => onEdit(product)}
+                  className="inline-flex items-center gap-2 rounded-full bg-caramel/20 text-caramel-deep px-5 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-caramel/30 transition"
+                >
+                  <Icons.Pencil className="h-4 w-4" />
+                  Editar
+                </button>
+                <button
+                  onClick={() => onDelete(product.slug)}
+                  className="inline-flex items-center gap-2 rounded-full bg-rose/20 text-rose px-5 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-rose/30 transition"
+                >
+                  <Icons.Trash2 className="h-4 w-4" />
+                  Excluir
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditProductModal({
+  product,
+  categories,
+  onSave,
+  onCancel,
+  onChange,
+  error,
+}: {
+  product: Product;
+  categories: string[];
+  onSave: (e: React.FormEvent) => void;
+  onCancel: () => void;
+  onChange: (field: keyof Product, value: string | number | string[]) => void;
+  error: string;
+}) {
+  const [imagePreview, setImagePreview] = useState<string[]>(product.images || []);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const compressImage = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const maxSize = 800;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height && width > maxSize) {
+              height = (height * maxSize) / width;
+              width = maxSize;
+            } else if (height > maxSize) {
+              width = (width * maxSize) / height;
+              height = maxSize;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              reject(new Error("Failed to get canvas context"));
+              return;
+            }
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", 0.8));
+          };
+          img.onerror = () => reject(new Error("Failed to load image"));
+          img.src = ev.target?.result as string;
+        };
+        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    const processFiles = Array.from(files);
+    const invalidFile = processFiles.find((file) => !file.type.startsWith("image/"));
+    if (invalidFile) {
+      alert("Escolha apenas arquivos de imagem validos.");
+      return;
+    }
+
+    Promise.all(processFiles.map((file) => compressImage(file)))
+      .then((base64Array) => {
+        const newImages = [...imagePreview, ...base64Array];
+        setImagePreview(newImages);
+        onChange("images", newImages);
+      })
+      .catch(() => {
+        alert("Erro ao processar imagens. Tente novamente.");
+      });
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = imagePreview.filter((_, i) => i !== index);
+    setImagePreview(newImages);
+    onChange("images", newImages);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl bg-card border border-border shadow-bloom p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-serif text-3xl font-bold">Editar Produto</h2>
+          <button
+            onClick={onCancel}
+            className="rounded-full p-2 hover:bg-secondary transition"
+          >
+            <Icons.X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <form className="space-y-5" onSubmit={onSave}>
+          <label className="space-y-2">
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Nome do produto</span>
+            <input
+              value={product.name}
+              onChange={(e) => onChange("name", e.target.value)}
+              className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+            />
+          </label>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            <label className="space-y-2">
+              <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Categoria</span>
+              <select
+                value={product.category}
+                onChange={(e) => onChange("category", e.target.value)}
+                className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco</span>
+              <input
+                type="number"
+                step="0.01"
+                value={product.price}
+                onChange={(e) => onChange("price", parseFloat(e.target.value) || 0)}
+                className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+              />
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Imagens do produto</span>
+            <input
+              id="edit-product-image-upload"
+              type="file"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              onChange={handleImageChange}
+            />
+            <label
+              htmlFor="edit-product-image-upload"
+              className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-background px-6 py-6 text-center hover:border-caramel/70 hover:bg-secondary/50 transition"
+            >
+              <Icons.UploadCloud className="h-8 w-8 text-caramel-deep" />
+              <p className="mt-2 text-base font-bold text-foreground">Clique para alterar imagens</p>
+            </label>
+            {imagePreview.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-3">
+                {imagePreview.map((img, idx) => (
+                  <div key={idx} className="relative">
+                    <img
+                      src={img}
+                      alt={`Preview ${idx + 1}`}
+                      className="h-20 w-20 rounded-xl object-cover shadow-soft"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="absolute -top-2 -right-2 rounded-full bg-rose text-white p-1 hover:bg-rose/80 transition"
+                    >
+                      <Icons.X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <label className="space-y-2">
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Resumo</span>
+            <input
+              value={product.short}
+              onChange={(e) => onChange("short", e.target.value)}
+              className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+            />
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Descricao</span>
+            <textarea
+              value={product.description}
+              onChange={(e) => onChange("description", e.target.value)}
+              rows={4}
+              className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition resize-none"
+            />
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Aromas (separados por virgula)</span>
+            <input
+              value={Array.isArray(product.scents) ? product.scents.join(", ") : ""}
+              onChange={(e) => onChange("scents", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))}
+              className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+            />
+          </label>
+
+          {error && <p className="text-base font-bold text-rose">{error}</p>}
+
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-caramel text-primary-foreground px-8 py-4 text-base font-bold uppercase tracking-[0.12em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all"
+            >
+              <Icons.Save className="h-4 w-4" />
+              Salvar alteracoes
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-8 py-4 text-base font-bold uppercase tracking-[0.12em] text-muted-foreground hover:bg-secondary transition"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function DeleteConfirmModal({
+  productName,
+  onConfirm,
+  onCancel,
+}: {
+  productName: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-3xl bg-card border border-border shadow-bloom p-8">
+        <div className="flex flex-col items-center text-center">
+          <div className="h-14 w-14 rounded-full bg-rose/20 flex items-center justify-center text-rose mb-4">
+            <Icons.AlertTriangle className="h-7 w-7" />
+          </div>
+          <h2 className="font-serif text-2xl font-bold mb-2">Confirmar exclusao</h2>
+          <p className="text-muted-foreground mb-6">
+            Tem certeza que deseja excluir <span className="font-bold text-foreground">"{productName}"</span>? Esta acao nao pode ser desfeita.
+          </p>
+          <div className="flex gap-3 w-full">
+            <button
+              onClick={onConfirm}
+              className="flex-1 rounded-full bg-rose text-white py-3 text-sm font-bold uppercase tracking-wider hover:bg-rose/90 transition"
+            >
+              Sim, excluir
+            </button>
+            <button
+              onClick={onCancel}
+              className="flex-1 rounded-full border border-border bg-background py-3 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:bg-secondary transition"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

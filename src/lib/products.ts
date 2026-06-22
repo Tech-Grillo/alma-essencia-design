@@ -10,7 +10,7 @@ export type Product = {
   name: string;
   category: string;
   price: number; // fallback / default price
-  image: string;
+  images: string[]; // primeira imagem é a principal (capa), as demais são da galeria
   short: string;
   description: string;
   purchaseLink: string;
@@ -25,7 +25,7 @@ export const products: Product[] = [
     category: "Velas",
     // price kept as medium size price
     price: 79.9,
-    image: p1,
+    images: [p1],
     short: "Cera de soja natural, queima limpa por até 40 horas.",
     description:
       "Vela artesanal feita com cera de soja 100% natural e óleos essenciais puros. Acende rituais de calma e perfuma o ambiente com delicadeza.",
@@ -42,7 +42,7 @@ export const products: Product[] = [
     name: "Sabonete em Barra de Rosas",
     category: "Sabonetes",
     price: 32.0,
-    image: p2,
+    images: [p2],
     short: "Glicerina pura com pétalas de rosa para um banho ritual.",
     description:
       "Sabonete artesanal nutritivo, com glicerina vegetal e óleos botânicos. Perfuma a pele e transforma o banho em um momento de cuidado.",
@@ -59,7 +59,7 @@ export const products: Product[] = [
     name: "Home Spray Eucalipto",
     category: "Home Spray",
     price: 64.5,
-    image: p3,
+    images: [p3],
     short: "Bruma perfumada para tecidos e ambientes.",
     description:
       "Bruma aromática feita com extratos botânicos e álcool de cereais. Perfuma tecidos, cortinas e ambientes com frescor sereno.",
@@ -76,7 +76,7 @@ export const products: Product[] = [
     name: "Difusor de Ambiente",
     category: "Difusores",
     price: 119.0,
-    image: p4,
+    images: [p4],
     short: "Aroma contínuo por até 9 dias com varetas de rattan.",
     description:
       "Difusor de varetas com fragrância concentrada. Liberação suave e contínua, ideal para espaços íntimos como quartos e salas de leitura.",
@@ -98,6 +98,19 @@ export const categories = [
   "Sabonetes",
   "Kits",
 ];
+
+export const categoryImagePaths: Record<string, string> = {
+  "Velas": "/src/assets/imagens_produtos/velas/",
+  "Hidratantes": "/src/assets/imagens_produtos/hidratantes/",
+  "Home Spray": "/src/assets/imagens_produtos/home-spray/",
+  "Difusores": "/src/assets/imagens_produtos/difusores/",
+  "Sabonetes": "/src/assets/imagens_produtos/sabonetes/",
+  "Kits": "/src/assets/imagens_produtos/kits/",
+};
+
+export function getCategoryImagePath(category: string): string {
+  return categoryImagePaths[category] || "/src/assets/imagens_produtos/";
+}
 
 export const WHATSAPP_NUMBER = "+55 (21) 98716-3045";
 const CUSTOM_PRODUCTS_KEY = "almaEssenciaCustomProducts";
@@ -135,7 +148,7 @@ export function getCustomProducts(): Product[] {
           typeof product.name === "string" &&
           typeof product.category === "string" &&
           typeof product.price === "number" &&
-          typeof product.image === "string" &&
+          Array.isArray(product.images) &&
           Array.isArray(product.scents) &&
           Array.isArray(product.sizes),
       );
@@ -162,7 +175,7 @@ function getEditedProducts(): Product[] {
           typeof product.name === "string" &&
           typeof product.category === "string" &&
           typeof product.price === "number" &&
-          typeof product.image === "string" &&
+          Array.isArray(product.images) &&
           Array.isArray(product.scents) &&
           Array.isArray(product.sizes),
       );
@@ -194,7 +207,17 @@ export function getAllProducts() {
 
   return [...products, ...getCustomProducts()]
     .filter((product) => !deletedSlugs.has(product.slug))
-    .map((product) => editedProducts.get(product.slug) || product);
+    .map((product) => {
+      const edited = editedProducts.get(product.slug);
+      if (edited) {
+        // Garantir que produtos editados tenham o campo images
+        return {
+          ...edited,
+          images: edited.images || product.images,
+        };
+      }
+      return product;
+    });
 }
 
 export function getAllCategories() {
@@ -217,6 +240,9 @@ export function saveCustomProduct(product: Omit<Product, "slug" | "purchaseLink"
     ...product,
     slug,
     purchaseLink: `/produtos/${slug}#comprar`,
+    images: product.images && product.images.length > 0 
+      ? product.images 
+      : ["/src/assets/imagens_inicio/hero.jpg"],
   };
 
   if (isBrowser()) {
@@ -260,6 +286,40 @@ export function deleteProduct(slug: string) {
   window.localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(nextDeletedSlugs));
 }
 
+
 export function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  const phone = WHATSAPP_NUMBER.replace(/\D/g, ""); // limpa o número: 5521987163045
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
+export interface WhatsappProductParams {
+  productName: string;
+  quantity: number;
+  price: number;
+  size?: string;   // tamanho (Pequeno / Médio / Grande)
+  scent?: string;  // aroma selecionado
+}
+
+export function buildProductWhatsappMessage(params: WhatsappProductParams): string {
+  const { productName, quantity, price, size, scent } = params;
+
+  const formattedPrice = (price * quantity)
+    .toFixed(2)
+    .replace(".", ",");
+
+  const lines: string[] = [
+    "Olá! Estou interessado em comprar um produto da Alma Essência. 🌿",
+    "",
+    `🛍️ *Produto:* ${productName}`,
+  ];
+
+  if (scent) lines.push(`🌸 *Aroma:* ${scent}`);
+  if (size)  lines.push(`📦 *Tamanho:* ${size}`);
+
+  lines.push(`🔢 *Quantidade:* ${quantity}`);
+  lines.push(`💰 *Preço total:* R$ ${formattedPrice}`);
+  lines.push("");
+  lines.push("Por favor, me informe sobre disponibilidade e formas de envio. Obrigado! 😊");
+
+  return lines.join("\n");
 }

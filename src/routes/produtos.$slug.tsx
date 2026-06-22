@@ -34,6 +34,7 @@ function ProductPage() {
   const [scent, setScent] = useState("");
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -100,16 +101,25 @@ function ProductPage() {
         <div className="grid lg:grid-cols-2 gap-14">
           {/* Gallery */}
           <div>
-            <div className="rounded-[2rem] overflow-hidden bg-secondary/40 shadow-soft aspect-square">
-              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-            </div>
-            <div className="grid grid-cols-4 gap-3 mt-4">
-              {[product.image, product.image, product.image, product.image].map((src, i) => (
-                <button key={i} className="rounded-2xl overflow-hidden aspect-square border border-border hover:border-caramel transition-colors">
-                  <img src={src} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+              <div className="rounded-[2rem] overflow-hidden bg-secondary/40 shadow-soft aspect-square">
+                <img 
+                  src={product.images[0]} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() => setSelectedImage(product.images[0])}
+                />
+              </div>
+              <div className="grid grid-cols-4 gap-3 mt-4">
+                {product.images.map((src, i) => (
+                  <button 
+                    key={i} 
+                    className="rounded-2xl overflow-hidden aspect-square border border-border hover:border-caramel transition-colors"
+                    onClick={() => setSelectedImage(src)}
+                  >
+                    <img src={src} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
           </div>
 
           {/* Info */}
@@ -225,7 +235,27 @@ function ProductPage() {
       </div>
 
       <Footer />
+
+      {/* Full Screen Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button 
+            className="absolute top-4 right-4 text-white hover:text-caramel transition-colors"
+            onClick={() => setSelectedImage(null)}
+          >
+            <Icons.X className="h-8 w-8" />
+          </button>
+          <img 
+            src={selectedImage} 
+            alt={product.name} 
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
-

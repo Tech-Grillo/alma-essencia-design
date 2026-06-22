@@ -2,15 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { GoogleMap } from "@/components/GoogleMap";
-import { whatsappLink } from "@/lib/products";
 import * as Icons from "lucide-react";
+
+export const whatsappLink = (productName: string) => {
+  const phoneNumber = "5521987163045"; // 55 (Brasil) + 21 (DDD) + Número
+  const message = encodeURIComponent(`Olá! Quero comprar a ${productName}`);
+  
+  return `https://wa.me/${phoneNumber}?text=${message}`;
+};
 
 export const Route = createFileRoute("/contato")({
   component: Contact,
-  head: () => ({ meta: [
-    { title: "Contato — Alma e Essência" },
-    { name: "description", content: "Fale com a gente pelo WhatsApp ou visite nosso ateliê." },
-  ]}),
+  // Removemos o "head" que causava o erro e mantemos a estrutura limpa da rota
 });
 
 function Contact() {

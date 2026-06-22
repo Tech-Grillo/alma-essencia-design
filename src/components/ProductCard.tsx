@@ -12,7 +12,7 @@ export function ProductCard({ product }: { product: Product }) {
           className="block h-full w-full"
         >
           <img
-            src={product.image}
+            src={product.images[0]}
             alt={product.name}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
