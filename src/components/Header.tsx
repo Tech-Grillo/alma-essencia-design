@@ -59,6 +59,13 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <Link
+              to="/admin/login"
+              aria-label="Acessar login administrativo"
+              className="rounded-full p-2.5 hover:bg-secondary transition-colors"
+            >
+              <Icons.LogIn className="h-4 w-4" />
+            </Link>
             <button
               onClick={toggle}
               aria-label="Alternar tema"
@@ -112,7 +119,14 @@ export function Header() {
               </li>
             ))}
             <li>
-             
+              <Link
+                to="/admin/login"
+                onClick={() => setOpen(false)}
+                className="font-serif text-2xl font-semibold text-chocolate dark:text-white px-4 py-3 rounded-full flex items-center gap-3 transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
+              >
+                <Icons.LogIn className="h-5 w-5" />
+                Login
+              </Link>
             </li>
           </ul>
 

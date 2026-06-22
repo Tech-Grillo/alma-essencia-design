@@ -1,19 +1,15 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { products, whatsappLink } from "@/lib/products";
+import { ProductReviews } from "@/components/ProductReviews";
+import { getAllProducts, whatsappLink } from "@/lib/products";
 import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useState } from "react";
 import * as Icons from "lucide-react";
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: ProductPage,
-  loader: ({ params }) => {
-    const product = products.find((p) => p.slug === params.slug);
-    if (!product) throw notFound();
-    return { product };
-  },
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
@@ -31,20 +27,26 @@ export const Route = createFileRoute("/produtos/$slug")({
 
 function ProductPage() {
   const navigate = useNavigate();
-  const { product } = Route.useLoaderData();
+  const { slug } = Route.useParams();
   const { addItem } = useCart();
-  const [scent, setScent] = useState(product.scents[0]);
-  const [size, setSize] = useState(product.sizes[0].label);
+  const [allProducts, setAllProducts] = useState(() => getAllProducts());
+  const product = allProducts.find((p) => p.slug === slug);
+  const [scent, setScent] = useState("");
+  const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
 
   const handleAddToCart = () => {
+    if (!product) return;
+
     addItem(productToCartItem(product, size), qty);
     navigate({ to: "/carrinho" });
   };
 
-  const related = products.filter((p) => p.slug !== product.slug);
+  const related = product ? allProducts.filter((p) => p.slug !== product.slug) : [];
   const scrollToPurchase = (event?: MouseEvent<HTMLAnchorElement>) => {
     event?.preventDefault();
+
+    if (!product) return;
 
     document.getElementById("comprar")?.scrollIntoView({
       behavior: "smooth",
@@ -54,12 +56,35 @@ function ProductPage() {
   };
 
   useEffect(() => {
-    if (window.location.hash !== "#comprar") return;
+    setAllProducts(getAllProducts());
+  }, []);
+
+  useEffect(() => {
+    if (!product) return;
+
+    setScent(product.scents[0] || "");
+    setSize(product.sizes[0]?.label || "");
+    setQty(1);
+  }, [product]);
+
+  useEffect(() => {
+    if (!product || window.location.hash !== "#comprar") return;
 
     window.setTimeout(() => {
       scrollToPurchase();
     }, 100);
-  }, [product.purchaseLink]);
+  }, [product?.purchaseLink]);
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="font-serif text-3xl mb-2">Produto não encontrado</h1>
+          <Link to="/produtos" className="text-caramel-deep underline">Voltar</Link>
+        </div>
+      </div>
+    );
+  }
 
   const message = `Olá! Quero comprar: ${product.name} (${scent}, ${size}) — Quantidade: ${qty}`;
 
@@ -180,6 +205,8 @@ function ProductPage() {
             <p className="text-xs text-center text-muted-foreground mt-3">Atendimento personalizado · Resposta em minutos</p>
           </div>
         </div>
+
+        <ProductReviews product={product} />
 
         {/* Related */}
         <div className="mt-32">

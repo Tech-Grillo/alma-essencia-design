@@ -100,6 +100,165 @@ export const categories = [
 ];
 
 export const WHATSAPP_NUMBER = "+55 (21) 98716-3045";
+const CUSTOM_PRODUCTS_KEY = "almaEssenciaCustomProducts";
+const EDITED_PRODUCTS_KEY = "almaEssenciaEditedProducts";
+const DELETED_PRODUCTS_KEY = "almaEssenciaDeletedProducts";
+
+function isBrowser() {
+  return typeof window !== "undefined";
+}
+
+export function slugifyProductName(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
+export function getCustomProducts(): Product[] {
+  if (!isBrowser()) return [];
+
+  try {
+    const raw = window.localStorage.getItem(CUSTOM_PRODUCTS_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter((product): product is Product => {
+      return Boolean(
+        product &&
+          typeof product.slug === "string" &&
+          typeof product.name === "string" &&
+          typeof product.category === "string" &&
+          typeof product.price === "number" &&
+          typeof product.image === "string" &&
+          Array.isArray(product.scents) &&
+          Array.isArray(product.sizes),
+      );
+    });
+  } catch {
+    return [];
+  }
+}
+
+function getEditedProducts(): Product[] {
+  if (!isBrowser()) return [];
+
+  try {
+    const raw = window.localStorage.getItem(EDITED_PRODUCTS_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter((product): product is Product => {
+      return Boolean(
+        product &&
+          typeof product.slug === "string" &&
+          typeof product.name === "string" &&
+          typeof product.category === "string" &&
+          typeof product.price === "number" &&
+          typeof product.image === "string" &&
+          Array.isArray(product.scents) &&
+          Array.isArray(product.sizes),
+      );
+    });
+  } catch {
+    return [];
+  }
+}
+
+function getDeletedProductSlugs(): string[] {
+  if (!isBrowser()) return [];
+
+  try {
+    const raw = window.localStorage.getItem(DELETED_PRODUCTS_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter((slug): slug is string => typeof slug === "string");
+  } catch {
+    return [];
+  }
+}
+
+export function getAllProducts() {
+  const editedProducts = new Map(getEditedProducts().map((product) => [product.slug, product]));
+  const deletedSlugs = new Set(getDeletedProductSlugs());
+
+  return [...products, ...getCustomProducts()]
+    .filter((product) => !deletedSlugs.has(product.slug))
+    .map((product) => editedProducts.get(product.slug) || product);
+}
+
+export function getAllCategories() {
+  return Array.from(new Set([...categories, ...getAllProducts().map((product) => product.category)]));
+}
+
+export function saveCustomProduct(product: Omit<Product, "slug" | "purchaseLink">) {
+  const customProducts = getCustomProducts();
+  const baseSlug = slugifyProductName(product.name) || "produto";
+  const existingSlugs = new Set([...products, ...customProducts].map((item) => item.slug));
+  let slug = baseSlug;
+  let count = 2;
+
+  while (existingSlugs.has(slug)) {
+    slug = `${baseSlug}-${count}`;
+    count += 1;
+  }
+
+  const savedProduct: Product = {
+    ...product,
+    slug,
+    purchaseLink: `/produtos/${slug}#comprar`,
+  };
+
+  if (isBrowser()) {
+    window.localStorage.setItem(CUSTOM_PRODUCTS_KEY, JSON.stringify([...customProducts, savedProduct]));
+  }
+
+  return savedProduct;
+}
+
+export function updateProduct(updatedProduct: Product) {
+  const customProducts = getCustomProducts();
+  const customProductIndex = customProducts.findIndex((product) => product.slug === updatedProduct.slug);
+  const productToSave = {
+    ...updatedProduct,
+    purchaseLink: `/produtos/${updatedProduct.slug}#comprar`,
+  };
+
+  if (!isBrowser()) return productToSave;
+
+  if (customProductIndex >= 0) {
+    const nextCustomProducts = [...customProducts];
+    nextCustomProducts[customProductIndex] = productToSave;
+    window.localStorage.setItem(CUSTOM_PRODUCTS_KEY, JSON.stringify(nextCustomProducts));
+    return productToSave;
+  }
+
+  const editedProducts = getEditedProducts().filter((product) => product.slug !== updatedProduct.slug);
+  window.localStorage.setItem(EDITED_PRODUCTS_KEY, JSON.stringify([...editedProducts, productToSave]));
+  return productToSave;
+}
+
+export function deleteProduct(slug: string) {
+  if (!isBrowser()) return;
+
+  const nextCustomProducts = getCustomProducts().filter((product) => product.slug !== slug);
+  const nextEditedProducts = getEditedProducts().filter((product) => product.slug !== slug);
+  const nextDeletedSlugs = Array.from(new Set([...getDeletedProductSlugs(), slug]));
+
+  window.localStorage.setItem(CUSTOM_PRODUCTS_KEY, JSON.stringify(nextCustomProducts));
+  window.localStorage.setItem(EDITED_PRODUCTS_KEY, JSON.stringify(nextEditedProducts));
+  window.localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(nextDeletedSlugs));
+}
 
 export function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
