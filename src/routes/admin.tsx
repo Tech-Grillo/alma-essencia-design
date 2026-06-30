@@ -1,9 +1,11 @@
+
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useState } from "react";
 import { validateAdminLogin } from "@/lib/admin-credentials";
 import { categories, getAllProducts, getAllCategories, saveCustomProduct, updateProduct, deleteProduct } from "@/lib/products";
 import type { Product } from "@/lib/products";
+import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
 
 export const Route = createFileRoute("/admin")({
@@ -35,6 +37,7 @@ function AdminDashboard() {
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("todas");
+  const [activeSection, setActiveSection] = useState<"products" | "analytics">("products");
 
   useEffect(() => {
     if (localStorage.getItem("adminAuth") === "true") {
@@ -521,6 +524,32 @@ function AdminDashboard() {
           </div>
         </div>
 
+        {/* Navegação por abas */}
+        <div className="mt-8 flex gap-4 border-b border-border">
+          <button
+            onClick={() => setActiveSection("products")}
+            className={`pb-3 px-4 font-semibold text-sm uppercase tracking-wider transition-all ${
+              activeSection === "products"
+                ? "border-b-2 border-caramel text-caramel-deep"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Icons.Package className="h-4 w-4 inline mr-2" />
+            Gerenciar Produtos
+          </button>
+          <button
+            onClick={() => setActiveSection("analytics")}
+            className={`pb-3 px-4 font-semibold text-sm uppercase tracking-wider transition-all ${
+              activeSection === "analytics"
+                ? "border-b-2 border-caramel text-caramel-deep"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Icons.BarChart3 className="h-4 w-4 inline mr-2" />
+            Estatísticas
+          </button>
+        </div>
+
         <div className="mt-12 rounded-2xl bg-card border border-border p-8">
           <h2 className="font-serif text-2xl mb-6">Bem-vindo à Área Administrativa!</h2>
           <p className="text-muted-foreground leading-relaxed">
@@ -528,18 +557,24 @@ function AdminDashboard() {
           </p>
         </div>
 
-        {newProductForm}
+        {activeSection === "products" && newProductForm}
 
-        <ProductManagementSection
-          products={getAllProducts()}
-          categories={getAllCategories()}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterCategory={filterCategory}
-          setFilterCategory={setFilterCategory}
-          onEdit={startEdit}
-          onDelete={(slug) => setDeletingSlug(slug)}
-        />
+        {activeSection === "products" && (
+          <ProductManagementSection
+            products={getAllProducts()}
+            categories={getAllCategories()}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filterCategory={filterCategory}
+            setFilterCategory={setFilterCategory}
+            onEdit={startEdit}
+            onDelete={(slug) => setDeletingSlug(slug)}
+          />
+        )}
+
+        {activeSection === "analytics" && (
+          <AnalyticsTab products={getAllProducts()} />
+        )}
       </div>
 
       {editingProduct && (
@@ -656,7 +691,7 @@ function ProductManagementSection({
                 </button>
                 <button
                   onClick={() => onDelete(product.slug)}
-                  className="inline-flex items-center gap-2 rounded-full bg-rose/20 text-rose px-5 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-rose/30 transition"
+                  className="inline-flex items-center gap-2 rounded-full bg-red-500 text-white px-5 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-red-600 transition"
                 >
                   <Icons.Trash2 className="h-4 w-4" />
                   Excluir

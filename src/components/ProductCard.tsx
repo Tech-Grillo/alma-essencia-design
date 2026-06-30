@@ -1,8 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { type Product } from "@/lib/products";
+import { useProductTracking } from "@/hooks/useProductTracking";
 
 export function ProductCard({ product }: { product: Product }) {
+  useProductTracking(product.slug, product.name);
+  
   return (
     <article className="group relative rounded-3xl bg-card border border-border/60 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-bloom">
       <div className="relative aspect-square overflow-hidden bg-secondary/40">
@@ -20,7 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
         </Link>
       </div>
       <div className="p-6 pb-16">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 mb-2 text-center">
+        <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 dark:text-white mb-2 text-center">
           {product.category}
         </p>
         <h3 className="font-serif text-2xl leading-tight mb-1 text-center">{product.name}</h3>
@@ -40,7 +43,7 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="flex items-center justify-between mb-4">
-          <span className="font-serif text-xl text-caramel-deep">
+          <span className="font-serif text-2xl text-caramel-deep dark:text-white">
             R$ {Math.min(...product.sizes.map((s: any) => s.price)).toFixed(2).replace(".", ",")}
           </span>
           <Link

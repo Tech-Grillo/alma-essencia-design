@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="mt-32 relative">
       <div className="h-px bg-gradient-to-r from-transparent via-rose to-transparent" />
-      <div className="bg-chocolate text-cream/90">
+      <div className="bg-chocolate text-cream/90 dark:bg-background dark:text-foreground">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid md:grid-cols-3 gap-12">
           <div>
             <p className="mt-6 font-serif italic text-cream/70 leading-relaxed">

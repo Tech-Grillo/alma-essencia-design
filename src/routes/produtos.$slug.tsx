@@ -7,6 +7,7 @@ import { getAllProducts, whatsappLink } from "@/lib/products";
 import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useState } from "react";
 import * as Icons from "lucide-react";
+import { useProductTracking } from "@/hooks/useProductTracking";
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: ProductPage,
@@ -31,6 +32,11 @@ function ProductPage() {
   const { addItem } = useCart();
   const [allProducts, setAllProducts] = useState(() => getAllProducts());
   const product = allProducts.find((p) => p.slug === slug);
+  
+  // Track product view
+  if (product) {
+    useProductTracking(product.slug, product.name);
+  }
   const [scent, setScent] = useState("");
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);

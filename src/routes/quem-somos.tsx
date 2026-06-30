@@ -17,7 +17,7 @@ function About() {
       <Header />
       <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
-          <p className="font-script text-3xl text-caramel-deep">— Nossa história</p>
+          <p className="font-script text-3xl text-caramel-deep dark:text-white">— Nossa história</p>
           <h1 className="font-serif text-5xl md:text-6xl mt-1">Pequeno, feito com tempo.</h1>
           <div className="botanical-divider mt-6"><span>✿</span></div>
         </div>
@@ -36,7 +36,7 @@ function About() {
             uma vela ao final da tarde, sentir o aroma de um sabonete no banho, perfumar o quarto com um 
             home spray antes de dormir.
           </p>
-          <p className="font-script text-3xl text-caramel-deep text-center pt-6">
+          <p className="font-script text-3xl text-caramel-deep dark:text-white text-center pt-6">
             Com amor,<br />Alma e Essência
           </p>
         </div>

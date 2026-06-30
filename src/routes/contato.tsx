@@ -22,7 +22,7 @@ function Contact() {
       <Header />
       <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
-          <p className="font-script text-3xl text-caramel-deep">— Conecte-se</p>
+          <p className="font-script text-3xl text-caramel-deep dark:text-white">— Conecte-se</p>
           <h1 className="font-serif text-5xl md:text-6xl">Fale com a gente</h1>
           <div className="botanical-divider mt-6"><span>✿</span></div>
         </div>
@@ -50,7 +50,7 @@ function Contact() {
 
             return (
               <a key={c.label} href={c.href} target="_blank" rel="noreferrer" className="rounded-3xl bg-card border border-border p-7 hover:shadow-bloom hover:-translate-y-1 transition-all">
-                <Icon className="h-6 w-6 text-caramel-deep mb-4" />
+                <Icon className="h-6 w-6 text-caramel-deep dark:text-white mb-4" />
                 <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">{c.label}</p>
                 <p className="font-serif text-xl">{c.value}</p>
               </a>
@@ -60,10 +60,14 @@ function Contact() {
 
         <div className="rounded-[2rem] overflow-hidden border border-border">
           <div className="p-8 bg-secondary/40 flex items-center gap-3">
-            <Icons.MapPin className="h-5 w-5 text-caramel-deep" />
-            <p className="font-serif text-lg">Rua das Acácias, 128 — Vila Madalena, São Paulo</p>
+            <Icons.MapPin className="h-5 w-5 text-caramel-deep dark:text-white" />
+            <div>
+              <p className="font-serif text-lg">BAIRRO DE ICARAÍ</p>
+              <p className="font-serif text-sm text-muted-foreground">FEIRA - CAMPO DE SÃO BENTO</p>
+              <p className="font-serif text-sm text-muted-foreground">RIO DE JANEIRO · RJ</p>
+            </div>
           </div>
-          <GoogleMap lat={-23.559} lng={-46.695} title="Alma e Essência - São Paulo" className="w-full h-80" />
+          <GoogleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" className="w-full h-80" />
         </div>
       </section>
       <Footer />

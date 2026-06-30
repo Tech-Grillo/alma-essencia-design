@@ -111,9 +111,9 @@
   --rose: oklch(0.7 0.06 25);
   --rose-soft: oklch(0.45 0.04 25);
   --caramel: oklch(0.78 0.07 55);
-  --caramel-deep: oklch(0.6 0.07 50);
+  --caramel-deep: oklch(0.95 0.012 60);
   --cream: oklch(0.32 0.03 35);
-  --chocolate: oklch(0.18 0.025 35);
+  --chocolate: oklch(0.95 0.012 60);
 
   --shadow-soft: 0 10px 30px -12px oklch(0 0 0 / 0.5);
   --shadow-bloom: 0 20px 60px -20px oklch(0 0 0 / 0.6);
