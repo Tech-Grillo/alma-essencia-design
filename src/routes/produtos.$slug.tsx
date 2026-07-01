@@ -34,9 +34,7 @@ function ProductPage() {
   const product = allProducts.find((p) => p.slug === slug);
   
   // Track product view
-  if (product) {
-    useProductTracking(product.slug, product.name);
-  }
+  useProductTracking(product?.slug || "", product?.name || "");
   const [scent, setScent] = useState("");
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);

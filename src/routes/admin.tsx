@@ -1,7 +1,7 @@
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { validateAdminLogin } from "@/lib/admin-credentials";
 import { categories, getAllProducts, getAllCategories, saveCustomProduct, updateProduct, deleteProduct } from "@/lib/products";
 import type { Product } from "@/lib/products";
@@ -26,6 +26,7 @@ function AdminDashboard() {
   const [productCategory, setProductCategory] = useState(categories[0]);
   const [newCategory, setNewCategory] = useState("");
   const [productPrice, setProductPrice] = useState("");
+  const priceValueRef = useRef<{ raw: string }>({ raw: "" });
   const [productImages, setProductImages] = useState<string[]>([]);
   const [productImageNames, setProductImageNames] = useState<string[]>([]);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
@@ -34,6 +35,17 @@ function AdminDashboard() {
   const [productScents, setProductScents] = useState("");
   const [productError, setProductError] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  
+  // Validation errors
+  const [errors, setErrors] = useState({
+    name: "",
+    category: "",
+    price: "",
+    images: "",
+    short: "",
+    description: "",
+    scents: ""
+  });
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("todas");
@@ -168,19 +180,89 @@ function AdminDashboard() {
     setProductDescription("");
     setProductScents("");
     setProductError("");
+    setErrors({
+      name: "",
+      category: "",
+      price: "",
+      images: "",
+      short: "",
+      description: "",
+      scents: ""
+    });
+  };
+
+  // Price handler - just clean the input
+  const handlePriceChange = (value: string) => {
+    // Only allow numbers and comma
+    const cleaned = value.replace(/[^\d,]/g, '');
+    setProductPrice(cleaned);
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      name: "",
+      category: "",
+      price: "",
+      images: "",
+      short: "",
+      description: "",
+      scents: ""
+    };
+
+    // Validate name
+    if (!productName.trim()) {
+      newErrors.name = "Nome do produto é obrigatório";
+    }
+
+    // Validate category
+    const category = newCategory.trim() || productCategory;
+    if (!category) {
+      newErrors.category = "Categoria é obrigatória";
+    }
+
+    // Validate price
+    const price = Number(productPrice.replace(",", "."));
+    if (!productPrice.trim()) {
+      newErrors.price = "Preço é obrigatório";
+    } else if (Number.isNaN(price) || price <= 0) {
+      newErrors.price = "Preço deve ser um valor válido";
+    }
+
+    // Validate images
+    if (productImages.length === 0) {
+      newErrors.images = "Adicione pelo menos uma imagem";
+    }
+
+    // Validate short description
+    if (!productShort.trim()) {
+      newErrors.short = "Resumo é obrigatório";
+    }
+
+    // Validate description
+    if (!productDescription.trim()) {
+      newErrors.description = "Descrição é obrigatória";
+    }
+
+    // Validate scents
+    if (!productScents.trim()) {
+      newErrors.scents = "Aromas são obrigatórios";
+    }
+
+    setErrors(newErrors);
+    return Object.values(newErrors).every(error => error === "");
   };
 
   const handleNewProductSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setProductError("");
 
-    const category = newCategory.trim() || productCategory;
-    const price = Number(productPrice.replace(",", "."));
-
-    if (!productName.trim() || !category || Number.isNaN(price) || price <= 0) {
-      setProductError("Preencha nome, categoria e preco corretamente.");
+    if (!validateForm()) {
+      setProductError("Preencha todos os campos obrigatórios corretamente.");
       return;
     }
+
+    const category = newCategory.trim() || productCategory;
+    const price = Number(productPrice.replace(",", "."));
 
     const scents = productScents
       .split(",")
@@ -192,8 +274,8 @@ function AdminDashboard() {
       category,
       price,
       images: productImages.length > 0 ? productImages : [heroImg],
-      short: productShort.trim() || "Produto artesanal Alma e Essencia.",
-      description: productDescription.trim() || productShort.trim() || "Produto artesanal cadastrado pela area administrativa.",
+      short: productShort.trim(),
+      description: productDescription.trim(),
       scents: scents.length > 0 ? scents : ["Essencia especial"],
       sizes: [{ label: "Unico", price }],
     });
@@ -270,26 +352,30 @@ function AdminDashboard() {
 
       <form className="grid lg:grid-cols-2 gap-5" onSubmit={handleNewProductSubmit}>
         <label className="space-y-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Nome do produto</span>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Nome do produto *</span>
           <input
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
             placeholder="Ex: Creme hidratante floral"
+            required
           />
+          {errors.name && <p className="text-sm text-rose font-medium">{errors.name}</p>}
         </label>
 
         <label className="space-y-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Categoria</span>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Categoria *</span>
           <select
             value={productCategory}
             onChange={(e) => setProductCategory(e.target.value)}
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+            required
           >
             {categories.map((category) => (
               <option key={category} value={category}>{category}</option>
             ))}
           </select>
+          {errors.category && <p className="text-sm text-rose font-medium">{errors.category}</p>}
         </label>
 
         <label className="space-y-2">
@@ -304,14 +390,16 @@ function AdminDashboard() {
         
 
         <label className="space-y-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco</span>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco *</span>
           <input
             value={productPrice}
-            onChange={(e) => setProductPrice(e.target.value)}
-            inputMode="decimal"
+            onChange={(e) => handlePriceChange(e.target.value)}
+            inputMode="numeric"
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
             placeholder="79,90"
+            required
           />
+          {errors.price && <p className="text-sm text-rose font-medium">{errors.price}</p>}
         </label>
 
         <div className="space-y-2 lg:col-span-2">
@@ -368,34 +456,40 @@ function AdminDashboard() {
         </div>
 
         <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Resumo</span>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Resumo *</span>
           <input
             value={productShort}
             onChange={(e) => setProductShort(e.target.value)}
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
             placeholder="Frase curta que aparece no card do produto"
+            required
           />
+          {errors.short && <p className="text-sm text-rose font-medium">{errors.short}</p>}
         </label>
 
         <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Descricao</span>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Descricao *</span>
           <textarea
             value={productDescription}
             onChange={(e) => setProductDescription(e.target.value)}
             rows={4}
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition resize-none"
             placeholder="Descricao completa do produto"
+            required
           />
+          {errors.description && <p className="text-sm text-rose font-medium">{errors.description}</p>}
         </label>
 
         <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Aromas</span>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Aromas *</span>
           <input
             value={productScents}
             onChange={(e) => setProductScents(e.target.value)}
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
             placeholder="Lavanda, Baunilha, Rosa"
+            required
           />
+          {errors.scents && <p className="text-sm text-rose font-medium">{errors.scents}</p>}
         </label>
 
         {productError && <p className="lg:col-span-2 text-base font-bold text-rose">{productError}</p>}
@@ -497,7 +591,7 @@ function AdminDashboard() {
           <h1 className="font-serif text-4xl">Painel Administrativo</h1>
             <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-rose/20 text-rose hover:bg-rose/30 transition"
+            className="flex items-center gap-2 px-6 py-3 rounded-full bg-chocolate text-cream hover:bg-chocolate/90 transition"
           >
             <Icons.LogOut className="h-4 w-4" />
             Sair
