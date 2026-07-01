@@ -34,6 +34,7 @@ function AdminDashboard() {
   const [productDescription, setProductDescription] = useState("");
   const [productScents, setProductScents] = useState("");
   const [productError, setProductError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   
   // Validation errors
@@ -282,6 +283,10 @@ function AdminDashboard() {
 
     setProductCount(getAllProducts().length);
     resetNewProductForm();
+    setSuccessMessage(`Produto "${productName.trim()}" cadastrado com sucesso!`);
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   const handleEditProduct = (product: Product) => {
@@ -316,13 +321,22 @@ function AdminDashboard() {
 
     setEditingProduct(null);
     setProductCount(getAllProducts().length);
+    setSuccessMessage(`Produto "${editingProduct.name}" editado com sucesso!`);
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   const handleDeleteProduct = () => {
     if (!deletingSlug) return;
+    const productName = getAllProducts().find(p => p.slug === deletingSlug)?.name || "";
     deleteProduct(deletingSlug);
     setDeletingSlug(null);
     setProductCount(getAllProducts().length);
+    setSuccessMessage(`Produto "${productName}" deletado com sucesso!`);
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   const startEdit = (product: Product) => {
@@ -587,6 +601,14 @@ function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-800 flex items-center gap-3 animate-fade-in-up">
+            <Icons.CheckCircle className="h-5 w-5 flex-shrink-0" />
+            <p className="font-medium">{successMessage}</p>
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-12">
           <h1 className="font-serif text-4xl">Painel Administrativo</h1>
             <button
@@ -815,6 +837,7 @@ function EditProductModal({
   error: string;
 }) {
   const [imagePreview, setImagePreview] = useState<string[]>(product.images || []);
+  const [editPrice, setEditPrice] = useState(product.price.toString().replace(".", ","));
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -921,11 +944,19 @@ function EditProductModal({
             <label className="space-y-2">
               <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco</span>
               <input
-                type="number"
-                step="0.01"
-                value={product.price}
-                onChange={(e) => onChange("price", parseFloat(e.target.value) || 0)}
+                type="text"
+                value={editPrice}
+                onChange={(e) => {
+                  const cleaned = e.target.value.replace(/[^\d,]/g, '');
+                  setEditPrice(cleaned);
+                  const priceNum = Number(cleaned.replace(",", "."));
+                  if (!isNaN(priceNum)) {
+                    onChange("price", priceNum);
+                  }
+                }}
+                inputMode="numeric"
                 className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+                placeholder="79,90"
               />
             </label>
           </div>
