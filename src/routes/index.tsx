@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products } from "@/lib/products";
-import { GoogleMap } from "@/components/GoogleMap";
+import { SimpleMap } from "@/components/SimpleMap";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
 import * as Icons from "lucide-react";
@@ -132,7 +132,7 @@ function Home() {
             </p>
           </div>
           <div className="aspect-[4/3] md:aspect-auto">
-            <GoogleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" />
+            <SimpleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" />
           </div>
         </div>
       </section>

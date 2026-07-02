@@ -98,22 +98,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const mapsScriptUrl = apiKey && apiKey !== "YOUR_GOOGLE_MAPS_API_KEY" 
-    ? `https://maps.googleapis.com/maps/api/js?key=${apiKey}`
-    : null;
-
   return (
     <html lang="en">
       <head>
         <HeadContent />
-        {mapsScriptUrl && (
-          <script
-            async
-            defer
-            src={mapsScriptUrl}
-          />
-        )}
       </head>
       <body>
         {children}

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { GoogleMap } from "@/components/GoogleMap";
+import { SimpleMap } from "@/components/SimpleMap";
 import * as Icons from "lucide-react";
 
 export const whatsappLink = (productName: string) => {
@@ -67,7 +67,7 @@ function Contact() {
               <p className="font-serif text-sm text-muted-foreground">RIO DE JANEIRO · RJ</p>
             </div>
           </div>
-          <GoogleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" className="w-full h-80" />
+          <SimpleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" className="w-full h-80" />
         </div>
       </section>
       <Footer />
