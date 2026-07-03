@@ -1,10 +1,10 @@
-
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { validateAdminLogin } from "@/lib/admin-credentials";
-import { categories, getAllProducts, getAllCategories, saveCustomProduct, updateProduct, deleteProduct } from "@/lib/products";
+import { validateAdminLogin, isAdminLoggedIn, adminLogout } from "@/lib/admin-credentials";
+import { categories } from "@/lib/products";
 import type { Product } from "@/lib/products";
+import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
 import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
 
@@ -36,7 +36,7 @@ function AdminDashboard() {
   const [productError, setProductError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  
+
   // Validation errors
   const [errors, setErrors] = useState({
     name: "",
@@ -51,16 +51,23 @@ function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("todas");
   const [activeSection, setActiveSection] = useState<"products" | "analytics">("products");
+  const [adminProducts, setAdminProducts] = useState<Product[]>([]);
+  const [adminCategories, setAdminCategories] = useState<string[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem("adminAuth") === "true") {
-      setAuthenticated(true);
-    }
+    isAdminLoggedIn().then(setAuthenticated);
   }, []);
 
   useEffect(() => {
     if (authenticated) {
-      setProductCount(getAllProducts().length);
+      setLoadingProducts(true);
+      getAllProducts().then(products => {
+        setAdminProducts(products);
+        setProductCount(products.length);
+        setAdminCategories(getAllCategories());
+        setLoadingProducts(false);
+      });
     }
   }, [authenticated]);
 
@@ -89,20 +96,20 @@ function AdminDashboard() {
     };
   }, [authenticated]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro("");
 
-    if (validateAdminLogin(email, senha)) {
-      localStorage.setItem("adminAuth", "true");
+    const success = await validateAdminLogin(email, senha);
+    if (success) {
       setAuthenticated(true);
     } else {
       setErro("Email ou senha incorretos");
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminAuth");
+  const handleLogout = async () => {
+    await adminLogout();
     setAuthenticated(false);
     setEmail("");
     setSenha("");
@@ -253,7 +260,7 @@ function AdminDashboard() {
     return Object.values(newErrors).every(error => error === "");
   };
 
-  const handleNewProductSubmit = (e: React.FormEvent) => {
+  const handleNewProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setProductError("");
 
@@ -270,30 +277,35 @@ function AdminDashboard() {
       .map((scent) => scent.trim())
       .filter(Boolean);
 
-    const savedProduct = saveCustomProduct({
-      name: productName.trim(),
-      category,
-      price,
-      images: productImages.length > 0 ? productImages : [heroImg],
-      short: productShort.trim(),
-      description: productDescription.trim(),
-      scents: scents.length > 0 ? scents : ["Essencia especial"],
-      sizes: [{ label: "Unico", price }],
-    });
+    try {
+      const savedProduct = await saveProduct({
+        name: productName.trim(),
+        category,
+        price,
+        images: productImages.length > 0 ? productImages : [heroImg],
+        short: productShort.trim(),
+        description: productDescription.trim(),
+        scents: scents.length > 0 ? scents : ["Essencia especial"],
+        sizes: [{ label: "Unico", price }],
+      });
 
-    setProductCount(getAllProducts().length);
-    resetNewProductForm();
-    setSuccessMessage(`Produto "${productName.trim()}" cadastrado com sucesso!`);
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => setSuccessMessage(""), 3000);
+      const products = await getAllProducts();
+      setProductCount(products.length);
+      resetNewProductForm();
+      setSuccessMessage(`Produto "${productName.trim()}" cadastrado com sucesso!`);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setProductError(`Erro ao salvar produto: ${error instanceof Error ? error.message : 'Tente novamente.'}`);
+    }
   };
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct({ ...product });
   };
 
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setProductError("");
 
@@ -311,32 +323,49 @@ function AdminDashboard() {
       ? editingProduct.scents
       : ["Essencia especial"];
 
-    const updated = updateProduct({
-      ...editingProduct,
-      scents,
-      sizes: editingProduct.sizes && editingProduct.sizes.length > 0
-        ? editingProduct.sizes
-        : [{ label: "Unico", price }],
-    });
+    try {
+      if (!editingProduct.id) {
+        setProductError("Erro: Produto não possui ID.");
+        return;
+      }
 
-    setEditingProduct(null);
-    setProductCount(getAllProducts().length);
-    setSuccessMessage(`Produto "${editingProduct.name}" editado com sucesso!`);
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => setSuccessMessage(""), 3000);
+      await updateProductInDb(editingProduct.id!, {
+        ...editingProduct,
+        scents,
+        sizes: editingProduct.sizes && editingProduct.sizes.length > 0
+          ? editingProduct.sizes
+          : [{ label: "Unico", price }],
+      });
+
+      const products = await getAllProducts();
+      setProductCount(products.length);
+      setEditingProduct(null);
+      setSuccessMessage(`Produto "${editingProduct.name}" editado com sucesso!`);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setProductError("Erro ao editar produto. Tente novamente.");
+    }
   };
 
-  const handleDeleteProduct = () => {
+  const handleDeleteProduct = async () => {
     if (!deletingSlug) return;
-    const productName = getAllProducts().find(p => p.slug === deletingSlug)?.name || "";
-    deleteProduct(deletingSlug);
-    setDeletingSlug(null);
-    setProductCount(getAllProducts().length);
-    setSuccessMessage(`Produto "${productName}" deletado com sucesso!`);
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => setSuccessMessage(""), 3000);
+    const productName = adminProducts.find((p: Product) => p.slug === deletingSlug)?.name || "";
+
+    try {
+      await deleteProductFromDb(deletingSlug);
+      const products = await getAllProducts();
+      setAdminProducts(products);
+      setProductCount(products.length);
+      setDeletingSlug(null);
+      setSuccessMessage(`Produto "${productName}" deletado com sucesso!`);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setProductError("Erro ao deletar produto. Tente novamente.");
+    }
   };
 
   const startEdit = (product: Product) => {
@@ -401,7 +430,7 @@ function AdminDashboard() {
             placeholder="Use se quiser criar outra categoria"
           />
         </label>
-        
+
 
         <label className="space-y-2">
           <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco *</span>
@@ -675,10 +704,10 @@ function AdminDashboard() {
 
         {activeSection === "products" && newProductForm}
 
-        {activeSection === "products" && (
+        {activeSection === "products" && !loadingProducts && (
           <ProductManagementSection
-            products={getAllProducts()}
-            categories={getAllCategories()}
+            products={adminProducts}
+            categories={adminCategories}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             filterCategory={filterCategory}
@@ -688,15 +717,15 @@ function AdminDashboard() {
           />
         )}
 
-        {activeSection === "analytics" && (
-          <AnalyticsTab products={getAllProducts()} />
+        {activeSection === "analytics" && !loadingProducts && (
+          <AnalyticsTab products={adminProducts} />
         )}
       </div>
 
-      {editingProduct && (
+      {editingProduct && !loadingProducts && (
         <EditProductModal
           product={editingProduct}
-          categories={getAllCategories()}
+          categories={adminCategories}
           onSave={handleEditSubmit}
           onCancel={cancelEdit}
           onChange={updateEditingField}
@@ -704,9 +733,9 @@ function AdminDashboard() {
         />
       )}
 
-      {deletingSlug && (
+      {deletingSlug && !loadingProducts && (
         <DeleteConfirmModal
-          productName={getAllProducts().find(p => p.slug === deletingSlug)?.name || ""}
+          productName={adminProducts.find(p => p.slug === deletingSlug)?.name || ""}
           onConfirm={handleDeleteProduct}
           onCancel={() => setDeletingSlug(null)}
         />

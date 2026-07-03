@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import { getAllProducts } from "@/lib/products-supabase";
+import type { Product } from "@/lib/products-supabase";
 import { SimpleMap } from "@/components/SimpleMap";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
@@ -15,6 +16,24 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getAllProducts().then(products => {
+      setProducts(products);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl">Carregando produtos...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Header />

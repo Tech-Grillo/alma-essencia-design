@@ -112,35 +112,8 @@ let productsCache: Product[] | null = null;
 let cacheTimestamp = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
 
-// Buscar produtos (do Supabase ou cache local)
-export async function getAllProducts(): Promise<Product[]> {
-  if (!isSupabaseConfigured()) {
-    // Retornar produtos padrão + localStorage se Supabase não estiver configurado
-    return getLocalProducts();
-  }
-
-  try {
-    // Verificar cache
-    const now = Date.now();
-    if (productsCache && now - cacheTimestamp < CACHE_DURATION) {
-      return productsCache;
-    }
-
-    const dbProducts = await fetchProducts();
-    productsCache = dbProducts;
-    cacheTimestamp = now;
-    
-    return dbProducts;
-  } catch (error) {
-    console.error('Error fetching products from Supabase:', error);
-    // Fallback para produtos locais
-    return getLocalProducts();
-  }
-}
-
 // Produtos locais (fallback)
 function getLocalProducts(): Product[] {
-  // Importar funções do arquivo original
   const productsModule = require('./products');
   const customProducts = productsModule.getCustomProducts ? productsModule.getCustomProducts() : [];
   const editedProducts = productsModule.getEditedProducts ? productsModule.getEditedProducts() : [];
@@ -163,15 +136,36 @@ function getLocalProducts(): Product[] {
     });
 }
 
+// Buscar produtos (do Supabase ou cache local)
+export async function getAllProducts(): Promise<Product[]> {
+  if (!isSupabaseConfigured()) {
+    return getLocalProducts();
+  }
+
+  try {
+    const now = Date.now();
+    if (productsCache && now - cacheTimestamp < CACHE_DURATION) {
+      return productsCache;
+    }
+
+    const dbProducts = await fetchProducts();
+    productsCache = dbProducts;
+    cacheTimestamp = now;
+    
+    return dbProducts;
+  } catch (error) {
+    console.error('Error fetching products from Supabase:', error);
+    return getLocalProducts();
+  }
+}
+
 export function getAllCategories(): string[] {
-  // Implementação simplificada - retorna categorias padrão
   return categories;
 }
 
 // Salvar produto (criar ou atualizar)
 export async function saveProduct(product: any): Promise<Product> {
   if (!isSupabaseConfigured()) {
-    // Fallback para localStorage
     const { saveCustomProduct } = require('./products');
     return saveCustomProduct(product);
   }
@@ -182,27 +176,28 @@ export async function saveProduct(product: any): Promise<Product> {
     
     for (const imageUrl of product.images) {
       if (imageUrl.startsWith('data:')) {
-        // Converter base64 para File e fazer upload
         const response = await fetch(imageUrl);
         const blob = await response.blob();
         const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
         const uploadedUrl = await uploadImage(file, 'products');
         imageUrls.push(uploadedUrl);
       } else if (imageUrl.startsWith('http')) {
-        // Já é uma URL, manter como está
         imageUrls.push(imageUrl);
       } else {
-        // Caminho local, manter como está
         imageUrls.push(imageUrl);
       }
     }
 
     const productData = {
       ...product,
+      slug: product.slug && product.slug.trim() !== ''
+        ? product.slug
+        : slugifyProductName(product.name),
       images: imageUrls,
     };
 
     const saved = await createProduct(productData);
+    
     // Limpar cache
     productsCache = null;
     return saved;
@@ -215,13 +210,11 @@ export async function saveProduct(product: any): Promise<Product> {
 // Atualizar produto
 export async function updateProductInDb(id: number, product: any): Promise<Product> {
   if (!isSupabaseConfigured()) {
-    // Fallback para localStorage
     const { updateProduct } = require('./products');
     return updateProduct(product);
   }
 
   try {
-    // Se há imagens novas, fazer upload
     const productData: any = { ...product };
     
     if (product.images) {
@@ -243,7 +236,6 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
     }
 
     const updated = await updateProduct(id, productData);
-    // Limpar cache
     productsCache = null;
     return updated;
   } catch (error) {
@@ -255,18 +247,15 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
 // Deletar produto
 export async function deleteProductFromDb(slug: string): Promise<void> {
   if (!isSupabaseConfigured()) {
-    // Fallback para localStorage
     const { deleteProduct } = require('./products');
     return deleteProduct(slug);
   }
 
   try {
-    // Buscar produto para obter o ID
     const products = await getAllProducts();
     const product = products.find((p: any) => p.slug === slug);
     
     if (product && product.id) {
-      // Deletar imagens do storage
       for (const imageUrl of product.images) {
         if (imageUrl.includes('product-images')) {
           const path = new URL(imageUrl).pathname.split('/').slice(-2).join('/');
@@ -274,10 +263,8 @@ export async function deleteProductFromDb(slug: string): Promise<void> {
         }
       }
       
-      // Deletar produto do banco
       const { deleteProduct: deleteFromDb } = await import('./supabase');
       await deleteFromDb(product.id);
-      // Limpar cache
       productsCache = null;
     }
   } catch (error) {
@@ -286,7 +273,7 @@ export async function deleteProductFromDb(slug: string): Promise<void> {
   }
 }
 
-// Função para slugify (mantida para compatibilidade)
+// Função para slugify
 export function slugifyProductName(value: string): string {
   return value
     .normalize("NFD")
@@ -297,7 +284,7 @@ export function slugifyProductName(value: string): string {
     .replace(/(^-|-$)+/g, "");
 }
 
-// Função WhatsApp (mantida para compatibilidade)
+// Função WhatsApp
 export const WHATSAPP_NUMBER = "+55 (21) 98716-3045";
 
 export function whatsappLink(message: string): string {

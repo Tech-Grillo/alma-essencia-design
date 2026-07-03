@@ -1,133 +1,205 @@
-# Como Saber se o Supabase está Funcionando
+# 🎯 Guia Completo: Testar se o Supabase está Funcionando
 
-## 🎯 Teste 1: Verificar no Console do Navegador
+## 📋 Pré-requisitos
 
-1. Acesse http://localhost:8080/admin
-2. Faça login
-3. Pressione **F12** para abrir o DevTools
-4. Vá na aba **"Console"**
-5. Procure por estas mensagens:
+Antes de começar, verifique se você tem:
+- [x] Arquivo `.env.local` configurado com as credenciais do Supabase
+- [x] Dependências instaladas (`npm install` ou `bun install`)
+- [x] Servidor rodando (`npm run dev` ou `bun run dev`)
 
-### ✅ Se o Supabase estiver funcionando:
+---
+
+## 🔍 Teste 1: Verificar no Console do Navegador
+
+### Passo a passo:
+
+1. **Abra o navegador** e acesse: `http://localhost:8080/admin`
+
+2. **Abra o DevTools** (Ferramentas do Desenvolvedor):
+   - Pressione **F12**
+   - Ou clique com botão direito → **Inspecionar**
+
+3. **Vá na aba "Console"**
+
+4. **Faça login** no painel admin (email e senha)
+
+5. **Procure por estas mensagens:**
+
+### ✅ SUCESSO:
 ```
 ✅ Supabase configurado: https://vjznmeoftbgyebhclibb.supabase.co
 ```
 
-### ❌ Se NÃO estiver funcionando:
+### ❌ ERRO:
 ```
-⚠️ Supabase credentials not found. Please set VITE_SUPABASE_URL...
+⚠️ Supabase credentials not found. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 ```
 
 ---
 
-## 🎯 Teste 2: Criar um Produto com Imagem
+## 🧪 Teste 2: Criar um Produto no Painel Admin
 
-1. No painel admin, clique em **"Inserir novo produto"**
-2. Preencha os dados:
-   - Nome: `Produto Teste`
+### Passo a passo:
+
+1. **Acesse** `http://localhost:8080/admin`
+
+2. **Faça login** com suas credenciais
+
+3. **Preencha o formulário** de novo produto:
+   - Nome: `Vela Teste`
    - Categoria: `Velas`
-   - Preço: `99,90`
-   - Imagem: Adicione uma imagem
-3. Clique em **"Salvar produto"**
+   - Preço: `79,90`
+   - Imagem: Selecione uma imagem
+   - Resumo: `Vela aromática teste`
+   - Descrição: `Descrição do produto teste`
+   - Aromas: `Lavanda, Baunilha`
 
-### ✅ Se funcionar:
-- Mensagem verde: `Produto "Produto Teste" cadastrado com sucesso!`
-- Console mostra: `✅ Produto salvo no Supabase`
+4. **Clique em "Salvar produto"**
 
-### ❌ Se não funcionar:
-- Mensagem de erro
-- Console mostra: `Error saving product: ...`
-
----
-
-## 🎯 Teste 3: Verificar no Supabase Dashboard
-
-1. Acesse: https://supabase.com/dashboard/project/vjznmeoftbgyebhclibb/editor
-2. Clique em **"Table Editor"** no menu lateral
-3. Clique em **"products"**
-4. Se aparecer o produto que você criou = ✅ **FUNCIONANDO!**
-
-### Verificar imagens:
-1. Clique em **"Storage"** no menu lateral
-2. Clique em **"product-images"**
-3. Se aparecer a imagem que você enviou = ✅ **FUNCIONANDO!**
+5. **Verifique:**
+   - ✅ Mensagem verde de sucesso aparece
+   - ✅ Produto aparece na lista abaixo
+   - ✅ Contador de produtos aumenta
 
 ---
 
-## 🎯 Teste 4: Verificar a URL da Imagem
+## 🔎 Teste 3: Verificar no Supabase Dashboard
 
-1. No painel admin, encontre o produto que você criou
-2. Clique em **"Editar"**
-3. Na seção de imagens, clique com o botão direito na imagem
-4. Selecione **"Abrir imagem em nova aba"**
+### Passo a passo:
 
-### ✅ Se funcionar:
-- A imagem abre em uma nova aba
-- A URL contém: `vjznmeoftbgyebhclibb.supabase.co`
+1. **Acesse** o Supabase Dashboard:
+   ```
+   https://supabase.com/dashboard/project/vjznmeoftbgyebhclibb
+   ```
 
-### ❌ Se não funcionar:
-- A imagem não abre
-- A URL é um caminho local (ex: `/src/assets/...`)
+2. **Vá na seção "Table Editor"** (menu lateral esquerdo)
+
+3. **Selecione a tabela `products`**
+
+4. **Verifique se o produto aparece** na lista
+
+5. **Clique no produto** para ver os detalhes:
+   - Nome: `Vela Teste`
+   - Categoria: `Velas`
+   - Preço: `79.90`
+   - Imagens: URLs do Supabase Storage
+   - E todos os outros campos
 
 ---
 
-## 🔍 Diagnóstico Rápido
+## 📊 Teste 4: Verificar Storage (Imagens)
 
-### Se NÃO está funcionando, verifique:
+### Passo a passo:
 
-1. **Arquivo .env.local existe?**
-   ```bash
-   # Deve ter estas linhas:
+1. **No Supabase Dashboard**, vá em **Storage** (menu lateral)
+
+2. **Clique no bucket `product-images`**
+
+3. **Verifique se há arquivos** de imagem uploadados
+
+4. **Clique em uma imagem** para ver a URL pública
+
+5. **Copie a URL** e abra no navegador para verificar se a imagem carrega
+
+---
+
+## 🐛 Troubleshooting
+
+### Problema 1: "Supabase credentials not found"
+
+**Solução:**
+1. Verifique se o arquivo `.env.local` existe na raiz do projeto
+2. Verifique se as variáveis estão corretas:
+   ```env
    VITE_SUPABASE_URL=https://vjznmeoftbgyebhclibb.supabase.co
    VITE_SUPABASE_ANON_KEY=sb_publishable_I6T782mAHfBHTJBxw0yIZA_w5jAx...
    ```
+3. **Reinicie o servidor** após alterar o `.env.local`
 
-2. **Tabela products existe no Supabase?**
-   - Vá em SQL Editor e execute:
-   ```sql
-   SELECT EXISTS (
-     SELECT FROM information_schema.tables 
-     WHERE table_schema = 'public' 
-     AND table_name = 'products'
-   );
-   ```
-   - Deve retornar: `true`
+### Problema 2: Erro ao criar produto
 
-3. **Policies estão criadas?**
-   - Execute no SQL Editor:
-   ```sql
-   SELECT policyname FROM pg_policies WHERE tablename = 'products';
-   ```
-   - Deve retornar 4 policies
+**Solução:**
+1. Verifique o console do navegador (F12) para ver o erro exato
+2. Verifique se as tabelas foram criadas no Supabase:
+   - Execute o arquivo `executar_no_supabase.sql` no SQL Editor do Supabase
+3. Verifique se as políticas (RLS) estão configuradas
 
-4. **Bucket product-images existe?**
-   - Vá em Storage
-   - Deve aparecer o bucket "product-images"
+### Problema 3: Imagens não aparecem
 
----
+**Solução:**
+1. Verifique se o bucket `product-images` existe no Storage
+2. Verifique se as políticas de Storage estão configuradas
+3. Verifique se as URLs das imagens estão corretas
 
-## ✅ Checklist de Funcionamento:
+### Problema 4: Erro "relation 'products' does not exist"
 
-- [ ] Console mostra "Supabase configurado"
-- [ ] Consigo criar produto sem erro
-- [ ] Produto aparece no Table Editor do Supabase
-- [ ] Imagem aparece no Storage do Supabase
-- [ ] URL da imagem contém "supabase.co"
+**Solução:**
+1. A tabela `products` não foi criada
+2. Execute o script SQL no Supabase Dashboard:
+   - Abra o arquivo `executar_no_supabase.sql`
+   - Copie todo o conteúdo
+   - Cole no SQL Editor do Supabase
+   - Clique em "Run"
 
 ---
 
-## 🆘 Se ainda não funcionar:
+## ✅ Checklist de Verificação
 
-1. **Verifique o console do navegador** (F12 > Console)
-2. **Verifique o terminal** onde o servidor está rodando
-3. **Verifique se o SQL foi executado** corretamente no Supabase
-4. **Verifique se as policies foram criadas**
+Marque cada item após verificar:
 
-## 💡 Dica:
+- [ ] Console mostra "✅ Supabase configurado"
+- [ ] Consigo fazer login no admin
+- [ ] Consigo criar um produto
+- [ ] Mensagem de sucesso aparece
+- [ ] Produto aparece na lista
+- [ ] Produto aparece no Supabase Dashboard (Table Editor)
+- [ ] Imagens foram uploadadas para o Storage
+- [ ] Imagens carregam corretamente
 
-O sistema funciona em **modo híbrido**:
-- Se Supabase não estiver configurado → usa localStorage
-- Se Supabase estiver configurado → usa banco de dados
-- Se houver erro → automaticamente usa localStorage
+---
 
-Então você pode testar mesmo sem Supabase funcionando!
+## 📝 Comandos Úteis
+
+### Reiniciar servidor (se alterou .env.local):
+```bash
+# Windows
+Ctrl + C
+npm run dev
+
+# Mac/Linux
+./run-dev.sh
+```
+
+### Verificar variáveis de ambiente:
+```bash
+# No console do navegador (F12):
+console.log(import.meta.env.VITE_SUPABASE_URL)
+console.log(import.meta.env.VITE_SUPABASE_ANON_KEY)
+```
+
+### Limpar cache do localStorage (se necessário):
+```javascript
+// No console do navegador:
+localStorage.clear()
+location.reload()
+```
+
+---
+
+## 🎯 Resultado Esperado
+
+Se tudo estiver funcionando, você verá:
+
+1. ✅ Console: `✅ Supabase configurado: https://vjznmeoftbgyebhclibb.supabase.co`
+2. ✅ Admin: Produto criado com sucesso
+3. ✅ Supabase Dashboard: Produto na tabela `products`
+4. ✅ Supabase Storage: Imagens no bucket `product-images`
+
+---
+
+## 📞 Suporte
+
+Se ainda houver problemas:
+1. Verifique o console do navegador para erros detalhados
+2. Verifique os logs do Supabase Dashboard
+3. Verifique se todas as migrations foram executadas
