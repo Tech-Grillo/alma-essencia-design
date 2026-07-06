@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { getAllProducts } from "@/lib/products-supabase";
 import type { Product } from "@/lib/products-supabase";
 import { SimpleMap } from "@/components/SimpleMap";
-import heroImg from "@/assets/imagens_inicio/hero.jpg";
+import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
 import * as Icons from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -70,10 +70,11 @@ function Home() {
             <div className="absolute -inset-6 bg-rose/40 rounded-[3rem] rotate-3 blur-2xl" />
             <img
               src={heroImg}
-              alt="Velas artesanais, sabonetes e flores secas"
+              alt="Imagem ilustrativa de barraca e produtos artesanais"
               width={1600}
               height={1024}
-              className="relative rounded-[2.5rem] shadow-bloom object-cover aspect-[5/4] w-full"
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="relative rounded-[2.5rem] shadow-bloom object-cover aspect-[5/4] w-full h-auto"
             />
             {/* Floating badge */}
             <div className="absolute -bottom-6 -left-6 bg-card border border-border rounded-2xl shadow-soft px-5 py-3 hidden md:block">

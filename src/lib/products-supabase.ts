@@ -1,4 +1,4 @@
-import { supabase, uploadImage, deleteImage, fetchProducts, createProduct, updateProduct } from './supabase';
+import { supabase, uploadImage, deleteImage, fetchProducts, createProduct, updateProduct, fetchProductBySlug, deleteProduct } from './supabase';
 
 export type SizeOption = { label: string; price: number };
 
@@ -188,11 +188,14 @@ export async function saveProduct(product: any): Promise<Product> {
       }
     }
 
+    const slug = product.slug && product.slug.trim() !== ''
+      ? product.slug
+      : slugifyProductName(product.name);
+
     const productData = {
       ...product,
-      slug: product.slug && product.slug.trim() !== ''
-        ? product.slug
-        : slugifyProductName(product.name),
+      slug,
+      purchaseLink: product.purchaseLink || `/produtos/${slug}#comprar`,
       images: imageUrls,
     };
 
@@ -235,12 +238,32 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
       productData.images = imageUrls;
     }
 
+    const slug = productData.slug || slugifyProductName(productData.name);
+    productData.slug = slug;
+    productData.purchaseLink = productData.purchaseLink || `/produtos/${slug}#comprar`;
+
     const updated = await updateProduct(id, productData);
     productsCache = null;
     return updated;
   } catch (error) {
     console.error('Error updating product:', error);
     throw error;
+  }
+}
+
+// Buscar um produto por slug
+export async function getProductBySlug(slug: string): Promise<Product | undefined> {
+  if (!isSupabaseConfigured()) {
+    return getAllProducts().find((product) => product.slug === slug);
+  }
+
+  try {
+    const product = await fetchProductBySlug(slug);
+    if (product) return product;
+    return (await getAllProducts()).find((item) => item.slug === slug);
+  } catch (error) {
+    console.error('Error fetching product by slug from Supabase:', error);
+    return (await getAllProducts()).find((item) => item.slug === slug);
   }
 }
 
@@ -263,8 +286,7 @@ export async function deleteProductFromDb(slug: string): Promise<void> {
         }
       }
       
-      const { deleteProduct: deleteFromDb } = await import('./supabase');
-      await deleteFromDb(product.id);
+      await deleteProduct(product.id);
       productsCache = null;
     }
   } catch (error) {

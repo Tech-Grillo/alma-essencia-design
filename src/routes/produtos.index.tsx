@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { getAllCategories, getAllProducts } from "@/lib/products";
+import { getAllProducts, type Product } from "@/lib/products-supabase";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/produtos/")({
@@ -14,20 +14,46 @@ export const Route = createFileRoute("/produtos/")({
 });
 
 function ProductsList() {
-  const [allProducts, setAllProducts] = useState(() => getAllProducts());
-  const [allCategories, setAllCategories] = useState(() => getAllCategories());
-  const [filter, setFilter] = useState<string>(() => {
-    if (typeof window === "undefined") return "Todos";
-    return new URLSearchParams(window.location.search).get("categoria") || "Todos";
-  });
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [filter, setFilter] = useState<string>("Todos");
+  const [loading, setLoading] = useState(true);
   const list = filter === "Todos" ? allProducts : allProducts.filter((p) => p.category === filter);
 
   useEffect(() => {
-    setAllProducts(getAllProducts());
-    setAllCategories(getAllCategories());
+    if (typeof window === "undefined") return;
+    const category = new URLSearchParams(window.location.search).get("categoria") || "Todos";
+    setFilter(category);
 
-    const category = new URLSearchParams(window.location.search).get("categoria");
-    if (category) setFilter(category);
+    const onPopState = () => {
+      const nextCategory = new URLSearchParams(window.location.search).get("categoria") || "Todos";
+      setFilter(nextCategory);
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    getAllProducts()
+      .then((products) => {
+        if (!mounted) return;
+        setAllProducts(products);
+        setAllCategories(Array.from(new Set(products.map((product) => product.category))).sort());
+      })
+      .catch(() => {
+        if (!mounted) return;
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (

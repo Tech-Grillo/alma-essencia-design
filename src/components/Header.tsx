@@ -60,7 +60,7 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <Link
-              to="/admin/login"
+              to="/admin"
               aria-label="Acessar login administrativo"
               className="rounded-full p-2.5 hover:bg-secondary transition-colors"
             >
@@ -120,7 +120,7 @@ export function Header() {
             ))}
             <li>
               <Link
-                to="/admin/login"
+                to="/admin"
                 onClick={() => setOpen(false)}
                 className="font-serif text-2xl font-semibold text-chocolate dark:text-white px-4 py-3 rounded-full flex items-center gap-3 transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
               >

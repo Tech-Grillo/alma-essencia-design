@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductReviews } from "@/components/ProductReviews";
-import { getAllProducts, whatsappLink } from "@/lib/products";
+import { getAllProducts, getProductBySlug, whatsappLink, type Product } from "@/lib/products-supabase";
 import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useState } from "react";
 import * as Icons from "lucide-react";
@@ -30,9 +30,42 @@ function ProductPage() {
   const navigate = useNavigate();
   const { slug } = Route.useParams();
   const { addItem } = useCart();
-  const [allProducts, setAllProducts] = useState(() => getAllProducts());
-  const product = allProducts.find((p) => p.slug === slug);
-  
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setProduct(null);
+
+    Promise.all([getAllProducts(), getProductBySlug(slug)])
+      .then(([products, foundProduct]) => {
+        if (!mounted) return;
+        setAllProducts(products);
+        setProduct(foundProduct || null);
+      })
+      .catch(() => {
+        if (!mounted) return;
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl">Carregando produto...</p>
+      </div>
+    );
+  }
+
   // Track product view
   useProductTracking(product?.slug || "", product?.name || "");
   const [scent, setScent] = useState("");
@@ -61,10 +94,6 @@ function ProductPage() {
   };
 
   useEffect(() => {
-    setAllProducts(getAllProducts());
-  }, []);
-
-  useEffect(() => {
     if (!product) return;
 
     setScent(product.scents[0] || "");
@@ -80,7 +109,7 @@ function ProductPage() {
     }, 100);
   }, [product?.purchaseLink]);
 
-  if (!product) {
+  if (!product && !loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

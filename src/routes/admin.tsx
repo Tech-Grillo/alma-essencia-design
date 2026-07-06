@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { validateAdminLogin, isAdminLoggedIn, adminLogout } from "@/lib/admin-credentials";
@@ -65,7 +65,7 @@ function AdminDashboard() {
       getAllProducts().then(products => {
         setAdminProducts(products);
         setProductCount(products.length);
-        setAdminCategories(getAllCategories());
+        setAdminCategories(Array.from(new Set([...getAllCategories(), ...products.map((product) => product.category)])));
         setLoadingProducts(false);
       });
     }
@@ -291,8 +291,14 @@ function AdminDashboard() {
 
       const products = await getAllProducts();
       setProductCount(products.length);
+      setAdminProducts(products);
+      setAdminCategories(Array.from(new Set([...getAllCategories(), ...products.map((product) => product.category)])));
       resetNewProductForm();
       setSuccessMessage(`Produto "${productName.trim()}" cadastrado com sucesso!`);
+
+      // Redirecionar para o site principal na aba de produtos com categoria selecionada
+      const redirectCategory = encodeURIComponent(category);
+      navigate({ to: `/produtos?categoria=${redirectCategory}` });
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -339,8 +345,14 @@ function AdminDashboard() {
 
       const products = await getAllProducts();
       setProductCount(products.length);
+      setAdminProducts(products);
+      setAdminCategories(Array.from(new Set([...getAllCategories(), ...products.map((product) => product.category)])));
       setEditingProduct(null);
       setSuccessMessage(`Produto "${editingProduct.name}" editado com sucesso!`);
+
+      // Redirecionar para a página de produtos na categoria do item editado
+      const redirectCategory = encodeURIComponent(category);
+      navigate({ to: "/produtos", search: { categoria: redirectCategory } });
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -814,19 +826,40 @@ function ProductManagementSection({
               key={product.slug}
               className="flex flex-col md:flex-row md:items-center gap-4 p-4 rounded-2xl bg-background border border-border hover:border-caramel/50 transition"
             >
-              <img
-                src={product.images[0] || "/src/assets/imagens_inicio/hero.jpg"}
-                alt={product.name}
-                className="h-20 w-20 rounded-xl object-cover shadow-soft"
-              />
-              <div className="flex-1 min-w-0">
-                <h3 className="font-serif text-xl font-bold truncate">{product.name}</h3>
-                <p className="text-sm text-muted-foreground">{product.category}</p>
-                <p className="text-lg font-bold text-caramel-deep mt-1">
-                  R$ {product.price.toFixed(2).replace(".", ",")}
-                </p>
-              </div>
-              <div className="flex gap-2 md:gap-3">
+              <Link
+                to="/produtos/$slug"
+                params={{ slug: product.slug }}
+                className="flex-1 min-w-0 flex items-center gap-4 no-underline"
+              >
+                <img
+                  src={product.images[0] || "/src/assets/imagens_inicio/hero.jpg"}
+                  alt={product.name}
+                  className="h-20 w-20 rounded-xl object-cover shadow-soft"
+                />
+                <div className="min-w-0">
+                  <h3 className="font-serif text-xl font-bold truncate">{product.name}</h3>
+                  <p className="text-sm text-muted-foreground">{product.category}</p>
+                  <p className="text-lg font-bold text-caramel-deep mt-1">
+                    R$ {product.price.toFixed(2).replace(".", ",")}
+                  </p>
+                </div>
+              </Link>
+              <div className="flex flex-wrap gap-2 md:gap-3">
+                <Link
+                  to="/produtos/$slug"
+                  params={{ slug: product.slug }}
+                  className="inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-rose transition"
+                >
+                  <Icons.Eye className="h-4 w-4" />
+                  Ver detalhes
+                </Link>
+                <a
+                  href={product.purchaseLink}
+                  className="inline-flex items-center gap-2 rounded-full bg-rose text-white px-5 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-rose/90 transition"
+                >
+                  <Icons.ShoppingBag className="h-4 w-4" />
+                  Comprar
+                </a>
                 <button
                   onClick={() => onEdit(product)}
                   className="inline-flex items-center gap-2 rounded-full bg-caramel/20 text-caramel-deep px-5 py-2.5 text-sm font-bold uppercase tracking-wider hover:bg-caramel/30 transition"
