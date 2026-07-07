@@ -92,20 +92,65 @@ export const products: Product[] = [
 
 export const categories = [
   "Velas",
-  "Hidratantes",
+  "Sabonetes",
   "Home Spray",
   "Difusores",
-  "Sabonetes",
   "Kits",
+  "Hidratantes",
+  "Esfoliante corporal",
+  "Sugar Cream",
+  "Escalda-pés",
+  "Creme para mãos e pés",
+  "Sais de banho",
+  "Sabonetes glicerinados",
+  "Sabonetes fitoterápicos",
+  "Geleia de banho",
+  "Sabonete líquido",
+  "Manteigas corporais",
+  "Body Splash",
+  "Home spray 250ml",
+  "Home spray 60ml",
+  "Difusores de ambiente 250ml",
+  "Perfume para cabelo",
+  "Spa para os pés",
+  "Óleo corporal",
+  "Velas aromáticas",
+  "Velas de massagem",
+  "Whalts Melts",
+  "Sachês aromáticos",
+  "Pastilhas aromáticas",
+  "Águas para lençóis",
 ];
+
+export const categoryGroups = [
+  { parent: "Velas", children: ["Velas aromáticas", "Velas de massagem"] },
+  { parent: "Sabonetes", children: ["Sabonetes glicerinados", "Sabonetes fitoterápicos", "Sabonete líquido"] },
+  { parent: "Home Spray", children: ["Home spray 250ml", "Home spray 60ml"] },
+  { parent: "Difusores", children: ["Difusores de ambiente 250ml"] },
+  { parent: "Hidratantes", children: ["Esfoliante corporal", "Sugar Cream", "Creme para mãos e pés", "Manteigas corporais", "Óleo corporal"] },
+  { parent: "Kits", children: [] },
+];
+
+export const topLevelCategories = categoryGroups.map((group) => group.parent);
+
+export function getCategoryGroup(category: string) {
+  return categoryGroups.find((group) => group.parent === category || group.children.includes(category));
+}
+
+export function getCategoryChildren(parent: string) {
+  return categoryGroups.find((group) => group.parent === parent)?.children ?? [];
+}
 
 export const categoryImagePaths: Record<string, string> = {
   "Velas": "/src/assets/imagens_produtos/velas/",
-  "Hidratantes": "/src/assets/imagens_produtos/hidratantes/",
+  "Sabonetes": "/src/assets/imagens_produtos/sabonetes/",
   "Home Spray": "/src/assets/imagens_produtos/home-spray/",
   "Difusores": "/src/assets/imagens_produtos/difusores/",
-  "Sabonetes": "/src/assets/imagens_produtos/sabonetes/",
   "Kits": "/src/assets/imagens_produtos/kits/",
+  "Hidratantes": "/src/assets/imagens_produtos/hidratantes/",
+  "Home spray 250ml": "/src/assets/imagens_produtos/home-spray/",
+  "Home spray 60ml": "/src/assets/imagens_produtos/home-spray/",
+  "Difusores de ambiente 250ml": "/src/assets/imagens_produtos/difusores/",
 };
 
 export function getCategoryImagePath(category: string): string {

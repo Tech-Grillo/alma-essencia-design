@@ -9,7 +9,7 @@ export function Footer() {
       <div className="bg-chocolate text-cream/90 dark:bg-background dark:text-foreground">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid md:grid-cols-3 gap-12">
           <div>
-            <p className="mt-6 font-serif italic text-cream/70 leading-relaxed">
+            <p className="mt-6 font-serif italic text-cream/70 leading-relaxed text-base sm:text-lg">
               Pequenos rituais que perfumam a casa e acalmam a alma. Feitos à mão, com tempo e cuidado.
             </p>
           </div>

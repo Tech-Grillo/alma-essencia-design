@@ -6,7 +6,7 @@ at $env:USERPROFILE\node-v24.16.0-win-x64 if present.
 #>
 
 $proj = Split-Path -Parent $MyInvocation.MyCommand.Path
-$nodeDir = Join-Path $env:USERPROFILE "node-v24.16.0-win-x64"
+$nodeDir = Join-Path $proj "node-v24.16.0-win-x64"
 $nodeExe = Join-Path $nodeDir "node.exe"
 $npmCmd = Join-Path $nodeDir "npm.cmd"
 $viteCli = Join-Path $proj "node_modules\vite\bin\vite.js"

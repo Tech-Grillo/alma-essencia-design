@@ -111,7 +111,7 @@ export function productToCartItem(p: Product, size?: string, quantity = 1): Omit
   // find size price if available
   const sizeObj = p.sizes?.find((s: any) => s.label === size);
   const price = sizeObj ? sizeObj.price : p.price;
-  return { slug: p.slug, name: p.name, price, image: p.image, size: size ?? null };
+  return { slug: p.slug, name: p.name, price, image: p.images?.[0] ?? "", size: size ?? null };
 }
 
 export default CartProvider;

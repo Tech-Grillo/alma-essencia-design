@@ -94,7 +94,7 @@ function RouteComponent() {
                       
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground mb-1">R$ {item.price.toFixed(2).replace(".", ",")}</p>
-                        <p className="font-serif text-xl text-caramel-deep">R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</p>
+                        <p className="font-serif text-2xl font-bold bg-gradient-caramel bg-clip-text text-transparent">R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</p>
                       </div>
                     </div>
                   </div>
@@ -133,7 +133,7 @@ function RouteComponent() {
                 <div className="mb-6">
                   <div className="flex justify-between mb-3">
                     <span className="font-serif text-xl">Total</span>
-                    <span className="font-serif text-2xl text-caramel-deep">R$ {getTotal().toFixed(2).replace(".", ",")}</span>
+                    <span className="font-serif text-3xl font-bold bg-gradient-caramel bg-clip-text text-transparent">R$ {getTotal().toFixed(2).replace(".", ",")}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Frete será calculado com o vendedor</p>
                 </div>

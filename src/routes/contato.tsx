@@ -30,8 +30,8 @@ function Contact() {
         <div className="grid md:grid-cols-3 gap-5 mb-12">
           {[
             { icon: Icons.MessageCircle, label: "WhatsApp", value: "(21) 989794503", href: whatsappLink("Olá!") },
-            { icon: Icons.Mail, label: "E-mail", value: "ola@almaeessencia.com", href: "mailto:ola@almaeessencia.com" },
-            { icon: Icons.Instagram, label: "Instagram", value: "@almaeessencia", href: "#" },
+            { icon: Icons.Mail, label: "E-mail", value: "alamaeessencia36@gmail.com", href: "mailto:alamaeessencia36@gmail.com" },
+            { icon: Icons.Instagram, label: "Instagram", value: "@alma_e_essencia", href: "#" },
           ].map((c) => {
             const Icon = c.icon;
             if (!Icon) {

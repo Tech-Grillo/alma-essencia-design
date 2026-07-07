@@ -43,7 +43,7 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="flex items-center justify-between mb-4">
-          <span className="font-serif text-2xl text-caramel-deep dark:text-white">
+          <span className="font-serif text-4xl font-bold bg-gradient-caramel bg-clip-text text-transparent">
             R$ {Math.min(...product.sizes.map((s: any) => s.price)).toFixed(2).replace(".", ",")}
           </span>
           <Link
@@ -55,12 +55,13 @@ export function ProductCard({ product }: { product: Product }) {
           </Link>
         </div>
 
-        <a
-          href={product.purchaseLink}
+        <Link
+          to="/produtos/$slug"
+          params={{ slug: product.slug }}
           className="absolute left-0 right-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 text-white text-sm py-3 flex items-center justify-center gap-2 font-medium bg-rose rounded-tl-3xl rounded-tr-3xl"
         >
           <Icons.ShoppingBag className="h-4 w-4" /> Comprar
-        </a>
+        </Link>
       </div>
     </article>
   );

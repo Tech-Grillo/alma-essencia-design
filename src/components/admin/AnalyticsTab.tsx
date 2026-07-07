@@ -98,7 +98,7 @@ export function AnalyticsTab({ products }: AnalyticsTabProps) {
             </div>
             <div>
               <h3 className="text-sm uppercase tracking-widest text-muted-foreground">Receita Total</h3>
-              <p className="font-serif text-3xl">R$ {totalRevenue.toFixed(2).replace(".", ",")}</p>
+              <p className="font-serif text-3xl font-bold bg-gradient-caramel bg-clip-text text-transparent">R$ {totalRevenue.toFixed(2).replace(".", ",")}</p>
             </div>
           </div>
           <p className="text-xs text-muted-foreground">Faturamento total</p>
@@ -111,7 +111,7 @@ export function AnalyticsTab({ products }: AnalyticsTabProps) {
             </div>
             <div>
               <h3 className="text-sm uppercase tracking-widest text-muted-foreground">Ticket Médio</h3>
-              <p className="font-serif text-3xl">
+              <p className="font-serif text-3xl font-bold bg-gradient-caramel bg-clip-text text-transparent">
                 R$ {totalSales > 0 ? (totalRevenue / totalSales).toFixed(2).replace(".", ",") : "0,00"}
               </p>
             </div>
@@ -331,7 +331,7 @@ export function AnalyticsTab({ products }: AnalyticsTabProps) {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-serif text-lg text-caramel-deep">
+                    <p className="font-serif text-xl font-bold bg-gradient-caramel bg-clip-text text-transparent">
                       R$ {(sale.price * sale.quantity).toFixed(2).replace(".", ",")}
                     </p>
                     <p className="text-xs text-muted-foreground">Qtd: {sale.quantity}</p>

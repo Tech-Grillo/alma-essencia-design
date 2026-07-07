@@ -100,11 +100,34 @@ const defaultProducts: Product[] = [
 
 export const categories = [
   "Velas",
-  "Hidratantes",
+  "Sabonetes",
   "Home Spray",
   "Difusores",
-  "Sabonetes",
   "Kits",
+  "Hidratantes",
+  "Esfoliante corporal",
+  "Sugar Cream",
+  "Escalda-pés",
+  "Creme para mãos e pés",
+  "Sais de banho",
+  "Sabonetes glicerinados",
+  "Sabonetes fitoterápicos",
+  "Geleia de banho",
+  "Sabonete líquido",
+  "Manteigas corporais",
+  "Body Splash",
+  "Home spray 250ml",
+  "Home spray 60ml",
+  "Difusores de ambiente 250ml",
+  "Perfume para cabelo",
+  "Spa para os pés",
+  "Óleo corporal",
+  "Velas aromáticas",
+  "Velas de massagem",
+  "Whalts Melts",
+  "Sachês aromáticos",
+  "Pastilhas aromáticas",
+  "Águas para lençóis",
 ];
 
 // Cache de produtos
@@ -254,7 +277,7 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
 // Buscar um produto por slug
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
   if (!isSupabaseConfigured()) {
-    return getAllProducts().find((product) => product.slug === slug);
+    return (await getAllProducts()).find((product) => product.slug === slug);
   }
 
   try {

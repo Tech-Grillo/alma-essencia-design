@@ -58,16 +58,6 @@ function ProductPage() {
     };
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl">Carregando produto...</p>
-      </div>
-    );
-  }
-
-  // Track product view
-  useProductTracking(product?.slug || "", product?.name || "");
   const [scent, setScent] = useState("");
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
@@ -109,7 +99,15 @@ function ProductPage() {
     }, 100);
   }, [product?.purchaseLink]);
 
-  if (!product && !loading) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl">Carregando produto...</p>
+      </div>
+    );
+  }
+
+  if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -173,7 +171,7 @@ function ProductPage() {
               Ir para a compra do produto
             </a>
 
-            <p className="font-serif text-3xl text-caramel-deep mb-8">
+            <p className="font-serif text-5xl font-bold bg-gradient-caramel bg-clip-text text-transparent mb-8">
               R$ {( (product.sizes.find((s: any) => s.label === size)?.price ?? product.price) * qty ).toFixed(2).replace(".", ",")}
             </p>
 

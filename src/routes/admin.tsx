@@ -2,8 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { validateAdminLogin, isAdminLoggedIn, adminLogout } from "@/lib/admin-credentials";
-import { categories } from "@/lib/products";
-import type { Product } from "@/lib/products";
+import { categories, categoryGroups, topLevelCategories } from "@/lib/products";
+import type { Product } from "@/lib/products-supabase";
 import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
 import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
@@ -426,9 +426,18 @@ function AdminDashboard() {
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
             required
           >
-            {categories.map((category) => (
-              <option key={category} value={category}>{category}</option>
-            ))}
+            <optgroup label="Categorias principais">
+              {topLevelCategories.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Variações">
+              {categories
+                .filter((category) => !topLevelCategories.includes(category))
+                .map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+            </optgroup>
           </select>
           {errors.category && <p className="text-sm text-rose font-medium">{errors.category}</p>}
         </label>
@@ -839,7 +848,7 @@ function ProductManagementSection({
                 <div className="min-w-0">
                   <h3 className="font-serif text-xl font-bold truncate">{product.name}</h3>
                   <p className="text-sm text-muted-foreground">{product.category}</p>
-                  <p className="text-lg font-bold text-caramel-deep mt-1">
+                  <p className="text-3xl font-bold bg-gradient-caramel bg-clip-text text-transparent mt-1">
                     R$ {product.price.toFixed(2).replace(".", ",")}
                   </p>
                 </div>
