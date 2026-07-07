@@ -22,11 +22,11 @@ export function ProductCard({ product }: { product: Product }) {
           />
         </Link>
       </div>
-      <div className="p-6 pb-16">
+      <div className="p-4 sm:p-6 pb-16">
         <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 dark:text-white mb-2 text-center">
           {product.category}
         </p>
-        <h3 className="font-serif text-2xl leading-tight mb-1 text-center">{product.name}</h3>
+        <h3 className="font-serif text-xl sm:text-2xl leading-tight mb-1 text-center">{product.name}</h3>
         <p className="text-sm text-muted-foreground mb-4 line-clamp-2 text-center">
           {product.short}
         </p>
@@ -42,14 +42,14 @@ export function ProductCard({ product }: { product: Product }) {
           ))}
         </div>
 
-        <div className="flex items-center justify-between mb-4">
-          <span className="font-serif text-4xl font-bold bg-gradient-caramel bg-clip-text text-transparent">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <span className="font-serif text-3xl sm:text-4xl font-bold bg-gradient-caramel bg-clip-text text-transparent">
             R$ {Math.min(...product.sizes.map((s: any) => s.price)).toFixed(2).replace(".", ",")}
           </span>
           <Link
             to="/produtos/$slug"
             params={{ slug: product.slug }}
-            className="rounded-full px-4 py-2 text-sm bg-secondary hover:bg-rose transition-colors"
+            className="rounded-full px-4 py-2 text-sm bg-secondary hover:bg-rose transition-colors text-center"
           >
             Ver detalhes
           </Link>
@@ -60,7 +60,7 @@ export function ProductCard({ product }: { product: Product }) {
           params={{ slug: product.slug }}
           className="absolute left-0 right-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 text-white text-sm py-3 flex items-center justify-center gap-2 font-medium bg-rose rounded-tl-3xl rounded-tr-3xl"
         >
-          <Icons.ShoppingBag className="h-4 w-4" /> Comprar
+          <Icons.ShoppingBag className="h-4 w-4" /> COMPRAR
         </Link>
       </div>
     </article>

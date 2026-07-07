@@ -182,8 +182,8 @@ export function ProductReviews({ product }: { product: Product }) {
         <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-8 p-6 lg:p-8">
           <form onSubmit={handleSubmit} className="rounded-[1.5rem] bg-secondary/45 p-6 space-y-5">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-caramel-deep mb-2">Sua avaliacao</p>
-              <h2 className="font-serif text-3xl">Conte como foi sua experiencia</h2>
+              <p className="text-xs uppercase tracking-[0.25em] text-caramel-deep mb-2">Sua avaliação</p>
+              <h2 className="font-serif text-3xl">Conte como foi sua experiência</h2>
             </div>
 
             <div>

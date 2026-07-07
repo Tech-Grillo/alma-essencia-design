@@ -6,6 +6,7 @@ import { getAllProducts } from "@/lib/products-supabase";
 import type { Product } from "@/lib/products-supabase";
 import { SimpleMap } from "@/components/SimpleMap";
 import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
+import heroImgFront from "@/assets/imagens_inicio/imagem_frente_mae.png";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
 import * as Icons from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -18,6 +19,8 @@ export const Route = createFileRoute("/")({
 function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroIndex, setHeroIndex] = useState(0);
+  const heroImages = [heroImg, heroImgFront];
 
   useEffect(() => {
     getAllProducts().then(products => {
@@ -25,6 +28,14 @@ function Home() {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroIndex((current) => (current + 1) % heroImages.length);
+    }, 2000);
+
+    return () => window.clearInterval(timer);
+  }, [heroImages.length]);
 
   if (loading) {
     return (
@@ -41,22 +52,22 @@ function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-warm opacity-80" />
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-10 pt-16 pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-14 items-center">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-10 sm:gap-14 items-center">
           <div className="relative z-10 animate-slide-in-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-8 border border-border">
               <Icons.Sparkles className="h-3 w-3" /> Artesanal · Natural
             </div>
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-foreground">
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-foreground">
               Feito com <em className="font-script text-caramel-deep dark:text-white not-italic">amor</em>,<br />
               sentido na pele.
             </h1>
-            <p className="mt-7 max-w-md text-lg text-muted-foreground leading-relaxed">
+            <p className="mt-7 max-w-md text-base sm:text-lg text-muted-foreground leading-relaxed">
               Velas, sabonetes e brumas perfumadas que transformam o ordinário em ritual. Pequenas pausas para respirar.
             </p>
-            <div className="mt-10 flex items-center gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link
                 to="/produtos"
-                className="rounded-full bg-gradient-caramel text-primary-foreground px-8 py-4 shadow-soft hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-sm uppercase tracking-[0.5em]"
+                className="w-full sm:w-auto rounded-full bg-gradient-caramel text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 shadow-soft hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-sm uppercase tracking-[0.5em] text-center"
               >
                 Explorar Produtos
               </Link>
@@ -68,14 +79,34 @@ function Home() {
 
           <div className="relative animate-slide-in-right">
             <div className="absolute -inset-6 bg-rose/40 rounded-[3rem] rotate-3 blur-2xl" />
-            <img
-              src={heroImg}
-              alt="Imagem ilustrativa de barraca e produtos artesanais"
-              width={1600}
-              height={1024}
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="relative rounded-[2.5rem] shadow-bloom object-cover aspect-[5/4] w-full h-auto"
-            />
+            <div className="relative overflow-hidden rounded-[2.5rem] shadow-bloom">
+              <div className="flex transition-transform duration-[2200ms] ease-[cubic-bezier(0.22,1,0.36,1)]" style={{ transform: `translateX(-${heroIndex * 100}%)` }}>
+                {heroImages.map((image, index) => (
+                  <img
+                    key={`${image}-${index}`}
+                    src={image}
+                    alt={`Imagem ilustrativa da marca em destaque ${index + 1}`}
+                    width={1600}
+                    height={1024}
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="min-w-full object-cover aspect-[5/4] w-full h-auto"
+                  />
+                ))}
+              </div>
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                {heroImages.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    aria-label={`Selecionar imagem ${index + 1}`}
+                    onClick={() => setHeroIndex(index)}
+                    className={`h-2.5 w-2.5 rounded-full border border-white/80 transition-all duration-300 ${
+                      heroIndex === index ? "scale-125 bg-white" : "bg-white/50 hover:bg-white/80"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
             {/* Floating badge */}
             <div className="absolute -bottom-6 -left-6 bg-card border border-border rounded-2xl shadow-soft px-5 py-3 hidden md:block">
               <p className="font-script text-2xl text-caramel-deep leading-none">100%</p>
@@ -94,7 +125,7 @@ function Home() {
       </section>
 
       {/* ABOUT */}
-      <section className="mx-auto max-w-7xl px-6 lg:px-10 py-24 lg:py-32 grid lg:grid-cols-2 gap-16 items-center animate-fade-in-up">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">
         <div className="relative">
           <img
             src={aboutImg}
@@ -108,13 +139,13 @@ function Home() {
         </div>
         <div>
           <p className="font-script text-3xl text-caramel-deep dark:text-white mb-3">— Quem somos</p>
-          <h2 className="font-serif text-4xl md:text-5xl leading-tight mb-6">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl leading-tight mb-6">
             Uma história feita à mão, dentro de casa.
           </h2>
           <div className="botanical-divider mb-6 max-w-xs ml-0">
             <span>✿</span>
           </div>
-          <p className="text-muted-foreground leading-relaxed text-lg mb-4">
+          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-lg sm:text-xl md:text-2xl mb-4 font-medium">
             A Alma e Essência nasceu na cozinha da nossa casa, entre panelas de cera e
             flores secas. Cada produto é pensado, mexido e embalado por mãos da família —
             com tempo, intenção e ingredientes que respeitam a pele e a natureza.
@@ -129,7 +160,7 @@ function Home() {
       <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-3">Destaques</p>
-          <h2 className="font-serif text-4xl md:text-5xl">Produtos favoritos</h2>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl">Produtos favoritos</h2>
           <div className="botanical-divider mt-6"><span>❀</span></div>
         </div>
         <FeaturedCarousel products={products} />
@@ -138,12 +169,12 @@ function Home() {
       {/* LOCATION */}
       <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="rounded-[2.5rem] overflow-hidden border border-border bg-card shadow-soft grid md:grid-cols-2">
-          <div className="p-10 md:p-14 flex flex-col justify-center">
+          <div className="p-6 sm:p-10 md:p-14 flex flex-col justify-center">
               <div className="inline-flex items-center gap-2 text-caramel-deep dark:text-white mb-4">
               <Icons.MapPin className="h-5 w-5" />
               <span className="text-xs uppercase tracking-[0.3em]">Visite-nos</span>
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl mb-4">Nos encontre</h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">Nos encontre</h2>
             <p className="text-muted-foreground leading-relaxed mb-2">
               BAIRRO DE ICARAÍ <br /> <span className="detalhe dark:text-white" style={{ color: "var(--caramel-deep)" }}>FEIRA - CAMPO DE SÃO BENTO</span><br />RIO DE JANEIRO · RJ
             </p>

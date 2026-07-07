@@ -75,6 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#f7f2ea" },
       { title: "Alma e Essência — Aromaterapia Artesanal" },
       { name: "description", content: "Velas, sabonetes, home sprays e difusores feitos à mão com amor. Pequenos rituais para perfumar a casa e acalmar a alma." },
       { name: "author", content: "Alma e Essência" },

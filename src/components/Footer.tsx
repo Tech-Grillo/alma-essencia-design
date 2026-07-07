@@ -1,15 +1,16 @@
 import * as Icons from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { whatsappLink } from "@/lib/products";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export function Footer() {
   return (
     <footer className="mt-32 relative">
       <div className="h-px bg-gradient-to-r from-transparent via-rose to-transparent" />
       <div className="bg-chocolate text-cream/90 dark:bg-background dark:text-foreground">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid md:grid-cols-3 gap-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-12 sm:py-16 grid gap-8 sm:gap-10 md:grid-cols-3">
           <div>
-            <p className="mt-6 font-serif italic text-cream/70 leading-relaxed text-base sm:text-lg">
+            <p className="mt-4 sm:mt-6 font-serif italic text-cream/70 leading-relaxed text-base sm:text-lg">
               Pequenos rituais que perfumam a casa e acalmam a alma. Feitos à mão, com tempo e cuidado.
             </p>
           </div>
@@ -40,7 +41,7 @@ export function Footer() {
               target="_blank" rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-whatsapp text-white px-5 py-2.5 text-sm hover:opacity-90 transition"
             >
-              <Icons.MessageCircle className="h-4 w-4" /> Falar no WhatsApp
+              <WhatsAppIcon className="h-4 w-4" /> Falar no WhatsApp
             </a>
           </div>
         </div>

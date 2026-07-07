@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { X, MessageCircle, ChevronRight, ShoppingBag, MapPin, Phone, Mail, Instagram, Package, Info } from "lucide-react";
+import { X, ChevronRight, ShoppingBag, MapPin, Phone, Mail, Instagram, Package, Info, Heart } from "lucide-react";
 
 type GuideSection = "home" | "products" | "about" | "contact" | "cart";
 
@@ -319,7 +319,7 @@ export default function HelpBot() {
         onClick={() => setOpen((s) => !s)}
         className="fixed z-50 right-6 bottom-6 inline-flex items-center justify-center rounded-full bg-rose/90 hover:bg-rose text-white h-14 w-14 shadow-lg hover:shadow-xl transition-all hover:scale-110"
       >
-        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        {open ? <X className="h-6 w-6" /> : <Heart className="h-6 w-6" />}
       </button>
 
       {/* Panel */}
@@ -334,7 +334,7 @@ export default function HelpBot() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">
-                <MessageCircle className="h-5 w-5 text-white" />
+                <Heart className="h-5 w-5 text-white" />
               </div>
               <div>
                 <h3 className="font-serif text-base text-white font-semibold">Guia Rápido</h3>

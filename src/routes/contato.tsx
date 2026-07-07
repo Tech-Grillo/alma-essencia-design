@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SimpleMap } from "@/components/SimpleMap";
 import * as Icons from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export const whatsappLink = (productName: string) => {
   const phoneNumber = "5521987163045"; // 55 (Brasil) + 21 (DDD) + Número
@@ -20,16 +21,16 @@ function Contact() {
   return (
     <div className="min-h-screen">
       <Header />
-      <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24 animate-fade-in-up">
-        <div className="text-center mb-14">
-          <p className="font-script text-3xl text-caramel-deep dark:text-white">— Conecte-se</p>
-          <h1 className="font-serif text-5xl md:text-6xl">Fale com a gente</h1>
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-10 pt-12 sm:pt-16 pb-20 sm:pb-24 animate-fade-in-up">
+        <div className="text-center mb-10 sm:mb-14">
+          <p className="font-script text-2xl sm:text-3xl text-caramel-deep dark:text-white">— Conecte-se</p>
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl">Fale com a gente</h1>
           <div className="botanical-divider mt-6"><span>✿</span></div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5 mb-12">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10 sm:mb-12">
           {[
-            { icon: Icons.MessageCircle, label: "WhatsApp", value: "(21) 989794503", href: whatsappLink("Olá!") },
+            { icon: WhatsAppIcon, label: "WhatsApp", value: "(21) 989794503", href: whatsappLink("Olá!") },
             { icon: Icons.Mail, label: "E-mail", value: "alamaeessencia36@gmail.com", href: "mailto:alamaeessencia36@gmail.com" },
             { icon: Icons.Instagram, label: "Instagram", value: "@alma_e_essencia", href: "#" },
           ].map((c) => {
@@ -59,7 +60,7 @@ function Contact() {
         </div>
 
         <div className="rounded-[2rem] overflow-hidden border border-border">
-          <div className="p-8 bg-secondary/40 flex items-center gap-3">
+          <div className="p-6 sm:p-8 bg-secondary/40 flex items-center gap-3">
             <Icons.MapPin className="h-5 w-5 text-caramel-deep dark:text-white" />
             <div>
               <p className="font-serif text-lg">BAIRRO DE ICARAÍ</p>

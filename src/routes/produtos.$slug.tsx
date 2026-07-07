@@ -8,6 +8,7 @@ import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useState } from "react";
 import * as Icons from "lucide-react";
 import { useProductTracking } from "@/hooks/useProductTracking";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: ProductPage,
@@ -237,10 +238,7 @@ function ProductPage() {
               target="_blank" rel="noreferrer"
               className="w-full flex items-center justify-center gap-3 rounded-full bg-whatsapp text-white py-5 text-base font-medium shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all"
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-                <path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/>
-                <path d="M20.5 3.5C18.3 1.2 15.2 0 12 0 5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4 6.6 0 12-5.4 12-12 .1-3.2-1.2-6.3-3.4-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4c-1-1.6-1.5-3.5-1.5-5.4 0-5.5 4.5-10 10-10 2.7 0 5.2 1 7.1 2.9 1.9 1.9 2.9 4.4 2.9 7.1 0 5.5-4.5 10-10 10z"/>
-              </svg>
+              <WhatsAppIcon className="h-5 w-5" />
               Comprar pelo WhatsApp
             </a>
             <p className="text-xs text-center text-muted-foreground mt-3">Atendimento personalizado · Resposta em minutos</p>

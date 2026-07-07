@@ -4,6 +4,7 @@ import { whatsappLink } from "@/lib/products";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import * as Icons from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export const Route = createFileRoute("/carrinho")({
   component: RouteComponent,
@@ -34,19 +35,19 @@ function RouteComponent() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 py-10">
-        <div className="flex items-center gap-3 mb-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-8 sm:py-10">
+        <div className="flex items-center gap-3 mb-8 sm:mb-10">
           <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-caramel-deep">
             <Icons.ChevronLeft className="h-4 w-4" /> Voltar
           </Link>
         </div>
         
 
-        <h1 className="font-serif text-5xl mb-2">Meu Carrinho</h1>
+        <h1 className="font-serif text-4xl sm:text-5xl mb-2">Meu Carrinho</h1>
         <p className="text-muted-foreground mb-8">{getCount()} {getCount() === 1 ? "item" : "itens"}</p>
 
         {items.length === 0 ? (
-          <div className="rounded-3xl border-2 border-dashed border-border p-12 text-center">
+          <div className="rounded-3xl border-2 border-dashed border-border p-8 sm:p-12 text-center">
             <Icons.ShoppingBag className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-lg font-medium mb-2">Seu carrinho está vazio</p>
             <p className="text-muted-foreground mb-6">Explore nossos produtos e adicione algo especial!</p>
@@ -55,11 +56,11 @@ function RouteComponent() {
             </Link>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-10">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-10">
             {/* Produtos */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
-                <div key={`${item.slug}-${item.size ?? "default"}`} className="rounded-2xl border border-border bg-card p-6 flex gap-6">
+                <div key={`${item.slug}-${item.size ?? "default"}`} className="rounded-2xl border border-border bg-card p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
                   {item.image && (
                     <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-secondary/40">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -72,7 +73,7 @@ function RouteComponent() {
                       <p className="text-sm text-muted-foreground mb-3">Tamanho: <span className="font-medium text-foreground">{item.size}</span></p>
                     )}
                     
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <span className="text-sm text-muted-foreground">Quantidade:</span>
                         <div className="inline-flex items-center rounded-full border border-border bg-secondary/50">
@@ -112,7 +113,7 @@ function RouteComponent() {
 
             {/* Resumo */}
             <div className="lg:col-span-1">
-              <div className="rounded-3xl border-2 border-rose/20 bg-rose/5 p-8 sticky top-24">
+              <div className="rounded-3xl border-2 border-rose/20 bg-rose/5 p-6 sm:p-8 lg:sticky lg:top-24">
                 <h2 className="font-serif text-2xl mb-6">Resumo do pedido</h2>
                 
                 <div className="space-y-3 mb-6 pb-6 border-b border-border">
@@ -144,10 +145,7 @@ function RouteComponent() {
                     target="_blank" rel="noreferrer"
                     className="w-full flex items-center justify-center gap-2 rounded-full bg-whatsapp text-white py-4 font-medium hover:opacity-90 transition-opacity shadow-soft hover:shadow-bloom"
                   >
-                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-                      <path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/>
-                      <path d="M20.5 3.5C18.3 1.2 15.2 0 12 0 5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4 6.6 0 12-5.4 12-12 .1-3.2-1.2-6.3-3.4-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4c-1-1.6-1.5-3.5-1.5-5.4 0-5.5 4.5-10 10-10 2.7 0 5.2 1 7.1 2.9 1.9 1.9 2.9 4.4 2.9 7.1 0 5.5-4.5 10-10 10z"/>
-                    </svg>
+                    <WhatsAppIcon className="h-5 w-5" />
                     Comprar pelo WhatsApp
                   </a>
                   <p className="text-xs text-center text-muted-foreground">Atendimento personalizado · Resposta em minutos</p>

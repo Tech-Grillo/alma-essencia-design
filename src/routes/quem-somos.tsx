@@ -15,18 +15,18 @@ function About() {
   return (
     <div className="min-h-screen">
       <Header />
-      <section className="mx-auto max-w-5xl px-6 lg:px-10 pt-16 pb-24 animate-fade-in-up">
-        <div className="text-center mb-14">
-          <p className="font-script text-3xl text-caramel-deep dark:text-white">— Nossa história</p>
-          <h1 className="font-serif text-5xl md:text-6xl mt-1">Pequeno, feito com tempo.</h1>
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-10 pt-12 sm:pt-16 pb-20 sm:pb-24 animate-fade-in-up">
+        <div className="text-center mb-10 sm:mb-14">
+          <p className="font-script text-2xl sm:text-3xl text-caramel-deep dark:text-white">— Nossa história</p>
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl mt-1">Pequeno, feito com tempo.</h1>
           <div className="botanical-divider mt-6"><span>✿</span></div>
         </div>
-        <img src={aboutImg} alt="Mãos artesanais" loading="lazy" className="rounded-[2rem] w-full aspect-[16/9] object-cover shadow-soft mb-12" />
+        <img src={aboutImg} alt="Mãos artesanais" loading="lazy" className="rounded-[2rem] w-full aspect-[16/9] object-cover shadow-soft mb-8 sm:mb-12" />
         <div className="prose prose-lg mx-auto max-w-2xl text-muted-foreground leading-relaxed space-y-6">
           <p className="text-xl font-serif text-foreground">
             Tudo começou numa cozinha pequena, com cera derretendo numa panela e o cheiro de lavanda invadindo a casa.
           </p>
-          <p>
+          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-xl md:text-2xl font-medium">
             A Alma e Essência é um pequeno negócio que nasceu do desejo de transformar
             momentos simples em rituais de cuidado. Nossos proutos são feitos
             com ingredientes naturais e muito carinho.

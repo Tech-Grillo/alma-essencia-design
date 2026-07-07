@@ -172,10 +172,14 @@ export async function getAllProducts(): Promise<Product[]> {
     }
 
     const dbProducts = await fetchProducts();
-    productsCache = dbProducts;
+    const withLinks = dbProducts.map((p: any) => ({
+      ...p,
+      purchaseLink: `/produtos/${p.slug}#comprar`,
+    }));
+    productsCache = withLinks;
     cacheTimestamp = now;
-    
-    return dbProducts;
+
+    return withLinks;
   } catch (error) {
     console.error('Error fetching products from Supabase:', error);
     return getLocalProducts();
@@ -215,18 +219,20 @@ export async function saveProduct(product: any): Promise<Product> {
       ? product.slug
       : slugifyProductName(product.name);
 
+    // purchaseLink não existe como coluna no banco — é sempre derivado do slug,
+    // então não deve ser enviado no insert.
+    const { purchaseLink, ...rest } = product;
     const productData = {
-      ...product,
+      ...rest,
       slug,
-      purchaseLink: product.purchaseLink || `/produtos/${slug}#comprar`,
       images: imageUrls,
     };
 
     const saved = await createProduct(productData);
-    
+
     // Limpar cache
     productsCache = null;
-    return saved;
+    return { ...saved, purchaseLink: `/produtos/${saved.slug}#comprar` };
   } catch (error) {
     console.error('Error saving product:', error);
     throw error;
@@ -263,11 +269,12 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
 
     const slug = productData.slug || slugifyProductName(productData.name);
     productData.slug = slug;
-    productData.purchaseLink = productData.purchaseLink || `/produtos/${slug}#comprar`;
+    // purchaseLink não existe como coluna no banco — remove antes de enviar.
+    delete productData.purchaseLink;
 
     const updated = await updateProduct(id, productData);
     productsCache = null;
-    return updated;
+    return { ...updated, purchaseLink: `/produtos/${updated.slug}#comprar` };
   } catch (error) {
     console.error('Error updating product:', error);
     throw error;
@@ -282,7 +289,7 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
 
   try {
     const product = await fetchProductBySlug(slug);
-    if (product) return product;
+    if (product) return { ...product, purchaseLink: `/produtos/${product.slug}#comprar` };
     return (await getAllProducts()).find((item) => item.slug === slug);
   } catch (error) {
     console.error('Error fetching product by slug from Supabase:', error);

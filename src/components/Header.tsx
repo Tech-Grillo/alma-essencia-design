@@ -37,8 +37,15 @@ export function Header() {
             >
               <Icons.Menu className="h-5 w-5" />
             </button>
-            <Link id="logo1" to="/" aria-label="Voltar para o início" className="flex items-center justify-center">
-              <img src={logo} alt="Alma e Essência" className="h-10 w-10 rounded-full shadow-sm object-cover" />
+            <Link id="logo1" to="/" aria-label="Voltar para o início" className="flex items-center gap-1.5 sm:gap-2 group min-w-0">
+              <img 
+                src={logo} 
+                alt="Alma e Essência" 
+                className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 flex-shrink-0 mix-blend-multiply"
+              />
+              <span className="font-script text-xs sm:text-sm md:text-base lg:text-lg text-chocolate dark:text-white whitespace-nowrap leading-none">
+                alma e essência
+              </span>
             </Link>
            
           </div>
@@ -67,7 +74,7 @@ export function Header() {
               <Icons.LogIn className="h-4 w-4" />
             </Link>
             <button
-              onClick={toggle}
+              onClick={(event) => toggle({ clientX: event.clientX, clientY: event.clientY })}
               aria-label="Alternar tema"
               className="rounded-full p-2.5 hover:bg-secondary transition-colors"
             >
@@ -91,10 +98,10 @@ export function Header() {
       >
         <div className="absolute inset-0 bg-chocolate/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
         <aside
-          className={`absolute left-0 top-0 h-full w-[88%] max-w-sm bg-background shadow-bloom p-8 transition-transform duration-500 ${open ? "translate-x-0" : "-translate-x-full"}`}
+          className={`fixed inset-y-0 left-0 w-[88%] max-w-sm overflow-y-auto bg-background shadow-bloom p-6 transition-transform duration-500 ${open ? "translate-x-0" : "-translate-x-full"}`}
         >
-          <div className="flex items-center justify-between mb-10">
-            <Link to="/" className="font-serif text-xl uppercase tracking-[0.12em] text-foreground/90">
+          <div className="flex items-center justify-between mb-8">
+            <Link to="/" className="font-serif text-xl uppercase tracking-[0.12em] text-foreground">
               Alma Essência
             </Link>
             <button onClick={() => setOpen(false)} className="rounded-full p-2 hover:bg-secondary">
@@ -102,46 +109,60 @@ export function Header() {
             </button>
           </div>
 
-          <p className="font-serif text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">
-            Navegação
-          </p>
-          <ul className="space-y-3 mb-10">
-            {nav.map((n) => (
-              <li key={n.to}>
+          <div className="pr-2">
+            <p className="font-serif text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-foreground mb-4">
+              Navegação
+            </p>
+            <ul className="space-y-3 mb-8">
+              {nav.map((n) => (
+                <li key={n.to}>
+                  <Link
+                    id="inicio"
+                    to={n.to}
+                    onClick={() => setOpen(false)}
+                    className="font-serif text-[1.15rem] sm:text-[1.25rem] font-bold text-foreground px-4 py-3 rounded-full block transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
+                  >
+                    {n.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
                 <Link
-                  id="inicio"
-                  to={n.to}
+                  to="/admin"
                   onClick={() => setOpen(false)}
-                  className="font-serif text-2xl font-semibold text-chocolate dark:text-white px-4 py-3 rounded-full block transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
+                  className="font-serif text-[1.15rem] sm:text-[1.25rem] font-bold text-foreground px-4 py-3 rounded-full flex items-center gap-3 transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
                 >
-                  {n.label}
+                  <Icons.LogIn className="h-5 w-5" />
+                  Login
                 </Link>
               </li>
-            ))}
-            <li>
-              <Link
-                to="/admin"
-                onClick={() => setOpen(false)}
-                className="font-serif text-2xl font-semibold text-chocolate dark:text-white px-4 py-3 rounded-full flex items-center gap-3 transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
-              >
-                <Icons.LogIn className="h-5 w-5" />
-                Login
-              </Link>
-            </li>
-          </ul>
+            </ul>
 
-          <p className="font-serif text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">
-            Categorias
-          </p>
-          <ul className="grid grid-cols-2 gap-2">
-            {categories.map((c) => (
-              <li key={c}>
-                <button className="w-full text-left rounded-full px-4 py-2 bg-secondary/60 hover:bg-rose/60 text-sm transition-colors">
-                  {c}
-                </button>
-              </li>
-            ))}
-          </ul>
+            <p className="font-serif text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-foreground mb-4">
+              Categorias
+            </p>
+            <ul className="grid grid-cols-2 gap-2 mb-8 max-h-56 overflow-y-auto pr-2" style={{ scrollbarWidth: "thin" }}>
+              {categories.map((c) => (
+                <li key={c}>
+                  <button className="w-full text-left rounded-full px-4 py-2 bg-secondary/70 hover:bg-rose/70 text-sm sm:text-[15px] font-semibold text-foreground/90 transition-colors">
+                    {c}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            <div className="rounded-2xl border border-border/70 bg-secondary/40 p-4 space-y-3">
+              <p className="font-serif text-base font-semibold text-foreground">
+                Sobre a Alma e Essência
+              </p>
+              <p className="text-[15px] font-medium text-foreground/85 leading-6">
+                Somos uma marca que une carinho, fragrâncias e rituais para transformar o lar em um espaço mais acolhedor e especial.
+              </p>
+              <p className="text-[15px] font-medium text-foreground/85 leading-6">
+                Aqui você encontra produtos artesanais, atendimento personalizado e uma experiência de compra mais leve e bonita.
+              </p>
+            </div>
+          </div>
         </aside>
       </div>
     </>
