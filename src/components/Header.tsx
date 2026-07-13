@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { useCart } from "@/lib/cart";
 import { categories } from "@/lib/products";
-import logo from "@/assets/imagens_inicio/logo_transparente.png";
+import logo from "@/assets/imagens_inicio/logo_da_marca_sem_fundo.png";
 
 
 
@@ -41,7 +41,7 @@ export function Header() {
               <img 
                 src={logo} 
                 alt="Alma e Essência" 
-                className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 flex-shrink-0 mix-blend-multiply"
+                className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 object-contain bg-transparent"
               />
               <span className="font-script text-xs sm:text-sm md:text-base lg:text-lg text-chocolate dark:text-white whitespace-nowrap leading-none">
                 alma e essência

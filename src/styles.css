@@ -239,11 +239,14 @@
 }
 
 #logo1 img {
-  border-radius: 9px;
-  box-shadow: 0 6px 18px rgba(224, 0, 0, 0.1);
-  height: 50px;
-  width: 80px;
-  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
+  height: 48px;
+  width: auto;
+  max-width: 56px;
+  object-fit: contain;
+  background: transparent;
+  display: block;
 }
 
 
