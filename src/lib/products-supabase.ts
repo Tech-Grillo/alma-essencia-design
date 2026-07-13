@@ -133,7 +133,7 @@ export const categories = [
 // Cache de produtos
 let productsCache: Product[] | null = null;
 let cacheTimestamp = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+const CACHE_DURATION = 10 * 1000; // 10 segundos (cache mais agressivo)
 
 // Produtos locais (fallback)
 function getLocalProducts(): Product[] {

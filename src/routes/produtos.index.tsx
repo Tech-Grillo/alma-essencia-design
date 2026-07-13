@@ -21,6 +21,7 @@ function ProductsList() {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
 
   const normalizeText = (value: string) =>
     value
@@ -115,27 +116,58 @@ function ProductsList() {
   useEffect(() => {
     let mounted = true;
 
-    getAllProducts()
-      .then((products) => {
+    const loadProducts = async () => {
+      try {
+        // Forçar busca no servidor (ignorar cache)
+        const products = await fetch('https://vjznmeoftbgyebhclibb.supabase.co/rest/v1/products?select=*', {
+          headers: {
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          }
+        }).then(res => res.json()).then(data => {
+          return data.map((p: any) => ({
+            ...p,
+            purchaseLink: `/produtos/${p.slug}#comprar`
+          }));
+        });
+        
         if (!mounted) return;
         setAllProducts(products);
         const categoriesFromProducts = Array.from(
-          new Set([...getAllCategories(), ...products.map((product) => product.category)]),
+          new Set([...getAllCategories(), ...products.map((product: any) => product.category)]),
         ).sort();
         setAllCategories(categoriesFromProducts);
-      })
-      .catch(() => {
+      } catch (error) {
         if (!mounted) return;
-      })
-      .finally(() => {
+        console.error('Erro ao carregar produtos:', error);
+      } finally {
         if (!mounted) return;
         setLoading(false);
-      });
+      }
+    };
 
+    loadProducts();
+
+    // Recarregar quando a página se tornar visível
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadProducts();
+      }
+    };
+
+    // Recarregar periodicamente (a cada 15 segundos)
+    const interval = setInterval(() => {
+      loadProducts();
+    }, 15000);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
     return () => {
       mounted = false;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
     };
-  }, []);
+  }, [reloadTrigger]);
 
   return (
     <div className="min-h-screen">

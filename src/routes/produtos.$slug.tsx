@@ -40,22 +40,61 @@ function ProductPage() {
     setLoading(true);
     setProduct(null);
 
-    Promise.all([getAllProducts(), getProductBySlug(slug)])
-      .then(([products, foundProduct]) => {
+    const loadProduct = async () => {
+      try {
+        // Buscar diretamente do Supabase (ignorar cache)
+        const [products, foundProduct] = await Promise.all([
+          fetch('https://vjznmeoftbgyebhclibb.supabase.co/rest/v1/products?select=*', {
+            headers: {
+              'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            }
+          }).then(res => res.json()).then(data => {
+            return data.map((p: any) => ({
+              ...p,
+              purchaseLink: `/produtos/${p.slug}#comprar`
+            }));
+          }),
+          fetch(`https://vjznmeoftbgyebhclibb.supabase.co/rest/v1/products?select=*&slug=eq.${slug}`, {
+            headers: {
+              'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            }
+          }).then(res => res.json()).then(data => data[0] || null)
+        ]);
+        
         if (!mounted) return;
         setAllProducts(products);
         setProduct(foundProduct || null);
-      })
-      .catch(() => {
+      } catch (error) {
         if (!mounted) return;
-      })
-      .finally(() => {
+        console.error('Erro ao carregar produto:', error);
+      } finally {
         if (!mounted) return;
         setLoading(false);
-      });
+      }
+    };
 
+    loadProduct();
+
+    // Recarregar quando a página se tornar visível
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadProduct();
+      }
+    };
+
+    // Recarregar periodicamente (a cada 15 segundos)
+    const interval = setInterval(() => {
+      loadProduct();
+    }, 15000);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
     return () => {
       mounted = false;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
     };
   }, [slug]);
 
