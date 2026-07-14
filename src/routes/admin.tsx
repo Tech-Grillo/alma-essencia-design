@@ -3,7 +3,7 @@ import * as Icons from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { validateAdminLogin, isAdminLoggedIn, adminLogout } from "@/lib/admin-credentials";
 import { categories, categoryGroups, topLevelCategories } from "@/lib/products";
-import type { Product } from "@/lib/products-supabase";
+import type { Product, SizeOption } from "@/lib/products-supabase";
 import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
 import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
@@ -335,12 +335,18 @@ function AdminDashboard() {
         return;
       }
 
+      // O site exibe o preço com base no menor valor em `sizes`, então mantemos
+      // o campo `price` sincronizado com o menor preço entre os tamanhos editados.
+      const finalSizes = editingProduct.sizes && editingProduct.sizes.length > 0
+        ? editingProduct.sizes
+        : [{ label: "Unico", price }];
+      const lowestSizePrice = Math.min(...finalSizes.map((s) => s.price));
+
       await updateProductInDb(editingProduct.id!, {
         ...editingProduct,
         scents,
-        sizes: editingProduct.sizes && editingProduct.sizes.length > 0
-          ? editingProduct.sizes
-          : [{ label: "Unico", price }],
+        price: lowestSizePrice,
+        sizes: finalSizes,
       });
 
       const products = await getAllProducts();
@@ -388,7 +394,7 @@ function AdminDashboard() {
     setEditingProduct(null);
   };
 
-  const updateEditingField = (field: keyof Product, value: string | number | string[]) => {
+  const updateEditingField = (field: keyof Product, value: string | number | string[] | SizeOption[]) => {
     if (!editingProduct) return;
     setEditingProduct({ ...editingProduct, [field]: value });
   };
@@ -904,11 +910,20 @@ function EditProductModal({
   categories: string[];
   onSave: (e: React.FormEvent) => void;
   onCancel: () => void;
-  onChange: (field: keyof Product, value: string | number | string[]) => void;
+  onChange: (field: keyof Product, value: string | number | string[] | SizeOption[]) => void;
   error: string;
 }) {
   const [imagePreview, setImagePreview] = useState<string[]>(product.images || []);
-  const [editPrice, setEditPrice] = useState(product.price.toString().replace(".", ","));
+  const sizes = product.sizes && product.sizes.length > 0
+    ? product.sizes
+    : [{ label: "Unico", price: product.price }];
+
+  const updateSizePrice = (index: number, rawValue: string) => {
+    const cleaned = rawValue.replace(/[^\d,]/g, "");
+    const priceNum = Number(cleaned.replace(",", "."));
+    const nextSizes = sizes.map((s, i) => (i === index ? { ...s, price: isNaN(priceNum) ? s.price : priceNum } : s));
+    onChange("sizes", nextSizes);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -998,38 +1013,36 @@ function EditProductModal({
             />
           </label>
 
-          <div className="grid md:grid-cols-2 gap-5">
-            <label className="space-y-2">
-              <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Categoria</span>
-              <select
-                value={product.category}
-                onChange={(e) => onChange("category", e.target.value)}
-                className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </label>
+          <label className="space-y-2">
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Categoria</span>
+            <select
+              value={product.category}
+              onChange={(e) => onChange("category", e.target.value)}
+              className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </label>
 
-            <label className="space-y-2">
-              <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco</span>
-              <input
-                type="text"
-                value={editPrice}
-                onChange={(e) => {
-                  const cleaned = e.target.value.replace(/[^\d,]/g, '');
-                  setEditPrice(cleaned);
-                  const priceNum = Number(cleaned.replace(",", "."));
-                  if (!isNaN(priceNum)) {
-                    onChange("price", priceNum);
-                  }
-                }}
-                inputMode="numeric"
-                className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-                placeholder="79,90"
-              />
-            </label>
+          <div className="space-y-2">
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preço por tamanho</span>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {sizes.map((s, index) => (
+                <label key={`${s.label}-${index}`} className="space-y-1">
+                  <span className="text-xs font-semibold text-muted-foreground">{s.label}</span>
+                  <input
+                    type="text"
+                    defaultValue={s.price.toString().replace(".", ",")}
+                    onChange={(e) => updateSizePrice(index, e.target.value)}
+                    inputMode="numeric"
+                    className="w-full rounded-2xl bg-background border border-border px-4 py-3 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+                    placeholder="0,00"
+                  />
+                </label>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">
