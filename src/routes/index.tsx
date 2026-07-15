@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { getAllProducts } from "@/lib/products-supabase";
 import type { Product } from "@/lib/products-supabase";
+import { getTopClickedProducts } from "@/lib/analytics";
 import { SimpleMap } from "@/components/SimpleMap";
 import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
 import heroImgFront from "@/assets/imagens_inicio/imagem_frente_mae.png";
@@ -23,8 +24,23 @@ function Home() {
   const heroImages = [heroImg, heroImgFront];
 
   useEffect(() => {
-    getAllProducts().then(products => {
-      setProducts(products);
+    getAllProducts().then(allProducts => {
+      // Buscar os top 10 produtos mais clicados
+      const topClicked = getTopClickedProducts(10);
+      
+      let featuredProducts: Product[];
+      
+      if (topClicked.length > 0) {
+        // Se houver produtos com cliques, mostrar os top 10
+        featuredProducts = topClicked
+          .map(clicked => allProducts.find(p => p.slug === clicked.slug))
+          .filter((p): p is Product => p !== undefined);
+      } else {
+        // Se não houver cliques ainda, mostrar os primeiros 10 produtos
+        featuredProducts = allProducts.slice(0, 10);
+      }
+      
+      setProducts(featuredProducts);
       setLoading(false);
     });
   }, []);

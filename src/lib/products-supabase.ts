@@ -248,10 +248,19 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
 
   try {
     const productData: any = { ...product };
-    
+
+    // Busca as imagens que o produto tinha ANTES da edição
+    const { data: currentProduct } = await supabase
+      .from('products')
+      .select('images')
+      .eq('id', id)
+      .single();
+
+    const oldImages: string[] = currentProduct?.images || [];
+
     if (product.images) {
       const imageUrls: string[] = [];
-      
+
       for (const imageUrl of product.images) {
         if (imageUrl.startsWith('data:')) {
           const response = await fetch(imageUrl);
@@ -263,13 +272,26 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
           imageUrls.push(imageUrl);
         }
       }
-      
+
       productData.images = imageUrls;
+
+      // Apaga do Storage as imagens antigas que não estão mais na lista nova
+      const imagesToDelete = oldImages.filter((old) => !imageUrls.includes(old));
+      for (const imageUrl of imagesToDelete) {
+        if (imageUrl.includes('product-images')) {
+          try {
+            const path = new URL(imageUrl).pathname.split('/').slice(-2).join('/');
+            await deleteImage(path);
+          } catch (imgError) {
+            console.error('Error deleting old image from storage:', imgError);
+            // não trava a atualização do produto por causa disso
+          }
+        }
+      }
     }
 
     const slug = productData.slug || slugifyProductName(productData.name);
     productData.slug = slug;
-    // purchaseLink não existe como coluna no banco — remove antes de enviar.
     delete productData.purchaseLink;
 
     const updated = await updateProduct(id, productData);
@@ -298,6 +320,7 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
 }
 
 // Deletar produto
+// Deletar produto
 export async function deleteProductFromDb(slug: string): Promise<void> {
   if (!isSupabaseConfigured()) {
     const { deleteProduct } = require('./products');
@@ -307,15 +330,20 @@ export async function deleteProductFromDb(slug: string): Promise<void> {
   try {
     const products = await getAllProducts();
     const product = products.find((p: any) => p.slug === slug);
-    
+
     if (product && product.id) {
       for (const imageUrl of product.images) {
         if (imageUrl.includes('product-images')) {
-          const path = new URL(imageUrl).pathname.split('/').slice(-2).join('/');
-          await deleteImage(path);
+          try {
+            const path = new URL(imageUrl).pathname.split('/').slice(-2).join('/');
+            await deleteImage(path);
+          } catch (imgError) {
+            console.error('Error deleting image from storage:', imgError);
+            // segue o fluxo mesmo se essa imagem não puder ser apagada
+          }
         }
       }
-      
+
       await deleteProduct(product.id);
       productsCache = null;
     }

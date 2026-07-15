@@ -34,6 +34,7 @@ function AdminDashboard() {
   const [productDescription, setProductDescription] = useState("");
   const [productScents, setProductScents] = useState("");
   const [productError, setProductError] = useState("");
+  const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -264,6 +265,9 @@ function AdminDashboard() {
     e.preventDefault();
     setProductError("");
 
+    // Evita clique duplo/reenvio: se já está salvando, ignora novos cliques.
+    if (isSubmittingProduct) return;
+
     if (!validateForm()) {
       setProductError("Preencha todos os campos obrigatórios corretamente.");
       return;
@@ -277,6 +281,7 @@ function AdminDashboard() {
       .map((scent) => scent.trim())
       .filter(Boolean);
 
+    setIsSubmittingProduct(true);
     try {
       const savedProduct = await saveProduct({
         name: productName.trim(),
@@ -303,7 +308,14 @@ function AdminDashboard() {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
-      setProductError(`Erro ao salvar produto: ${error instanceof Error ? error.message : 'Tente novamente.'}`);
+      const isDuplicateSlug = error instanceof Error && error.message.includes('products_slug_key');
+      setProductError(
+        isDuplicateSlug
+          ? "Já existe um produto com esse nome. Use um nome diferente, ou verifique se ele não foi salvo em uma tentativa anterior."
+          : `Erro ao salvar produto: ${error instanceof Error ? error.message : 'Tente novamente.'}`
+      );
+    } finally {
+      setIsSubmittingProduct(false);
     }
   };
 
@@ -567,10 +579,11 @@ function AdminDashboard() {
         <div className="lg:col-span-2 flex flex-wrap gap-3">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-caramel text-primary-foreground px-8 py-4 text-base font-bold uppercase tracking-[0.12em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all"
+            disabled={isSubmittingProduct}
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-caramel text-primary-foreground px-8 py-4 text-base font-bold uppercase tracking-[0.12em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
             <Icons.Plus className="h-4 w-4" />
-            Salvar produto
+            {isSubmittingProduct ? "Salvando..." : "Salvar produto"}
           </button>
         </div>
       </form>

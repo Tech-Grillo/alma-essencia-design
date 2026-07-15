@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { compressImage } from './image-compression';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -11,12 +12,13 @@ export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
 
 // Função para fazer upload de imagem
 export async function uploadImage(file: File, path: string): Promise<string> {
-  const fileExt = file.name.split('.').pop();
+  const compressedFile = await compressImage(file);           
+  const fileExt = compressedFile.name.split('.').pop();        
   const fileName = `${path}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
   
   const { data, error } = await supabase.storage
     .from('product-images')
-    .upload(fileName, file, {
+    .upload(fileName, compressedFile, {                        
       cacheControl: '3600',
       upsert: false,
     });
