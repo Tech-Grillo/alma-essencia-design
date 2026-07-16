@@ -68,7 +68,7 @@ function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-warm opacity-80" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-10 sm:gap-14 items-center">
+        <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-10 sm:gap-14 items-center">
           <div className="relative z-10 animate-slide-in-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-8 border border-border">
               <Icons.Sparkles className="h-3 w-3" /> Artesanal · Natural
@@ -141,7 +141,7 @@ function Home() {
       </section>
 
       {/* ABOUT */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">
+      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">
         <div className="relative">
           <img
             src={aboutImg}
@@ -173,7 +173,7 @@ function Home() {
       </section>
 
       {/* FEATURED PRODUCTS */}
-      <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
+      <section className="mx-auto max-w-[1600px] px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="text-center mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-3">Destaques</p>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl">Produtos favoritos</h2>
@@ -183,7 +183,7 @@ function Home() {
       </section>
 
       {/* LOCATION */}
-      <section className="mx-auto max-w-7xl px-6 lg:px-10 pb-24 animate-fade-in-up">
+      <section className="mx-auto max-w-[1600px] px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="rounded-[2.5rem] overflow-hidden border border-border bg-card shadow-soft grid md:grid-cols-2">
           <div className="p-6 sm:p-10 md:p-14 flex flex-col justify-center">
               <div className="inline-flex items-center gap-2 text-caramel-deep dark:text-white mb-4">
@@ -249,7 +249,7 @@ function FeaturedCarousel({ products }: { products: typeof import("@/lib/product
       <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
         <div className="flex gap-7">
           {products.map((p) => (
-            <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] md:min-w-[calc(33.333%-1.75rem)] lg:min-w-[calc(25%-1.75rem)] xl:min-w-[calc(20%-1.75rem)]">
+            <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] md:min-w-[calc(33.333%-1.75rem)] lg:min-w-[calc(25%-1.75rem)] xl:min-w-[calc(20%-1.75rem)] 2xl:min-w-[calc(16.666%-1.75rem)]">
               <ProductCard product={p} />
             </div>
           ))}

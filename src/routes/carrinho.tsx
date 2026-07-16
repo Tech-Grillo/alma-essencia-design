@@ -35,7 +35,7 @@ function RouteComponent() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-8 sm:py-10">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-8 sm:py-10">
         <div className="flex items-center gap-3 mb-8 sm:mb-10">
           <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-caramel-deep">
             <Icons.ChevronLeft className="h-4 w-4" /> Voltar

@@ -9,7 +9,7 @@ export function Footer() {
     <footer className="mt-32 relative">
       <div className="h-px bg-gradient-to-r from-transparent via-rose to-transparent" />
       <div className="bg-chocolate text-cream/90 dark:bg-background dark:text-foreground">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-12 sm:py-16">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-12 sm:py-16">
           {/* Logo e Tagline */}
           <div className="text-center mb-10 sm:mb-14">
             <img 

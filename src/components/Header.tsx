@@ -28,7 +28,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
-        <div className="mx-auto max-w-7xl px-5 lg:px-10 h-20 flex items-center justify-between gap-4">
+        <div className="mx-auto max-w-[1600px] px-5 lg:px-10 h-20 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setOpen(true)}
@@ -43,7 +43,7 @@ export function Header() {
                 alt="Alma e Essência" 
                 className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 object-contain bg-transparent"
               />
-              <span className="font-script text-xs sm:text-sm md:text-base lg:text-lg text-chocolate dark:text-white whitespace-nowrap leading-none">
+              <span className="font-script text-lg sm:text-xl md:text-2xl lg:text-3xl text-chocolate dark:text-white whitespace-nowrap leading-none">
                 alma e essência
               </span>
             </Link>
@@ -78,10 +78,10 @@ export function Header() {
               aria-label="Alternar tema"
               className="rounded-full p-2.5 hover:bg-secondary transition-colors"
             >
-              {theme === "light" ? <Icons.Moon className="h-4 w-4" /> : <Icons.Sun className="h-4 w-4" />}
+              {theme === "light" ? <Icons.Moon className="h-6 w-6" /> : <Icons.Sun className="h-6 w-6" />}
             </button>
             <Link to="/carrinho" aria-label="Carrinho" className="relative rounded-full p-2.5 hover:bg-secondary transition-colors">
-              <Icons.ShoppingCart className="h-4 w-4" />
+              <Icons.ShoppingCart className="h-6 w-6" />
               {getCount() > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] rounded-full bg-rose text-foreground flex items-center justify-center font-medium">
                   {getCount()}

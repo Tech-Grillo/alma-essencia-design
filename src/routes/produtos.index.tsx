@@ -172,7 +172,7 @@ function ProductsList() {
   return (
     <div className="min-h-screen">
       <Header />
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-10 sm:pt-12 pb-16 sm:pb-20 animate-fade-in-up">
+      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-10 sm:pt-12 pb-16 sm:pb-20 animate-fade-in-up">
         <div className="text-center mb-10 sm:mb-12">
           <p className="font-script text-2xl sm:text-3xl text-caramel-deep">— Coleção</p>
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl">Nossos produtos</h1>
@@ -282,7 +282,7 @@ function ProductsList() {
             })}
           </div>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 sm:gap-7">
           {list.map((p) => <ProductCard key={p.slug} product={p} />)}
           {list.length === 0 && (
             <p className="col-span-full text-center text-muted-foreground py-20">Em breve novidades nesta categoria ✿</p>
