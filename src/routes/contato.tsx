@@ -5,11 +5,9 @@ import { SimpleMap } from "@/components/SimpleMap";
 import * as Icons from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
-export const whatsappLink = (productName: string) => {
+export const whatsappLink = (message: string) => {
   const phoneNumber = "5521987163045"; // 55 (Brasil) + 21 (DDD) + Número
-  const message = encodeURIComponent(`Olá! Quero comprar a ${productName}`);
-  
-  return `https://wa.me/${phoneNumber}?text=${message}`;
+  return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 };
 
 export const Route = createFileRoute("/contato")({
@@ -30,9 +28,9 @@ function Contact() {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10 sm:mb-12">
           {[
-            { icon: WhatsAppIcon, label: "WhatsApp", value: "(21) 989794503", href: whatsappLink("Olá!") },
+            { icon: WhatsAppIcon, label: "WhatsApp", value: "(21) 989794503", href: whatsappLink("Olá! 🌿\n\nGostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?") },
             { icon: Icons.Mail, label: "E-mail", value: "alamaeessencia36@gmail.com", href: "mailto:alamaeessencia36@gmail.com" },
-            { icon: Icons.Instagram, label: "Instagram", value: "@alma_e_essencia", href: "#" },
+            { icon: Icons.Instagram, label: "Instagram", value: "@alma_e_essencia", href: "https://www.instagram.com/alma_e_essencia/" },
           ].map((c) => {
             const Icon = c.icon;
             if (!Icon) {

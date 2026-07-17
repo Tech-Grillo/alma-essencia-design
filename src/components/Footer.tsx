@@ -1,6 +1,6 @@
 import * as Icons from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { whatsappLink } from "@/lib/products";
+import { whatsappLink, categories, categoryGroups } from "@/lib/products";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import logo from "@/assets/imagens_inicio/logo_da_marca_sem_fundo.png";
 
@@ -23,7 +23,7 @@ export function Footer() {
           </div>
 
           {/* Grid de conteúdo */}
-          <div className="grid gap-8 sm:gap-10 md:grid-cols-3 mb-10 sm:mb-14">
+          <div className="grid gap-8 sm:gap-10 md:grid-cols-4 mb-10 sm:mb-14">
             {/* Navegação */}
             <div className="text-center md:text-left">
               <p className="font-serif uppercase tracking-[0.3em] text-xs text-rose mb-5 font-semibold">Navegação</p>
@@ -54,19 +54,53 @@ export function Footer() {
             {/* Categorias */}
             <div className="text-center md:text-left">
               <p className="font-serif uppercase tracking-[0.3em] text-xs text-rose mb-5 font-semibold">Categorias</p>
-              <ul className="space-y-3 font-light text-sm">
-                <li className="flex items-center justify-center md:justify-start gap-2">
-                  <Icons.Flame className="h-3.5 w-3.5 text-rose" /> Velas Aromáticas
-                </li>
-                <li className="flex items-center justify-center md:justify-start gap-2">
-                  <Icons.Droplets className="h-3.5 w-3.5 text-rose" /> Sabonetes Artesanais
-                </li>
-                <li className="flex items-center justify-center md:justify-start gap-2">
-                  <Icons.Wind className="h-3.5 w-3.5 text-rose" /> Home Sprays
-                </li>
-                <li className="flex items-center justify-center md:justify-start gap-2">
-                  <Icons.Sparkles className="h-3.5 w-3.5 text-rose" /> Difusores
-                </li>
+              <ul className="space-y-2 font-light text-sm">
+                {categoryGroups.map((group) => (
+                  <li key={group.parent}>
+                    <Link
+                      to="/produtos"
+                      search={(prev) => ({ ...prev, categoria: group.parent })}
+                      className="inline-flex items-center gap-2 hover:text-rose transition font-semibold"
+                    >
+                      <Icons.ChevronRight className="h-3 w-3 text-rose" /> {group.parent}
+                    </Link>
+                    {group.children.length > 0 && (
+                      <ul className="ml-5 mt-1 space-y-1 mb-2">
+                        {group.children.map((child) => (
+                          <li key={child}>
+                            <Link
+                              to="/produtos"
+                              search={(prev) => ({ ...prev, categoria: child })}
+                              className="inline-flex items-center gap-1.5 hover:text-rose transition opacity-80 hover:opacity-100"
+                            >
+                              <span className="text-rose">·</span> {child}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Demais Categorias */}
+            <div className="text-center md:text-left">
+              <p className="font-serif uppercase tracking-[0.3em] text-xs text-rose mb-5 font-semibold">Especiais</p>
+              <ul className="space-y-2 font-light text-sm">
+                {categories
+                  .filter((cat) => !categoryGroups.some((g) => g.parent === cat || g.children.includes(cat)))
+                  .map((cat) => (
+                    <li key={cat}>
+                      <Link
+                        to="/produtos"
+                        search={(prev) => ({ ...prev, categoria: cat })}
+                        className="inline-flex items-center gap-2 hover:text-rose transition"
+                      >
+                        <Icons.Circle className="h-2 w-2 text-rose fill-current" /> {cat}
+                      </Link>
+                    </li>
+                  ))}
               </ul>
             </div>
 

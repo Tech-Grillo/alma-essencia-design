@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/lib/theme";
 import HelpBot from "@/components/HelpBot";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import CartProvider from "@/lib/cart";
 
 function NotFoundComponent() {
@@ -120,6 +121,7 @@ function RootComponent() {
       <ThemeProvider>
         <CartProvider>
           <Outlet />
+          <FloatingWhatsApp />
           <HelpBot />
         </CartProvider>
       </ThemeProvider>

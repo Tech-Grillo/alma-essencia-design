@@ -44,6 +44,7 @@
   --color-caramel-deep: var(--caramel-deep);
   --color-cream: var(--cream);
   --color-chocolate: var(--chocolate);
+  --color-header-bg: var(--header-bg);
   --color-whatsapp: var(--whatsapp);
 }
 
@@ -78,6 +79,7 @@
   --caramel-deep: oklch(0.55 0.07 50);
   --cream: oklch(0.91 0.025 60);
   --chocolate: oklch(0.28 0.04 35);
+  --header-bg: oklch(0.68 0.05 50);
   --whatsapp: oklch(0.7 0.16 145);
 
   --shadow-soft: 0 10px 30px -12px oklch(42.42% 0.1909 331.186 / 0.226);
@@ -114,6 +116,7 @@
   --caramel-deep: oklch(0.95 0.012 60);
   --cream: oklch(0.32 0.03 35);
   --chocolate: oklch(0.95 0.012 60);
+  --header-bg: oklch(0.68 0.05 50);
 
   --shadow-soft: 0 10px 30px -12px oklch(0 0 0 / 0.5);
   --shadow-bloom: 0 20px 60px -20px oklch(0 0 0 / 0.6);
@@ -214,6 +217,20 @@
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
+/* Floating WhatsApp button animation */
+@keyframes whatsapp-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-whatsapp-bounce {
+  animation: whatsapp-bounce 2s ease-in-out infinite;
+}
+
 /* Decorative botanical divider */
 .botanical-divider {
   display: flex;
@@ -243,10 +260,19 @@
   box-shadow: none;
   height: 48px;
   width: auto;
-  max-width: 56px;
+  max-width: 58px;
   object-fit: contain;
   background: transparent;
   display: block;
+}
+
+header #logo1 img {
+  filter: brightness(0) invert(1);
+}
+
+footer img {
+  filter: brightness(0) invert(1);
+  opacity: 1;
 }
 
 

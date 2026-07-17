@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
+import { SearchBar } from "@/components/SearchBar";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { getAllProducts } from "@/lib/products-supabase";
@@ -64,6 +65,13 @@ function Home() {
   return (
     <div className="min-h-screen">
       <Header />
+
+      {/* SEARCH BAR */}
+      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-2">
+        <div className="flex flex-col items-center gap-4">
+          <SearchBar />
+        </div>
+      </section>
 
       {/* HERO */}
       <section className="relative overflow-hidden">

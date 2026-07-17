@@ -27,63 +27,62 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
-        <div className="mx-auto max-w-[1600px] px-5 lg:px-10 h-20 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-40 bg-header-bg shadow-md">
+        <div className="mx-auto max-w-[2000px] pl-1 sm:pl-2 lg:pl-3 pr-2 sm:pr-4 lg:pr-6 h-16 sm:h-20 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-0 sm:gap-0.5 lg:gap-1">
             <button
               onClick={() => setOpen(true)}
               aria-label="Abrir menu"
-              className="rounded-full p-2 hover:bg-secondary transition-colors"
+              className="rounded-full p-1 sm:p-1.5 hover:bg-white/10 transition-colors text-white"
             >
-              <Icons.Menu className="h-5 w-5" />
+              <Icons.Menu className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
-            <Link id="logo1" to="/" aria-label="Voltar para o início" className="flex items-center gap-1.5 sm:gap-2 group min-w-0">
+            <Link id="logo1" to="/" aria-label="Voltar para o início" className="flex items-center gap-0.5 sm:gap-1 group min-w-0">
               <img 
                 src={logo} 
                 alt="Alma e Essência" 
-                className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 object-contain bg-transparent"
+                className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 flex-shrink-0 object-contain bg-transparent"
               />
-              <span className="font-script text-lg sm:text-xl md:text-2xl lg:text-3xl text-chocolate dark:text-white whitespace-nowrap leading-none">
+              <span className="font-script text-lg sm:text-xl md:text-2xl lg:text-3xl text-white whitespace-nowrap leading-none">
                 alma e essência
               </span>
             </Link>
-           
           </div>
 
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
             {nav.map((n) => (
               <Link
                 id="inicio"
                 key={n.to}
                 to={n.to}
                 activeOptions={{ exact: n.to === "/" }}
-                activeProps={{ className: "text-lg font-semibold text-chocolate dark:text-white bg-chocolate/10 dark:bg-chocolate/30 rounded-full px-4 py-2" }}
-                className="text-lg font-semibold tracking-wide uppercase text-chocolate dark:text-white px-4 py-2 rounded-full transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
+                activeProps={{ className: "text-sm lg:text-base font-semibold text-white bg-white/20 rounded-full px-3 lg:px-4 py-1.5 lg:py-2" }}
+                className="text-sm lg:text-base font-semibold tracking-wide uppercase text-white/90 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full transition-all hover:text-white hover:bg-white/10"
               >
                 {n.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Link
               to="/admin"
               aria-label="Acessar login administrativo"
-              className="rounded-full p-2.5 hover:bg-secondary transition-colors"
+              className="rounded-full p-2 sm:p-2.5 hover:bg-white/10 transition-colors text-white"
             >
-              <Icons.LogIn className="h-4 w-4" />
+              <Icons.LogIn className="h-4 w-4 sm:h-5 sm:w-5" />
             </Link>
             <button
               onClick={(event) => toggle({ clientX: event.clientX, clientY: event.clientY })}
               aria-label="Alternar tema"
-              className="rounded-full p-2.5 hover:bg-secondary transition-colors"
+              className="rounded-full p-2 sm:p-2.5 hover:bg-white/10 transition-colors text-white"
             >
-              {theme === "light" ? <Icons.Moon className="h-6 w-6" /> : <Icons.Sun className="h-6 w-6" />}
+              {theme === "light" ? <Icons.Moon className="h-5 w-5 sm:h-6 sm:w-6" /> : <Icons.Sun className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
-            <Link to="/carrinho" aria-label="Carrinho" className="relative rounded-full p-2.5 hover:bg-secondary transition-colors">
-              <Icons.ShoppingCart className="h-6 w-6" />
+            <Link to="/carrinho" aria-label="Carrinho" className="relative rounded-full p-2 sm:p-2.5 hover:bg-white/10 transition-colors text-white">
+              <Icons.ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
               {getCount() > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] rounded-full bg-rose text-foreground flex items-center justify-center font-medium">
+                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] rounded-full bg-rose text-white flex items-center justify-center font-medium">
                   {getCount()}
                 </span>
               )}
@@ -101,7 +100,7 @@ export function Header() {
           className={`fixed inset-y-0 left-0 w-[88%] max-w-sm overflow-y-auto bg-background shadow-bloom p-6 transition-transform duration-500 ${open ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="flex items-center justify-between mb-8">
-            <Link to="/" className="font-serif text-xl uppercase tracking-[0.12em] text-foreground">
+            <Link to="/" className="font-serif text-xl uppercase tracking-[0.12em] text-chocolate dark:text-white">
               Alma Essência
             </Link>
             <button onClick={() => setOpen(false)} className="rounded-full p-2 hover:bg-secondary">
