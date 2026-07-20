@@ -28,7 +28,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 bg-header-bg shadow-md">
-        <div className="mx-auto max-w-[2000px] pl-1 sm:pl-2 lg:pl-3 pr-2 sm:pr-4 lg:pr-6 h-16 sm:h-20 flex items-center justify-between gap-2">
+        <div className="mx-auto max-w-[2000px] pl-1 sm:pl-2 lg:pl-3 pr-2 sm:pr-4 lg:pr-6 h-14 sm:h-16 flex items-center justify-between gap-2">
           <div className="flex items-center gap-0 sm:gap-0.5 lg:gap-1">
             <button
               onClick={() => setOpen(true)}
@@ -65,13 +65,6 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <Link
-              to="/admin"
-              aria-label="Acessar login administrativo"
-              className="rounded-full p-2 sm:p-2.5 hover:bg-white/10 transition-colors text-white"
-            >
-              <Icons.LogIn className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Link>
             <button
               onClick={(event) => toggle({ clientX: event.clientX, clientY: event.clientY })}
               aria-label="Alternar tema"
@@ -125,16 +118,6 @@ export function Header() {
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link
-                  to="/admin"
-                  onClick={() => setOpen(false)}
-                  className="font-serif text-[1.15rem] sm:text-[1.25rem] font-bold text-foreground px-4 py-3 rounded-full flex items-center gap-3 transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
-                >
-                  <Icons.LogIn className="h-5 w-5" />
-                  Login
-                </Link>
-              </li>
             </ul>
 
             <p className="font-serif text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-foreground mb-4">

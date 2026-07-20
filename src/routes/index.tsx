@@ -10,6 +10,7 @@ import { SimpleMap } from "@/components/SimpleMap";
 import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
 import heroImgFront from "@/assets/imagens_inicio/imagem_frente_mae.png";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
+import gregoImg from "@/assets/imagens_inicio/imagem-grego.jpg";
 import * as Icons from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
@@ -71,6 +72,16 @@ function Home() {
         <div className="flex flex-col items-center gap-4">
           <SearchBar />
         </div>
+      </section>
+
+      {/* GREGO IMAGE */}
+      <section className="relative left-1/2 -translate-x-1/2 w-screen">
+        <img
+          src={gregoImg}
+          alt="Imagem grega"
+          className="w-full h-40 sm:h-48 md:h-56 object-contain"
+          style={{ margin: 0, padding: 0 }}
+        />
       </section>
 
       {/* HERO */}
