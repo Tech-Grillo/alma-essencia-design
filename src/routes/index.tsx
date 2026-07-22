@@ -9,8 +9,11 @@ import { getTopClickedProducts } from "@/lib/analytics";
 import { SimpleMap } from "@/components/SimpleMap";
 import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
 import heroImgFront from "@/assets/imagens_inicio/imagem_frente_mae.png";
+import barraca02Img from "@/assets/imagens_inicio/imagem barraca02.jpg";
+import produtosImg from "@/assets/imagens_inicio/produtos.png";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
 import gregoImg from "@/assets/imagens_inicio/imagem-grego.jpg";
+import linhaAzulImg from "@/assets/imagens_inicio/linhaazul.png";
 import * as Icons from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
@@ -23,7 +26,9 @@ function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
-  const heroImages = [heroImg, heroImgFront];
+  const [aboutIndex, setAboutIndex] = useState(0);
+  const heroImages = [heroImg, heroImgFront, barraca02Img, produtosImg];
+  const aboutImages = [aboutImg, gregoImg, linhaAzulImg];
 
   useEffect(() => {
     getAllProducts().then(allProducts => {
@@ -58,6 +63,14 @@ function Home() {
     return () => window.clearInterval(timer);
   }, [heroImages.length]);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setAboutIndex((current) => (current + 1) % aboutImages.length);
+    }, 3000);
+
+    return () => window.clearInterval(timer);
+  }, [aboutImages.length]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -71,21 +84,13 @@ function Home() {
       <Header />
 
       {/* SEARCH BAR */}
-      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-2">
+      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-12">
         <div className="flex flex-col items-center gap-4">
           <SearchBar />
         </div>
       </section>
 
-      {/* GREGO IMAGE */}
-      <section className="relative left-1/2 -translate-x-1/2 w-screen">
-        <img
-          src={gregoImg}
-          alt="Imagem grega"
-          className="w-full h-40 sm:h-48 md:h-56 object-contain"
-          style={{ margin: 0, padding: 0 }}
-        />
-      </section>
+    
 
       {/* HERO */}
       <section className="relative overflow-hidden">
@@ -165,15 +170,36 @@ function Home() {
       {/* ABOUT */}
       <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">
         <div className="relative">
-          <img
-            src={aboutImg}
-            alt="Mãos segurando sabonete artesanal"
-            width={1024}
-            height={1024}
-            loading="lazy"
-            className="rounded-[2rem] shadow-soft aspect-square object-cover w-full"
-          />
+          <div className="relative overflow-hidden rounded-[2rem] shadow-soft aspect-square">
+            <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${aboutIndex * 100}%)` }}>
+              {aboutImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={index === 0 ? "Mãos segurando sabonete artesanal" : "Imagem grega"}
+                  width={1024}
+                  height={1024}
+                  loading="lazy"
+                  className="min-w-full object-cover aspect-square w-full h-auto"
+                />
+              ))}
+            </div>
+          </div>
           <div className="absolute -top-5 -right-5 h-24 w-24 rounded-full border border-caramel/40 hidden md:block" />
+          {/* Navigation dots */}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            {aboutImages.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                aria-label={`Selecionar imagem ${index + 1}`}
+                onClick={() => setAboutIndex(index)}
+                className={`h-2.5 w-2.5 rounded-full border border-caramel/60 transition-all duration-300 ${
+                  aboutIndex === index ? "scale-125 bg-caramel-deep" : "bg-caramel/40 hover:bg-caramel/80"
+                }`}
+              />
+            ))}
+          </div>
         </div>
         <div>
           <p className="font-script text-3xl text-caramel-deep dark:text-white mb-3">— Quem somos</p>
@@ -271,7 +297,7 @@ function FeaturedCarousel({ products }: { products: typeof import("@/lib/product
       <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
         <div className="flex gap-7">
           {products.map((p) => (
-            <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] md:min-w-[calc(33.333%-1.75rem)] lg:min-w-[calc(25%-1.75rem)] xl:min-w-[calc(20%-1.75rem)] 2xl:min-w-[calc(16.666%-1.75rem)]">
+            <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(33.333%-1.75rem)] md:min-w-[calc(25%-1.75rem)] lg:min-w-[calc(20%-1.75rem)] xl:min-w-[calc(16.666%-1.75rem)] 2xl:min-w-[calc(14.285%-1.75rem)]">
               <ProductCard product={p} />
             </div>
           ))}
