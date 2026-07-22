@@ -1,5 +1,10 @@
 import { supabase, uploadImage, deleteImage, fetchProducts, createProduct, updateProduct, fetchProductBySlug, deleteProduct } from './supabase';
-
+import {
+  getAllProducts as getAllProductsLocal,
+  saveCustomProduct as saveCustomProductLocal,
+  updateProduct as updateProductLocal,
+  deleteProduct as deleteProductLocal,
+} from './products';
 export type SizeOption = { label: string; price: number };
 
 export type Product = { 
@@ -137,26 +142,7 @@ const CACHE_DURATION = 10 * 1000; // 10 segundos (cache mais agressivo)
 
 // Produtos locais (fallback)
 function getLocalProducts(): Product[] {
-  const productsModule = require('./products');
-  const customProducts = productsModule.getCustomProducts ? productsModule.getCustomProducts() : [];
-  const editedProducts = productsModule.getEditedProducts ? productsModule.getEditedProducts() : [];
-  const deletedSlugs = productsModule.getDeletedProductSlugs ? productsModule.getDeletedProductSlugs() : [];
-  
-  const editedMap = new Map(editedProducts.map((product: any) => [product.slug, product]));
-  const deletedSet = new Set(deletedSlugs);
-
-  return [...defaultProducts, ...customProducts]
-    .filter((product: any) => !deletedSet.has(product.slug))
-    .map((product: any) => {
-      const edited = editedMap.get(product.slug);
-      if (edited) {
-        return {
-          ...edited,
-          images: (edited as any).images || product.images,
-        };
-      }
-      return product;
-    });
+  return getAllProductsLocal() as unknown as Product[];
 }
 
 // Buscar produtos (do Supabase ou cache local)
@@ -193,8 +179,7 @@ export function getAllCategories(): string[] {
 // Salvar produto (criar ou atualizar)
 export async function saveProduct(product: any): Promise<Product> {
   if (!isSupabaseConfigured()) {
-    const { saveCustomProduct } = require('./products');
-    return saveCustomProduct(product);
+    return saveCustomProductLocal(product);
   }
 
   try {
@@ -241,9 +226,8 @@ export async function saveProduct(product: any): Promise<Product> {
 
 // Atualizar produto
 export async function updateProductInDb(id: number, product: any): Promise<Product> {
-  if (!isSupabaseConfigured()) {
-    const { updateProduct } = require('./products');
-    return updateProduct(product);
+   if (!isSupabaseConfigured()) {
+    return updateProductLocal(product);
   }
 
   try {
@@ -323,8 +307,7 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
 // Deletar produto
 export async function deleteProductFromDb(slug: string): Promise<void> {
   if (!isSupabaseConfigured()) {
-    const { deleteProduct } = require('./products');
-    return deleteProduct(slug);
+    return deleteProductLocal(slug);
   }
 
   try {

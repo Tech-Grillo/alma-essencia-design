@@ -68,6 +68,9 @@ function AdminDashboard() {
         setProductCount(products.length);
         setAdminCategories(Array.from(new Set([...getAllCategories(), ...products.map((product) => product.category)])));
         setLoadingProducts(false);
+      }).catch(error => {
+        console.error('Erro ao carregar produtos:', error);
+        setLoadingProducts(false);
       });
     }
   }, [authenticated]);

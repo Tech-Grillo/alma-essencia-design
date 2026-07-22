@@ -61,6 +61,8 @@ export function SearchBar() {
         new Set([...getAllCategories(), ...products.map((p) => p.category)]),
       ).sort();
       setAllCategories(categoriesFromProducts);
+    }).catch(error => {
+      console.error('Erro ao carregar categorias:', error);
     });
   }, []);
 
