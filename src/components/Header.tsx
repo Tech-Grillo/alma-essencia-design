@@ -28,8 +28,8 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 bg-header-bg shadow-md">
-        <div className="mx-auto max-w-[2000px] pl-1 sm:pl-2 lg:pl-3 pr-2 sm:pr-4 lg:pr-6 h-14 sm:h-16 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-0 sm:gap-0.5 lg:gap-1">
+        <div className="mx-auto max-w-[2000px] pl-1 sm:pl-2 lg:pl-3 pr-2 sm:pr-4 lg:pr-6 h-14 sm:h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
             <button
               onClick={() => setOpen(true)}
               aria-label="Abrir menu"
@@ -49,22 +49,22 @@ export function Header() {
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+          <nav className="hidden md:flex items-center gap-3 lg:gap-5">
             {nav.map((n) => (
               <Link
                 id="inicio"
                 key={n.to}
                 to={n.to}
                 activeOptions={{ exact: n.to === "/" }}
-                activeProps={{ className: "text-sm lg:text-base font-semibold text-white bg-white/20 rounded-full px-3 lg:px-4 py-1.5 lg:py-2" }}
-                className="text-sm lg:text-base font-semibold tracking-wide uppercase text-white/90 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full transition-all hover:text-white hover:bg-white/10"
+                activeProps={{ className: "text-sm lg:text-base font-semibold text-white bg-white/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2" }}
+                className="text-sm lg:text-base font-semibold tracking-wide uppercase text-white/90 px-4 lg:px-5 py-1.5 lg:py-2 rounded-full transition-all hover:text-white hover:bg-white/10"
               >
                 {n.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={(event) => toggle({ clientX: event.clientX, clientY: event.clientY })}
               aria-label="Alternar tema"

@@ -13,6 +13,8 @@ import barraca02Img from "@/assets/imagens_inicio/imagem barraca02.jpg";
 import produtosImg from "@/assets/imagens_inicio/produtos.png";
 import aboutImg from "@/assets/imagens_inicio/about.jpg";
 import gregoImg from "@/assets/imagens_inicio/imagem-grego.jpg";
+import velasImg from "@/assets/imagens_inicio/imagem_velas_o.png";
+import difusorImg from "@/assets/imagens_inicio/imagem_difusor_Home.png";
 import linhaAzulImg from "@/assets/imagens_inicio/linhaazul.png";
 import * as Icons from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -28,7 +30,7 @@ function Home() {
   const [heroIndex, setHeroIndex] = useState(0);
   const [aboutIndex, setAboutIndex] = useState(0);
   const heroImages = [heroImg, heroImgFront, barraca02Img, produtosImg];
-  const aboutImages = [aboutImg, gregoImg, linhaAzulImg];
+  const aboutImages = [aboutImg, gregoImg, velasImg, difusorImg, linhaAzulImg];
 
   useEffect(() => {
     getAllProducts().then(allProducts => {
@@ -97,24 +99,24 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-warm opacity-80" />
         <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-10 sm:gap-14 items-center">
           <div className="relative z-10 animate-slide-in-left">
-            <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-8 border border-border">
-              <Icons.Sparkles className="h-3 w-3" /> Artesanal · Natural
+            <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-5 py-2 text-sm uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-8 border border-border">
+              <Icons.Sparkles className="h-4 w-4" /> Artesanal · Natural
             </div>
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-foreground">
+            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] text-foreground">
               Feito com <em className="font-script text-caramel-deep dark:text-white not-italic">amor</em>,<br />
               sentido na pele.
             </h1>
-            <p className="mt-7 max-w-md text-base sm:text-lg text-muted-foreground leading-relaxed">
+            <p className="mt-7 max-w-md text-lg sm:text-xl text-muted-foreground leading-relaxed">
               Velas, sabonetes e brumas perfumadas que transformam o ordinário em ritual. Pequenas pausas para respirar.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link
                 to="/produtos"
-                className="w-full sm:w-auto rounded-full bg-gradient-caramel text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 shadow-soft hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-sm uppercase tracking-[0.5em] text-center"
+                className="w-full sm:w-auto rounded-full bg-gradient-caramel text-primary-foreground px-8 sm:px-10 py-4 sm:py-5 shadow-soft hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-base uppercase tracking-[0.5em] text-center"
               >
                 Explorar Produtos
               </Link>
-              <Link to="/quem-somos" className="text-sm uppercase tracking-[0.2em] text-foreground/70 hover:text-caramel-deep dark:hover:text-white border-b border-border pb-1">
+              <Link to="/quem-somos" className="text-base uppercase tracking-[0.2em] text-foreground/70 hover:text-caramel-deep dark:hover:text-white border-b border-border pb-1">
                 Nossa história
               </Link>
             </div>

@@ -257,7 +257,7 @@ function ProductsList() {
                   </button>
 
                   {isExpanded && children.length > 0 && (
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <div className="flex flex-col items-center gap-2 mt-2 w-full max-w-md">
                       {children.map((child) => (
                         <button
                           key={child}
@@ -266,7 +266,7 @@ function ProductsList() {
                             setExpandedGroup(category);
                             window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(child)}`);
                           }}
-                          className={`rounded-full px-3.5 py-1.75 text-sm font-medium transition-all duration-300 ease-out transform ${
+                          className={`w-full rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 ease-out transform ${
                             filter === child
                               ? "bg-chocolate text-cream shadow-soft scale-[1.02] ring-2 ring-chocolate/40"
                               : "bg-white/80 hover:bg-rose/20 hover:scale-[1.01]"
