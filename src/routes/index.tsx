@@ -116,9 +116,9 @@ function Home() {
               >
                 Explorar Produtos
               </Link>
-              <Link to="/quem-somos" className="text-base uppercase tracking-[0.2em] text-foreground/70 hover:text-caramel-deep dark:hover:text-white border-b border-border pb-1">
-                Nossa história
-              </Link>
+              <Link to="/quem-somos" className="text-base uppercase tracking-[0.2em] text-foreground/70 hover:text-caramel-deep transition-colors">
+  Nossa história
+</Link>
             </div>
           </div>
 
@@ -296,15 +296,15 @@ function FeaturedCarousel({ products }: { products: typeof import("@/lib/product
 
   return (
     <div className="relative">
-      <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
-        <div className="flex gap-7">
-          {products.map((p) => (
-            <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(33.333%-1.75rem)] md:min-w-[calc(25%-1.75rem)] lg:min-w-[calc(20%-1.75rem)] xl:min-w-[calc(16.666%-1.75rem)] 2xl:min-w-[calc(14.285%-1.75rem)]">
-              <ProductCard product={p} />
-            </div>
-          ))}
+        <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
+          <div className="flex gap-7">
+            {products.map((p) => (
+              <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] lg:min-w-[calc(33.333%-1.75rem)] xl:min-w-[calc(25%-1.75rem)] 2xl:min-w-[calc(20%-1.75rem)]">
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
       {/* Navigation Buttons */}
       <button

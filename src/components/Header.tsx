@@ -3,7 +3,6 @@ import * as Icons from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { useCart } from "@/lib/cart";
-import { categories } from "@/lib/products";
 import logo from "@/assets/imagens_inicio/logo_da_marca_sem_fundo.png";
 
 
@@ -49,15 +48,15 @@ export function Header() {
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-3 lg:gap-5">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
             {nav.map((n) => (
               <Link
                 id="inicio"
                 key={n.to}
                 to={n.to}
                 activeOptions={{ exact: n.to === "/" }}
-                activeProps={{ className: "text-sm lg:text-base font-semibold text-white bg-white/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2" }}
-                className="text-sm lg:text-base font-semibold tracking-wide uppercase text-white/90 px-4 lg:px-5 py-1.5 lg:py-2 rounded-full transition-all hover:text-white hover:bg-white/10"
+                activeProps={{ className: "text-base lg:text-lg font-semibold text-white bg-white/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2" }}
+                className="text-base lg:text-lg font-semibold tracking-wide uppercase text-white/90 px-4 lg:px-5 py-1.5 lg:py-2 rounded-full transition-all hover:text-white hover:bg-white/10"
               >
                 {n.label}
               </Link>
@@ -116,19 +115,6 @@ export function Header() {
                   >
                     {n.label}
                   </Link>
-                </li>
-              ))}
-            </ul>
-
-            <p className="font-serif text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-foreground mb-4">
-              Categorias
-            </p>
-            <ul className="grid grid-cols-2 gap-2 mb-8 max-h-56 overflow-y-auto pr-2" style={{ scrollbarWidth: "thin" }}>
-              {categories.map((c) => (
-                <li key={c}>
-                  <button className="w-full text-left rounded-full px-4 py-2 bg-secondary/70 hover:bg-rose/70 text-sm sm:text-[15px] font-semibold text-foreground/90 transition-colors">
-                    {c}
-                  </button>
                 </li>
               ))}
             </ul>
