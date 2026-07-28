@@ -19,6 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            style={{ transform: 'translateZ(0)' }}
           />
         </Link>
       </div>

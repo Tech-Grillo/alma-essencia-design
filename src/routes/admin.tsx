@@ -181,6 +181,11 @@ function AdminDashboard() {
       });
   };
 
+  const removeNewProductImage = (index: number) => {
+    setProductImages((prev) => prev.filter((_, i) => i !== index));
+    setProductImageNames((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const resetNewProductForm = () => {
     setProductName("");
     setProductCategory(categories[0]);
@@ -303,10 +308,6 @@ function AdminDashboard() {
       setAdminCategories(Array.from(new Set([...getAllCategories(), ...products.map((product) => product.category)])));
       resetNewProductForm();
       setSuccessMessage(`Produto "${productName.trim()}" cadastrado com sucesso!`);
-
-      // Redirecionar para o site principal na aba de produtos com categoria selecionada
-      const redirectCategory = encodeURIComponent(category);
-      navigate({ to: `/produtos?categoria=${redirectCategory}` });
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -517,12 +518,20 @@ function AdminDashboard() {
               <div className="grid w-full gap-5 md:grid-cols-[180px_1fr] md:text-left">
                 <div className="flex gap-2 overflow-x-auto md:flex-col md:w-44">
                   {productImages.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt={`Previa ${idx + 1}`}
-                      className="h-20 w-20 flex-shrink-0 rounded-xl object-cover shadow-soft md:h-44 md:w-full"
-                    />
+                    <div key={idx} className="relative flex-shrink-0">
+                      <img
+                        src={img}
+                        alt={`Previa ${idx + 1}`}
+                        className="h-20 w-20 rounded-xl object-cover shadow-soft md:h-44 md:w-full"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeNewProductImage(idx)}
+                        className="absolute -top-2 -right-2 rounded-full bg-rose text-white p-1 hover:bg-rose/80 transition shadow-md"
+                      >
+                        <Icons.X className="h-3 w-3" />
+                      </button>
+                    </div>
                   ))}
                 </div>
                 <div className="flex flex-col justify-center">

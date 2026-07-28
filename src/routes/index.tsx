@@ -11,13 +11,18 @@ import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
 import heroImgFront from "@/assets/imagens_inicio/imagem_frente_mae.png";
 import barraca02Img from "@/assets/imagens_inicio/imagem barraca02.jpg";
 import produtosImg from "@/assets/imagens_inicio/produtos.png";
-import aboutImg from "@/assets/imagens_inicio/about.jpg";
+import aboutImg from "@/assets/imagens_inicio/body.png";
 import gregoImg from "@/assets/imagens_inicio/imagem-grego.jpg";
 import velasImg from "@/assets/imagens_inicio/imagem_velas_o.png";
 import difusorImg from "@/assets/imagens_inicio/imagem_difusor_Home.png";
 import linhaAzulImg from "@/assets/imagens_inicio/linhaazul.png";
+import bombaAromaImg from "@/assets/imagens_inicio/bomba_de_aroma.png";
+import difusorLAImg from "@/assets/imagens_inicio/difusor_LA.png";
+import tuboLataImg from "@/assets/imagens_inicio/tubo_de_lata.png";
+import velasImg2 from "@/assets/imagens_inicio/velas.png";
+import waltsMeltsImg from "@/assets/imagens_inicio/walts_melts.png";
 import * as Icons from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
 export const Route = createFileRoute("/")({
@@ -125,7 +130,7 @@ function Home() {
           <div className="relative animate-slide-in-right">
             <div className="absolute -inset-6 bg-rose/40 rounded-[3rem] rotate-3 blur-2xl" />
             <div className="relative overflow-hidden rounded-[2.5rem] shadow-bloom">
-              <div className="flex transition-transform duration-[2200ms] ease-[cubic-bezier(0.22,1,0.36,1)]" style={{ transform: `translateX(-${heroIndex * 100}%)` }}>
+              <div className="flex transition-transform duration-[2200ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform" style={{ transform: `translateX(-${heroIndex * 100}%)`, backfaceVisibility: 'hidden' }}>
                 {heroImages.map((image, index) => (
                   <img
                     key={`${image}-${index}`}
@@ -173,7 +178,7 @@ function Home() {
       <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">
         <div className="relative">
           <div className="relative overflow-hidden rounded-[2rem] shadow-soft aspect-square">
-            <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${aboutIndex * 100}%)` }}>
+              <div className="flex transition-transform duration-700 ease-in-out will-change-transform" style={{ transform: `translateX(-${aboutIndex * 100}%)`, backfaceVisibility: 'hidden' }}>
               {aboutImages.map((image, index) => (
                 <img
                   key={index}
@@ -230,6 +235,16 @@ function Home() {
           <div className="botanical-divider mt-6"><span>❀</span></div>
         </div>
         <FeaturedCarousel products={products} />
+      </section>
+
+      {/* BEST SELLERS */}
+      <section className="mx-auto max-w-[1600px] px-6 lg:px-10 pb-24 animate-fade-in-up">
+        <div className="text-center mb-14">
+          <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white mb-3">Destaques</p>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl">Mais vendidos</h2>
+          <div className="botanical-divider mt-6"><span>✿</span></div>
+        </div>
+        <BestSellersCarousel />
       </section>
 
       {/* LOCATION */}
@@ -319,6 +334,93 @@ function FeaturedCarousel({ products }: { products: typeof import("@/lib/product
         onClick={scrollNext}
         disabled={!canScrollNext}
         className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        aria-label="Próximo"
+      >
+        <Icons.ChevronRight className="h-6 w-6" />
+      </button>
+    </div>
+  );
+}
+
+const bestSellers = [
+  { name: "Velas", image: velasImg2 },
+  { name: "Tubo de lata", image: tuboLataImg },
+  { name: "Difusor", image: difusorLAImg },
+  { name: "Wax melts", image: waltsMeltsImg },
+];
+
+function BestSellersCarousel() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    slidesToScroll: 1,
+    loop: true,
+    dragFree: false,
+  });
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  return (
+    <div className="relative">
+      <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
+        <div className="flex gap-7">
+          {bestSellers.map((item) => (
+            <div
+              key={item.name}
+              className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] lg:min-w-[calc(33.333%-1.75rem)] xl:min-w-[calc(25%-1.75rem)]"
+            >
+              <Link
+                to="/produtos"
+                className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:-translate-y-1 hover:shadow-bloom"
+              >
+                <div className="aspect-square overflow-hidden bg-muted">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-5 text-center">
+                  <p className="font-serif text-2xl text-foreground">{item.name}</p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-caramel-deep">Ver produtos</p>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => emblaApi?.scrollPrev()}
+        disabled={!canScrollPrev}
+        className="absolute left-0 top-1/2 z-10 flex h-12 w-12 -translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-soft transition-all hover:border-caramel hover:bg-caramel hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+        aria-label="Anterior"
+      >
+        <Icons.ChevronLeft className="h-6 w-6" />
+      </button>
+      <button
+        type="button"
+        onClick={() => emblaApi?.scrollNext()}
+        disabled={!canScrollNext}
+        className="absolute right-0 top-1/2 z-10 flex h-12 w-12 translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-soft transition-all hover:border-caramel hover:bg-caramel hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
         aria-label="Próximo"
       >
         <Icons.ChevronRight className="h-6 w-6" />
