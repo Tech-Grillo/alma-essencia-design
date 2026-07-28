@@ -59,11 +59,14 @@ function Contact() {
 
         <div className="rounded-[2rem] overflow-hidden border border-border">
           <div className="p-6 sm:p-8 bg-secondary/40 flex items-center gap-3">
-            <Icons.MapPin className="h-5 w-5 text-caramel-deep dark:text-white" />
-            <div>
-              <p className="font-serif text-lg">BAIRRO DE ICARAÍ</p>
-              <p className="font-serif text-sm text-muted-foreground">FEIRA - CAMPO DE SÃO BENTO</p>
-              <p className="font-serif text-sm text-muted-foreground">RIO DE JANEIRO · RJ</p>
+            <Icons.MapPin className="h-6 w-6 text-caramel-deep dark:text-white" />
+            <div className="space-y-1">
+              <p className="font-serif text-xl sm:text-2xl font-bold text-foreground leading-tight">BAIRRO DE ICARAÍ</p>
+              <p className="font-serif text-base sm:text-lg font-semibold text-caramel-deep dark:text-white leading-tight">FEIRA - CAMPO DE SÃO BENTO</p>
+              <p className="font-serif text-sm sm:text-base font-medium text-foreground/80 leading-tight">RIO DE JANEIRO · RJ</p>
+              <p className="font-serif text-base sm:text-lg font-bold text-caramel-deep dark:text-white mt-2">
+                Domingos · 09h às 15h
+              </p>
             </div>
           </div>
           <SimpleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" className="w-full h-80" />

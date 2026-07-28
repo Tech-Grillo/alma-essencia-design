@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.category}
         </p>
         <h3 className="font-serif text-xl sm:text-2xl leading-tight mb-2 text-center">{product.name}</h3>
-        <span className="font-serif text-2xl sm:text-3xl font-bold bg-gradient-caramel bg-clip-text text-transparent text-center mb-4">
+        <span className="font-serif text-3xl sm:text-4xl font-black text-[#8B4513] text-center mb-4 drop-shadow-md tracking-tight">
           R$ {Math.min(...product.sizes.map((s: any) => s.price)).toFixed(2).replace(".", ",")}
         </span>
 
@@ -36,7 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Link
             to="/produtos/$slug"
             params={{ slug: product.slug }}
-            className="w-full flex items-center justify-center gap-2 rounded-full bg-rose text-white text-sm py-3 font-medium transition-all hover:opacity-90"
+            className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8B4513] text-white text-sm py-3 font-medium transition-all hover:bg-[#6B3410] hover:shadow-lg"
           >
             <Icons.ShoppingBag className="h-4 w-4" /> COMPRAR
           </Link>

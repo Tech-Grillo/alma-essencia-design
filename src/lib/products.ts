@@ -22,7 +22,7 @@ export const products: Product[] = [
   {
     slug: "vela-aromatica-lavanda",
     name: "Vela Aromática de Soja",
-    category: "Velas",
+    category: "Velas aromáticas",
     // price kept as medium size price
     price: 79.9,
     images: [p1],
@@ -123,12 +123,19 @@ export const categories = [
 ];
 
 export const categoryGroups = [
-  { parent: "Velas", children: ["Velas aromáticas", "Velas de massagem"] },
+  { parent: "Velas aromáticas", children: ["Velas de massagem"] },
   { parent: "Sabonetes", children: ["Sabonetes glicerinados", "Sabonetes fitoterápicos", "Sabonete líquido"] },
   { parent: "Home Spray", children: ["Home spray 250ml", "Home spray 60ml"] },
   { parent: "Difusores", children: ["Difusores de ambiente 250ml"] },
-  { parent: "Hidratantes", children: ["Esfoliante corporal", "Sugar Cream", "Creme para mãos e pés", "Manteigas corporais", "Óleo corporal"] },
+  { parent: "Hidratantes", children: ["Sugar Cream", "Creme para mãos e pés", "Manteigas corporais", "Óleo corporal"] },
+  { parent: "Esfoliante corporal", children: [] },
   { parent: "Kits", children: [] },
+  { parent: "Águas de lençóis", children: [] },
+  { parent: "Body Splash", children: [] },
+  { parent: "Geleia de banho", children: [] },
+  { parent: "Escalda-pés", children: [] },
+  { parent: "Whalts Melts", children: [] },
+  { parent: "Sais de banho", children: [] },
 ];
 
 export const topLevelCategories = categoryGroups.map((group) => group.parent);
@@ -142,12 +149,13 @@ export function getCategoryChildren(parent: string) {
 }
 
 export const categoryImagePaths: Record<string, string> = {
-  "Velas": "/src/assets/imagens_produtos/velas/",
+  "Velas aromáticas": "/src/assets/imagens_produtos/velas/",
   "Sabonetes": "/src/assets/imagens_produtos/sabonetes/",
   "Home Spray": "/src/assets/imagens_produtos/home-spray/",
   "Difusores": "/src/assets/imagens_produtos/difusores/",
   "Kits": "/src/assets/imagens_produtos/kits/",
   "Hidratantes": "/src/assets/imagens_produtos/hidratantes/",
+  "Esfoliante corporal": "/src/assets/imagens_produtos/hidratantes/",
   "Home spray 250ml": "/src/assets/imagens_produtos/home-spray/",
   "Home spray 60ml": "/src/assets/imagens_produtos/home-spray/",
   "Difusores de ambiente 250ml": "/src/assets/imagens_produtos/difusores/",

@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { getAllProducts, getAllCategories, type Product } from "@/lib/products-supabase";
 import { categoryGroups, topLevelCategories } from "@/lib/products";
 import { useEffect, useState } from "react";
+import { Search, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/produtos/")({
   component: ProductsList,
@@ -180,18 +181,36 @@ function ProductsList() {
         </div>
         <div className="flex flex-col items-center gap-4 mb-10 sm:mb-12">
           <div className="w-full max-w-2xl">
-            <label className="mb-2 block text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Buscar categoria
-            </label>
-            <div className="relative">
-              <input
-                value={searchQuery}
-                onChange={(event) => handleSearchInput(event.target.value)}
-                placeholder="Ex: Hidratante"
-                className="w-full rounded-full border border-border bg-background/90 px-5 py-3 text-base shadow-sm outline-none transition focus:border-rose focus:ring-2 focus:ring-rose/20"
-              />
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Sparkles className="h-5 w-5 text-caramel-deep" />
+              <label className="text-sm font-bold uppercase tracking-[0.3em] bg-gradient-caramel bg-clip-text text-transparent">
+                Buscar categorias
+              </label>
+              <Sparkles className="h-5 w-5 text-caramel-deep" />
+            </div>
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-rose/20 via-caramel/20 to-rose/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-caramel-deep/60 group-focus-within:text-caramel-deep transition-colors" />
+                <input
+                  value={searchQuery}
+                  onChange={(event) => handleSearchInput(event.target.value)}
+                  placeholder="Ex: Hidratante"
+                  className="w-full rounded-full border-2 border-border bg-background/95 pl-14 pr-6 py-4 text-base shadow-lg outline-none transition-all duration-300 focus:border-rose focus:shadow-bloom focus:scale-[1.02]"
+                />
+                {searchQuery && (
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2">
+                    <div className="h-2 w-2 rounded-full bg-rose animate-pulse" />
+                  </div>
+                )}
+              </div>
               {searchQuery && suggestionOptions.length > 0 && (
-                <div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-2xl border border-border bg-background/95 p-2 shadow-xl backdrop-blur">
+                <div className="absolute left-0 right-0 top-full z-10 mt-3 rounded-2xl border-2 border-border bg-background/98 p-3 shadow-2xl backdrop-blur-xl">
+                  <div className="mb-2 px-3 py-1">
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-semibold">
+                      Sugestões encontradas
+                    </p>
+                  </div>
                   {suggestionOptions.map((option) => (
                     <button
                       key={option}
@@ -202,10 +221,12 @@ function ProductsList() {
                         setExpandedGroup(categoryGroups.find((group) => group.parent === option || group.children.includes(option))?.parent ?? null);
                         window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(option)}`);
                       }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-medium text-foreground transition hover:bg-rose/10"
+                      className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-medium text-foreground transition-all duration-200 hover:bg-gradient-to-r hover:from-rose/10 hover:to-caramel/10 hover:translate-x-1"
                     >
-                      <span>{option}</span>
-                      <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Ir</span>
+                      <span className="font-semibold">{option}</span>
+                      <span className="text-xs uppercase tracking-[0.2em] text-caramel-deep font-bold">
+                        Ir →
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -213,28 +234,30 @@ function ProductsList() {
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2">
-            <button
-              onClick={() => {
-                setFilter("Todos");
-                setExpandedGroup(null);
-                window.history.replaceState(null, "", "/produtos");
-              }}
-              className={`rounded-full px-5 py-2 text-base font-medium transition-all duration-300 ease-out transform ${
-                filter === "Todos"
-                  ? "bg-rose text-foreground shadow-soft scale-[1.03] ring-2 ring-rose/50"
-                  : "bg-secondary/60 hover:bg-rose/40 hover:scale-[1.01]"
-              }`}
-            >
-              Todos
-            </button>
+           <div className="flex flex-wrap justify-center gap-2">
+            <div className="w-full flex justify-center mb-2">
+              <button
+                onClick={() => {
+                  setFilter("Todos");
+                  setExpandedGroup(null);
+                  window.history.replaceState(null, "", "/produtos");
+                }}
+                className={`rounded-full px-5 py-2 text-base font-medium transition-all duration-300 ${
+                  filter === "Todos"
+                    ? "bg-rose text-foreground shadow-soft ring-2 ring-rose/50"
+                    : "bg-secondary/60 hover:bg-rose/40"
+                }`}
+              >
+                Todos
+              </button>
+            </div>
 
             {topLevelCategories.map((category) => {
               const children = categoryGroups.find((group) => group.parent === category)?.children ?? [];
               const isExpanded = expandedGroup === category || filter === category;
 
               return (
-                <div key={category} className="flex flex-col items-center gap-2">
+                <div key={category} className="flex flex-col items-center">
                   <button
                     onClick={() => {
                       if (filter === category && expandedGroup === category) {
@@ -247,18 +270,18 @@ function ProductsList() {
                         window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(category)}`);
                       }
                     }}
-                    className={`rounded-full px-5 py-2 text-base font-medium transition-all duration-300 ease-out transform ${
+                    className={`rounded-full px-5 py-2 text-base font-medium transition-all duration-300 ${
                       filter === category
-                        ? "bg-rose text-foreground shadow-soft scale-[1.03] ring-2 ring-rose/50"
-                        : "bg-secondary/60 hover:bg-rose/40 hover:scale-[1.01]"
+                        ? "bg-rose text-foreground shadow-soft ring-2 ring-rose/50"
+                        : "bg-secondary/60 hover:bg-rose/40"
                     }`}
                   >
                     {category}
                   </button>
 
                   {isExpanded && children.length > 0 && (
-                    <div className="flex flex-col items-center gap-2 mt-2 w-full max-w-md">
-                      {children.map((child) => (
+                    <div className="flex flex-col items-center gap-2 mt-3 w-full max-w-md animate-slide-down">
+                      {children.map((child, index) => (
                         <button
                           key={child}
                           onClick={() => {
@@ -266,11 +289,12 @@ function ProductsList() {
                             setExpandedGroup(category);
                             window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(child)}`);
                           }}
-                          className={`w-full rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 ease-out transform ${
+                          className={`w-full rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 animate-fade-in-up-item ${
                             filter === child
-                              ? "bg-chocolate text-cream shadow-soft scale-[1.02] ring-2 ring-chocolate/40"
-                              : "bg-white/80 hover:bg-rose/20 hover:scale-[1.01]"
+                              ? "bg-chocolate text-cream shadow-soft ring-2 ring-chocolate/40"
+                              : "bg-white/80 hover:bg-rose/20"
                           }`}
+                          style={{ animationDelay: `${index * 0.05}s` }}
                         >
                           {child}
                         </button>

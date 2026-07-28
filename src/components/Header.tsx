@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { useCart } from "@/lib/cart";
 import logo from "@/assets/imagens_inicio/logo_da_marca_sem_fundo.png";
+import { WHATSAPP_NUMBER } from "@/lib/products";
 
 
 
@@ -90,11 +91,27 @@ export function Header() {
         <div className="absolute inset-0 bg-chocolate/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
         <aside
           className={`fixed inset-y-0 left-0 w-[88%] max-w-sm overflow-y-auto bg-background shadow-bloom p-6 transition-transform duration-500 ${open ? "translate-x-0" : "-translate-x-full"}`}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <div className="flex items-center justify-between mb-8">
-            <Link to="/" className="font-serif text-xl uppercase tracking-[0.12em] text-chocolate dark:text-white">
-              Alma Essência
-            </Link>
+            <div className="flex items-center gap-3">
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative"
+              >
+                <div className="absolute -inset-2 bg-gradient-to-r from-rose/20 to-caramel/20 rounded-full blur-md opacity-60" />
+                <img 
+                  src={logo} 
+                  alt="Alma e Essência" 
+                  className="relative h-10 w-10 object-contain"
+                />
+              </a>
+              <Link to="/" className="font-serif text-xl uppercase tracking-[0.12em] text-chocolate dark:text-white">
+                Alma Essência
+              </Link>
+            </div>
             <button onClick={() => setOpen(false)} className="rounded-full p-2 hover:bg-secondary">
               <Icons.X className="h-5 w-5" />
             </button>
@@ -129,6 +146,44 @@ export function Header() {
               <p className="text-[15px] font-medium text-foreground/85 leading-6">
                 Aqui você encontra produtos artesanais, atendimento personalizado e uma experiência de compra mais leve e bonita.
               </p>
+            </div>
+
+            <div className="mt-6 rounded-2xl border-2 border-caramel/20 bg-gradient-to-br from-rose/5 via-caramel/5 to-rose/5 p-5 space-y-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Icons.MapPin className="h-5 w-5 text-caramel-deep" />
+                <p className="font-serif text-base font-bold uppercase tracking-[0.2em] text-caramel-deep">
+                  Visite-nos
+                </p>
+              </div>
+              
+               <div className="space-y-2">
+                <p className="text-base font-bold text-foreground leading-tight">
+                  BAIRRO DE ICARAÍ
+                </p>
+                <p className="text-sm font-semibold text-caramel-deep leading-tight">
+                  FEIRA - CAMPO DE SÃO BENTO
+                </p>
+                <p className="text-sm font-medium text-foreground/80 leading-tight">
+                  RIO DE JANEIRO · RJ
+                </p>
+                
+                <div className="pt-3 border-t border-caramel/20">
+                  <p className="text-lg font-bold text-caramel-deep flex items-center gap-2">
+                    <Icons.Clock className="h-5 w-5" />
+                    Domingos · 09h às 15h
+                  </p>
+                </div>
+
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-caramel-deep transition-colors pt-2"
+                >
+                  <Icons.MessageCircle className="h-4 w-4" />
+                  {WHATSAPP_NUMBER}
+                </a>
+              </div>
             </div>
           </div>
         </aside>
