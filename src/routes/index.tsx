@@ -98,10 +98,8 @@ function Home() {
         </div>
       </section>
 
-      
-
       {/* HERO */}
-      <section className="relative overflow-hidden">
+      <section className="relative">
         <div className="absolute inset-0 bg-gradient-warm opacity-80" />
         <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-10 sm:gap-14 items-center">
           <div className="relative z-10 animate-slide-in-left space-y-6">
@@ -184,6 +182,46 @@ function Home() {
         </svg>
       </section>
 
+      {/* Golden aromatic leaves decoration */}
+      <div className="absolute inset-0 pointer-events-none overflow-visible">
+        <svg className="absolute bottom-20 left-10 w-40 h-40 text-caramel-deep opacity-90" style={{ animation: 'pulse 3s ease-in-out infinite' }} viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M100 20 Q80 60 100 100 Q120 140 100 180" />
+          <path d="M100 40 Q70 50 50 70" />
+          <path d="M100 40 Q130 50 150 70" />
+          <path d="M100 70 Q60 80 40 100" />
+          <path d="M100 70 Q140 80 160 100" />
+          <path d="M100 100 Q70 110 50 130" />
+          <path d="M100 100 Q130 110 150 130" />
+          <path d="M100 130 Q80 140 60 160" />
+          <path d="M100 130 Q120 140 140 160" />
+          <circle cx="100" cy="100" r="5" fill="currentColor" opacity="0.9" />
+        </svg>
+
+        <svg className="absolute top-40 left-0 w-32 h-32 text-caramel opacity-85" style={{ animation: 'pulse 4s ease-in-out infinite' }} viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M100 30 Q85 70 100 110 Q115 150 100 170" />
+          <path d="M100 50 Q75 60 55 85" />
+          <path d="M100 50 Q125 60 145 85" />
+          <path d="M100 80 Q70 90 50 115" />
+          <path d="M100 80 Q130 90 150 115" />
+          <path d="M100 110 Q80 120 65 140" />
+          <path d="M100 110 Q120 120 135 140" />
+          <circle cx="100" cy="100" r="4" fill="currentColor" opacity="0.8" />
+        </svg>
+
+        <svg className="absolute bottom-40 right-10 w-36 h-36 text-caramel-deep opacity-85" style={{ animation: 'pulse 3.5s ease-in-out infinite' }} viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <path d="M100 25 Q85 65 100 105 Q115 145 100 175" />
+          <path d="M100 45 Q70 55 45 80" />
+          <path d="M100 45 Q130 55 155 80" />
+          <path d="M100 75 Q65 85 40 110" />
+          <path d="M100 75 Q135 85 160 110" />
+          <path d="M100 105 Q75 115 55 135" />
+          <path d="M100 105 Q125 115 145 135" />
+          <path d="M100 135 Q85 145 70 165" />
+          <path d="M100 135 Q115 145 130 165" />
+          <circle cx="100" cy="100" r="4.5" fill="currentColor" opacity="0.85" />
+        </svg>
+      </div>
+
       {/* ABOUT */}
       <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">
         <div className="relative">
@@ -221,19 +259,20 @@ function Home() {
         <div>
           <p className="font-script text-3xl text-caramel-deep dark:text-white mb-3">— Quem somos</p>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl leading-tight mb-6">
-            Uma história feita à mão, dentro de casa.
+            Alma e Essência
           </h2>
           <div className="botanical-divider mb-6 max-w-xs ml-0">
             <span>✿</span>
           </div>
           <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-lg sm:text-xl md:text-2xl mb-4 font-medium">
-            A Alma e Essência nasceu na cozinha da nossa casa, entre panelas de cera e
-            flores secas. Cada produto é pensado, mexido e embalado por mãos da família —
-            com tempo, intenção e ingredientes que respeitam a pele e a natureza.
+            Na Alma e Essência, cada produto é desenvolvido com carinho, dedicação e respeito ao bem-estar de quem usa.
+          </p>
+          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-lg sm:text-xl md:text-2xl mb-4 font-medium">
+            Nossos sabonetes, velas aromáticas, difusores de ambiente, águas para lençóis, hidratantes, esfoliantes e geleias de banho são produzidos com ingredientes de origem vegana, enriquecidos com óleos essenciais, óleos vegetais e extratos naturais cuidadosamente selecionados.
           </p>
           <p className="text-xl font-sans text-[#8B4513] font-semibold leading-relaxed">
-  Acreditamos que cuidar de si é um gesto pequeno, repetido todos os dias.
-</p>
+            Acreditamos que cuidar de si é um gesto pequeno, repetido todos os dias.
+          </p>
         </div>
       </section>
 
@@ -326,27 +365,27 @@ function Home() {
       {/* LOCATION */}
       <section className="mx-auto max-w-[1600px] px-6 lg:px-10 pb-24 animate-fade-in-up">
         <div className="rounded-[2.5rem] overflow-hidden border border-border bg-card shadow-soft grid md:grid-cols-2">
-      <div className="p-6 sm:p-10 md:p-14 flex flex-col justify-center">
-        <div className="inline-flex items-center gap-2 text-caramel-deep dark:text-white mb-6">
-          <Icons.MapPin className="h-6 w-6" />
-          <span className="text-sm uppercase tracking-[0.3em] font-bold">Visite-nos</span>
-        </div>
-        <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl mb-6">Nos encontre</h2>
-        <div className="font-serif space-y-1 mb-4">
-          <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-tight">
-            BAIRRO DE ICARAÍ
-          </p>
-          <p className="text-lg sm:text-xl md:text-2xl font-semibold text-caramel-deep dark:text-white leading-tight">
-            FEIRA - CAMPO DE SÃO BENTO
-          </p>
-          <p className="text-base sm:text-lg md:text-xl font-medium text-foreground/80 leading-tight">
-            RIO DE JANEIRO · RJ
-          </p>
-        </div>
-        <p className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-caramel-deep dark:text-white">
-          Domingos · 09h às 15h
-        </p>
-      </div>
+          <div className="p-6 sm:p-10 md:p-14 flex flex-col justify-center">
+            <div className="inline-flex items-center gap-2 text-caramel-deep dark:text-white mb-6">
+              <Icons.MapPin className="h-6 w-6" />
+              <span className="text-sm uppercase tracking-[0.3em] font-bold">Visite-nos</span>
+            </div>
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl mb-6">Nos encontre</h2>
+            <div className="font-serif space-y-1 mb-4">
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-tight">
+                BAIRRO DE ICARAÍ
+              </p>
+              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-caramel-deep dark:text-white leading-tight">
+                FEIRA - CAMPO DE SÃO BENTO
+              </p>
+              <p className="text-base sm:text-lg md:text-xl font-medium text-foreground/80 leading-tight">
+                RIO DE JANEIRO · RJ
+              </p>
+            </div>
+            <p className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-caramel-deep dark:text-white">
+              Domingos · 09h às 15h
+            </p>
+          </div>
           <div className="aspect-[4/3] md:aspect-auto">
             <SimpleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" />
           </div>
@@ -358,7 +397,7 @@ function Home() {
   );
 }
 
-function FeaturedCarousel({ products }: { products: typeof import("@/lib/products").products }) {
+function FeaturedCarousel({ products }: { products: Product[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     align: "start",
     slidesToScroll: 1,

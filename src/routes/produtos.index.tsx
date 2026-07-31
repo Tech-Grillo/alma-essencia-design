@@ -234,77 +234,77 @@ function ProductsList() {
             </div>
           </div>
 
-           <div className="flex flex-wrap justify-center gap-2">
-            <div className="w-full flex justify-center mb-2">
-              <button
-                onClick={() => {
-                  setFilter("Todos");
-                  setExpandedGroup(null);
-                  window.history.replaceState(null, "", "/produtos");
-                }}
-                className={`rounded-full px-5 py-2 text-base font-medium transition-all duration-300 ${
-                  filter === "Todos"
-                    ? "bg-rose text-foreground shadow-soft ring-2 ring-rose/50"
-                    : "bg-secondary/60 hover:bg-rose/40"
-                }`}
-              >
-                Todos
-              </button>
-            </div>
+            <div className="flex flex-wrap justify-center gap-3 hide-scrollbar">
+             <div className="w-full flex justify-center mb-3">
+               <button
+                 onClick={() => {
+                   setFilter("Todos");
+                   setExpandedGroup(null);
+                   window.history.replaceState(null, "", "/produtos");
+                 }}
+                 className={`rounded-full px-8 py-3 text-xl font-bold transition-all duration-300 hover:scale-105 ${
+                   filter === "Todos"
+                     ? "bg-rose text-foreground shadow-soft ring-2 ring-rose/50 scale-105"
+                     : "bg-secondary/60 hover:bg-rose/40"
+                 }`}
+               >
+                 Todos
+               </button>
+             </div>
 
-            {topLevelCategories.map((category) => {
-              const children = categoryGroups.find((group) => group.parent === category)?.children ?? [];
-              const isExpanded = expandedGroup === category || filter === category;
+             {topLevelCategories.map((category) => {
+               const children = categoryGroups.find((group) => group.parent === category)?.children ?? [];
+               const isExpanded = expandedGroup === category || filter === category;
 
-              return (
-                <div key={category} className="flex flex-col items-center">
-                  <button
-                    onClick={() => {
-                      if (filter === category && expandedGroup === category) {
-                        setFilter("Todos");
-                        setExpandedGroup(null);
-                        window.history.replaceState(null, "", "/produtos");
-                      } else {
-                        setFilter(category);
-                        setExpandedGroup(category);
-                        window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(category)}`);
-                      }
-                    }}
-                    className={`rounded-full px-5 py-2 text-base font-medium transition-all duration-300 ${
-                      filter === category
-                        ? "bg-rose text-foreground shadow-soft ring-2 ring-rose/50"
-                        : "bg-secondary/60 hover:bg-rose/40"
-                    }`}
-                  >
-                    {category}
-                  </button>
+               return (
+                 <div key={category} className="flex flex-col items-center">
+                   <button
+                     onClick={() => {
+                       if (filter === category && expandedGroup === category) {
+                         setFilter("Todos");
+                         setExpandedGroup(null);
+                         window.history.replaceState(null, "", "/produtos");
+                       } else {
+                         setFilter(category);
+                         setExpandedGroup(category);
+                         window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(category)}`);
+                       }
+                     }}
+                     className={`rounded-full px-8 py-3 text-xl font-bold transition-all duration-300 hover:scale-105 ${
+                       filter === category
+                         ? "bg-rose text-foreground shadow-soft ring-2 ring-rose/50 scale-105"
+                         : "bg-secondary/60 hover:bg-rose/40"
+                     }`}
+                   >
+                     {category}
+                   </button>
 
-                  {isExpanded && children.length > 0 && (
-                    <div className="flex flex-col items-center gap-2 mt-3 w-full max-w-md animate-slide-down">
-                      {children.map((child, index) => (
-                        <button
-                          key={child}
-                          onClick={() => {
-                            setFilter(child);
-                            setExpandedGroup(category);
-                            window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(child)}`);
-                          }}
-                          className={`w-full rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 animate-fade-in-up-item ${
-                            filter === child
-                              ? "bg-chocolate text-cream shadow-soft ring-2 ring-chocolate/40"
-                              : "bg-white/80 hover:bg-rose/20"
-                          }`}
-                          style={{ animationDelay: `${index * 0.05}s` }}
-                        >
-                          {child}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                   {isExpanded && children.length > 0 && (
+                     <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-md animate-slide-down">
+                       {children.map((child, index) => (
+                         <button
+                           key={child}
+                           onClick={() => {
+                             setFilter(child);
+                             setExpandedGroup(category);
+                             window.history.replaceState(null, "", `/produtos?categoria=${encodeURIComponent(child)}`);
+                           }}
+                           className={`w-full rounded-full px-6 py-3 text-lg font-semibold transition-all duration-300 animate-fade-in-up-item ${
+                             filter === child
+                               ? "bg-chocolate text-cream shadow-soft ring-2 ring-chocolate/40"
+                               : "bg-white/80 hover:bg-rose/20"
+                           }`}
+                           style={{ animationDelay: `${index * 0.05}s` }}
+                         >
+                           {child}
+                         </button>
+                       ))}
+                     </div>
+                   )}
+                 </div>
+               );
+             })}
+           </div>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 sm:gap-7">
           {list.map((p) => <ProductCard key={p.slug} product={p} />)}
