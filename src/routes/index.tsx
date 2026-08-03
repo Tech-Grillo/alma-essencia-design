@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { getAllProducts } from "@/lib/products-supabase";
 import type { Product } from "@/lib/products-supabase";
-import { getTopClickedProducts } from "@/lib/analytics";
+import { getTopFavoriteProducts } from "@/lib/analytics";
 import { SimpleMap } from "@/components/SimpleMap";
 import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
 import heroImgFront from "@/assets/imagens_inicio/imagem_frente_mae.png";
@@ -40,18 +40,15 @@ function Home() {
 
   useEffect(() => {
     getAllProducts().then(allProducts => {
-      // Buscar os top 10 produtos mais clicados
-      const topClicked = getTopClickedProducts(10);
+      const favoriteProducts = getTopFavoriteProducts(10);
       
       let featuredProducts: Product[];
       
-      if (topClicked.length > 0) {
-        // Se houver produtos com cliques, mostrar os top 10
-        featuredProducts = topClicked
-          .map(clicked => allProducts.find(p => p.slug === clicked.slug))
+      if (favoriteProducts.length > 0) {
+        featuredProducts = favoriteProducts
+          .map(item => allProducts.find(p => p.slug === item.slug))
           .filter((p): p is Product => p !== undefined);
       } else {
-        // Se não houver cliques ainda, mostrar os primeiros 10 produtos
         featuredProducts = allProducts.slice(0, 10);
       }
       
@@ -172,55 +169,7 @@ function Home() {
             </div>
           </div>
         </div>
-
-        {/* botanical svg */}
-        <svg className="absolute top-10 right-0 w-40 text-rose opacity-40" viewBox="0 0 100 200" fill="none" stroke="currentColor" strokeWidth="0.6">
-          <path d="M50 0 Q40 50 50 100 Q60 150 50 200" />
-          <path d="M50 30 Q30 30 20 50" /><path d="M50 30 Q70 30 80 50" />
-          <path d="M50 70 Q30 70 20 90" /><path d="M50 70 Q70 70 80 90" />
-          <path d="M50 110 Q30 110 20 130" /><path d="M50 110 Q70 110 80 130" />
-        </svg>
       </section>
-
-      {/* Golden aromatic leaves decoration */}
-      <div className="absolute inset-0 pointer-events-none overflow-visible">
-        <svg className="absolute bottom-20 left-10 w-40 h-40 text-caramel-deep opacity-90" style={{ animation: 'pulse 3s ease-in-out infinite' }} viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M100 20 Q80 60 100 100 Q120 140 100 180" />
-          <path d="M100 40 Q70 50 50 70" />
-          <path d="M100 40 Q130 50 150 70" />
-          <path d="M100 70 Q60 80 40 100" />
-          <path d="M100 70 Q140 80 160 100" />
-          <path d="M100 100 Q70 110 50 130" />
-          <path d="M100 100 Q130 110 150 130" />
-          <path d="M100 130 Q80 140 60 160" />
-          <path d="M100 130 Q120 140 140 160" />
-          <circle cx="100" cy="100" r="5" fill="currentColor" opacity="0.9" />
-        </svg>
-
-        <svg className="absolute top-40 left-0 w-32 h-32 text-caramel opacity-85" style={{ animation: 'pulse 4s ease-in-out infinite' }} viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M100 30 Q85 70 100 110 Q115 150 100 170" />
-          <path d="M100 50 Q75 60 55 85" />
-          <path d="M100 50 Q125 60 145 85" />
-          <path d="M100 80 Q70 90 50 115" />
-          <path d="M100 80 Q130 90 150 115" />
-          <path d="M100 110 Q80 120 65 140" />
-          <path d="M100 110 Q120 120 135 140" />
-          <circle cx="100" cy="100" r="4" fill="currentColor" opacity="0.8" />
-        </svg>
-
-        <svg className="absolute bottom-40 right-10 w-36 h-36 text-caramel-deep opacity-85" style={{ animation: 'pulse 3.5s ease-in-out infinite' }} viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="2.2">
-          <path d="M100 25 Q85 65 100 105 Q115 145 100 175" />
-          <path d="M100 45 Q70 55 45 80" />
-          <path d="M100 45 Q130 55 155 80" />
-          <path d="M100 75 Q65 85 40 110" />
-          <path d="M100 75 Q135 85 160 110" />
-          <path d="M100 105 Q75 115 55 135" />
-          <path d="M100 105 Q125 115 145 135" />
-          <path d="M100 135 Q85 145 70 165" />
-          <path d="M100 135 Q115 145 130 165" />
-          <circle cx="100" cy="100" r="4.5" fill="currentColor" opacity="0.85" />
-        </svg>
-      </div>
 
       {/* ABOUT */}
       <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">

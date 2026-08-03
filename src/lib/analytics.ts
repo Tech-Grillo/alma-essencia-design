@@ -122,15 +122,81 @@ export function getSalesByProduct(): Map<string, { quantity: number; revenue: nu
   return map;
 }
 
-export function getTopSellingProducts(limit: number = 10) {
-  const byProduct = getSalesByProduct();
-  return Array.from(byProduct.entries())
-    .map(([slug, data]) => ({ slug, ...data }))
-    .sort((a, b) => b.quantity - a.quantity)
+const REVIEW_KEY_PREFIX = "alma-essencia-reviews:";
+
+export function getCommentCountsByProduct(): Map<string, { comments: number; productName: string }> {
+  if (typeof window === 'undefined') return new Map();
+
+  const map = new Map<string, { comments: number; productName: string }>();
+
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i);
+    if (!key?.startsWith(REVIEW_KEY_PREFIX)) continue;
+
+    const productSlug = key.slice(REVIEW_KEY_PREFIX.length);
+    try {
+      const raw = window.localStorage.getItem(key);
+      if (!raw) continue;
+
+      const reviews = JSON.parse(raw) as Array<{ name: string; rating: number; comment: string; createdAt: string }>;
+      const comments = Array.isArray(reviews) ? reviews.length : 0;
+      const productName = reviews?.[0]?.productName || "";
+
+      map.set(productSlug, {
+        comments,
+        productName: productName || "",
+      });
+    } catch {
+      // ignore invalid stored review data
+    }
+  }
+
+  return map;
+}
+
+export function getTopFavoriteProducts(limit: number = 10) {
+  const clicks = getClicksByProduct();
+  const sales = getSalesByProduct();
+  const comments = getCommentCountsByProduct();
+
+  const allSlugs = new Set<string>([
+    ...Array.from(clicks.keys()),
+    ...Array.from(sales.keys()),
+    ...Array.from(comments.keys()),
+  ]);
+
+  return Array.from(allSlugs.values())
+    .map((slug) => {
+      const clickData = clicks.get(slug);
+      const saleData = sales.get(slug);
+      const commentData = comments.get(slug);
+
+      const clicksCount = clickData?.clicks ?? 0;
+      const quantity = saleData?.quantity ?? 0;
+      const commentsCount = commentData?.comments ?? 0;
+      const productName = clickData?.productName ?? saleData?.productName ?? commentData?.productName ?? "";
+
+      const score = clicksCount + commentsCount + quantity * 2;
+
+      return {
+        slug,
+        productName,
+        clicks: clicksCount,
+        quantity,
+        comments: commentsCount,
+        score,
+      };
+    })
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (b.quantity !== a.quantity) return b.quantity - a.quantity;
+      if (b.clicks !== a.clicks) return b.clicks - a.clicks;
+      return b.comments - a.comments;
+    })
     .slice(0, limit);
 }
 
-export function getTotalRevenue(): number {
+export function getTopSellingProducts(limit: number = 10) {
   const sales = getSales();
   return sales.reduce((total, sale) => total + (sale.price * sale.quantity), 0);
 }

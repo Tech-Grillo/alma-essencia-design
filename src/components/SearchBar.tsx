@@ -47,11 +47,13 @@ export function SearchBar() {
   const [suggestionOptions, setSuggestionOptions] = useState<string[]>([]);
 
   const handleSearchInput = (value: string) => {
-    if (!value) {
+    const cleaned = value.replace(/\s+/g, " ").trimStart();
+
+    if (!cleaned) {
       setSearchQuery("");
       return;
     }
-    const cleaned = value.trim();
+
     const formatted = cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
     setSearchQuery(formatted);
   };
