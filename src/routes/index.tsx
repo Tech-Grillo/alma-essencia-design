@@ -112,7 +112,10 @@ function Home() {
             </h1>
             
             <p className="max-w-lg text-lg sm:text-xl text-muted-foreground leading-relaxed">
-              <span className="text-caramel-deep dark:text-white font-semibold">Velas, sabonetes e brumas perfumadas</span> que transformam o ordinário em ritual. Pequenas pausas para respirar.
+              <span className="font-serif text-caramel-deep dark:text-white font-semibold text-2xl sm:text-3xl tracking-tight block">
+                velas, sabonetes, hidratantes, home spray, difusores de ambiente e muito mais
+              </span>
+              que transformam o ordinário em ritual. Pequenas pausas para respirar.
             </p>
             
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
@@ -206,20 +209,20 @@ function Home() {
           </div>
         </div>
         <div>
-          <p className="font-script text-3xl text-caramel-deep dark:text-white mb-3">— Quem somos</p>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl leading-tight mb-6">
+          <p className="font-script text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-caramel-deep dark:text-white mb-6 animate-fade-in-up">— Quem somos</p>
+          <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl leading-tight mb-10 bg-gradient-caramel bg-clip-text text-transparent">
             Alma e Essência
           </h2>
-          <div className="botanical-divider mb-6 max-w-xs ml-0">
-            <span>✿</span>
+          <div className="botanical-divider mb-10 max-w-xs ml-0">
+            <span className="text-6xl">✿</span>
           </div>
-          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-lg sm:text-xl md:text-2xl mb-4 font-medium">
+          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-8 font-medium">
             Na Alma e Essência, cada produto é desenvolvido com carinho, dedicação e respeito ao bem-estar de quem usa.
           </p>
-          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-lg sm:text-xl md:text-2xl mb-4 font-medium">
+          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-8 font-medium">
             Nossos sabonetes, velas aromáticas, difusores de ambiente, águas para lençóis, hidratantes, esfoliantes e geleias de banho são produzidos com ingredientes de origem vegana, enriquecidos com óleos essenciais, óleos vegetais e extratos naturais cuidadosamente selecionados.
           </p>
-          <p className="text-xl font-sans text-[#8B4513] font-semibold leading-relaxed">
+          <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans text-[#8B4513] font-bold leading-relaxed">
             Acreditamos que cuidar de si é um gesto pequeno, repetido todos os dias.
           </p>
         </div>
@@ -381,6 +384,15 @@ function FeaturedCarousel({ products }: { products: Product[] }) {
     };
   }, [emblaApi, onSelect]);
 
+  useEffect(() => {
+    if (!emblaApi) return;
+    const autoplay = window.setInterval(() => {
+      emblaApi.scrollNext();
+    }, 3000);
+
+    return () => window.clearInterval(autoplay);
+  }, [emblaApi]);
+
   return (
     <div className="relative">
         <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
@@ -431,6 +443,14 @@ function BestSellersCarousel() {
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
 
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setCanScrollPrev(emblaApi.canScrollPrev());
@@ -448,14 +468,23 @@ function BestSellersCarousel() {
     };
   }, [emblaApi, onSelect]);
 
+  useEffect(() => {
+    if (!emblaApi) return;
+    const autoplay = window.setInterval(() => {
+      emblaApi.scrollNext();
+    }, 3000);
+
+    return () => window.clearInterval(autoplay);
+  }, [emblaApi]);
+
   return (
     <div className="relative">
       <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
-        <div className="flex gap-7">
+        <div className="flex gap-10 px-4 sm:px-6">
           {bestSellers.map((item) => (
             <div
               key={item.name}
-              className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] lg:min-w-[calc(33.333%-1.75rem)] xl:min-w-[calc(25%-1.75rem)]"
+              className="min-w-[calc(100%-2.5rem)] sm:min-w-[calc(50%-2.5rem)] lg:min-w-[calc(33.333%-2.5rem)] xl:min-w-[calc(25%-2.5rem)]"
             >
               <article className="group relative rounded-3xl bg-card/95 border border-border/60 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-bloom h-full flex flex-col">
                 <div className="relative aspect-square overflow-hidden bg-secondary/40 flex-shrink-0">
@@ -478,17 +507,17 @@ function BestSellersCarousel() {
                     {item.category}
                   </p>
                   <h3 className="font-serif text-xl sm:text-2xl leading-tight mb-2 text-center">{item.name}</h3>
-                  <span className="font-serif text-3xl sm:text-4xl font-black text-[#8B4513] text-center mb-4 drop-shadow-md tracking-tight">
+                  <span className="font-serif text-3xl sm:text-4xl font-semibold text-caramel-deep dark:text-white text-center mb-4 tracking-tight">
                     R$ {item.price.toFixed(2).replace(".", ",")}
                   </span>
                   <div className="mt-auto">
                     <Link
                       to="/produtos/$slug"
                       params={{ slug: item.slug }}
-                    className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8B4513] text-white text-sm py-3 font-medium transition-all hover:bg-[#6B3410] hover:shadow-lg"
-                  >
-                    <ShoppingBag className="h-4 w-4" /> COMPRAR
-                  </Link>
+                      className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8B4513] text-white text-sm py-3 font-medium transition-all hover:bg-[#6B3410] hover:shadow-lg"
+                    >
+                      <ShoppingBag className="h-4 w-4" /> COMPRAR
+                    </Link>
                   </div>
                 </div>
               </article>
@@ -499,18 +528,18 @@ function BestSellersCarousel() {
 
       <button
         type="button"
-        onClick={() => emblaApi?.scrollPrev()}
+        onClick={scrollPrev}
         disabled={!canScrollPrev}
-        className="absolute left-0 top-1/2 z-10 flex h-12 w-12 -translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-soft transition-all hover:border-caramel hover:bg-caramel hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         aria-label="Anterior"
       >
         <Icons.ChevronLeft className="h-6 w-6" />
       </button>
       <button
         type="button"
-        onClick={() => emblaApi?.scrollNext()}
+        onClick={scrollNext}
         disabled={!canScrollNext}
-        className="absolute right-0 top-1/2 z-10 flex h-12 w-12 translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-soft transition-all hover:border-caramel hover:bg-caramel hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         aria-label="Próximo"
       >
         <Icons.ChevronRight className="h-6 w-6" />

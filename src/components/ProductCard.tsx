@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.category}
         </p>
         <h3 className="font-serif text-xl sm:text-2xl leading-tight mb-2 text-center">{product.name}</h3>
-        <span className="font-serif text-3xl sm:text-4xl font-black text-[#8B4513] text-center mb-4 drop-shadow-md tracking-tight">
+        <span className="font-serif text-3xl sm:text-4xl font-semibold text-caramel-deep dark:text-white text-center mb-4 tracking-tight">
           R$ {Math.min(...product.sizes.map((s: any) => s.price)).toFixed(2).replace(".", ",")}
         </span>
 

@@ -47,12 +47,15 @@ function RouteComponent() {
         <p className="text-muted-foreground mb-8">{getCount()} {getCount() === 1 ? "item" : "itens"}</p>
 
         {items.length === 0 ? (
-          <div className="rounded-3xl border-2 border-dashed border-border p-8 sm:p-12 text-center">
-            <Icons.ShoppingBag className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg font-medium mb-2">Seu carrinho está vazio</p>
-            <p className="text-muted-foreground mb-6">Explore nossos produtos e adicione algo especial!</p>
-            <Link to="/produtos" className="inline-flex items-center gap-2 rounded-full bg-rose px-6 py-3 text-white hover:bg-rose/90 transition-colors font-medium">
-              <Icons.ShoppingBag className="h-4 w-4" /> Ver produtos
+          <div className="rounded-3xl border-2 border-dashed border-caramel/30 bg-gradient-to-b from-rose/5 to-transparent p-8 sm:p-12 text-center">
+            <Icons.ShoppingBag className="h-20 w-20 text-caramel-deep/40 mx-auto mb-6" />
+            <p className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-caramel-deep mb-4">Seu carrinho está vazio</p>
+            <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-md mx-auto">Explore nossos produtos e adicione algo especial!</p>
+            <Link to="/produtos" className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-caramel text-primary-foreground px-10 sm:px-12 py-4 sm:py-5 shadow-2xl hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-base uppercase tracking-[0.5em] text-center font-bold">
+              <span className="relative z-10 flex items-center gap-2">
+                <Icons.ShoppingBag className="h-5 w-5" />
+                Ver produtos
+              </span>
             </Link>
           </div>
         ) : (
@@ -95,7 +98,7 @@ function RouteComponent() {
                       
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground mb-1">R$ {item.price.toFixed(2).replace(".", ",")}</p>
-                        <p className="font-serif text-2xl font-bold bg-gradient-caramel bg-clip-text text-transparent">R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</p>
+                        <p className="font-serif text-2xl font-semibold text-caramel-deep dark:text-white">R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</p>
                       </div>
                     </div>
                   </div>
@@ -134,7 +137,7 @@ function RouteComponent() {
                 <div className="mb-6">
                   <div className="flex justify-between mb-3">
                     <span className="font-serif text-xl">Total</span>
-                    <span className="font-serif text-3xl font-bold bg-gradient-caramel bg-clip-text text-transparent">R$ {getTotal().toFixed(2).replace(".", ",")}</span>
+                    <span className="font-serif text-3xl font-semibold text-caramel-deep dark:text-white">R$ {getTotal().toFixed(2).replace(".", ",")}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Frete será calculado com o vendedor</p>
                 </div>

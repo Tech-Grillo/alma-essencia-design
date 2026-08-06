@@ -32,7 +32,7 @@ function Contact() {
               icon: WhatsAppIcon, 
               label: "WhatsApp", 
               value: "(21) 989794503", 
-              href: whatsappLink("Olá! 🌿\n\nGostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?"),
+              href: whatsappLink("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?"),
               iconColor: "text-green-600 dark:text-green-400",
               labelColor: "text-green-700 dark:text-green-300",
               valueColor: "text-foreground",
@@ -105,40 +105,40 @@ function Contact() {
         </div>
 
         <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16">
-          <div className="rounded-[2rem] border border-border bg-card p-6 sm:p-8 shadow-bloom">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-caramel/10 dark:bg-caramel/20 flex items-center justify-center">
-                <Icons.Clock className="h-5 w-5 sm:h-6 sm:w-6 text-caramel-deep dark:text-caramel" />
+          <div className="rounded-[2rem] border border-border bg-card p-8 sm:p-10 shadow-bloom">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-caramel/10 dark:bg-caramel/20 flex items-center justify-center shadow-soft">
+                <Icons.Clock className="h-6 w-6 sm:h-7 sm:w-7 text-caramel-deep dark:text-caramel" />
               </div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground">Horário de Atendimento Presencial</h3>
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-caramel-deep dark:text-white">Horário de Atendimento Presencial</h3>
             </div>
-            <div className="space-y-2 ml-0 sm:ml-13">
-              <p className="font-sans text-base sm:text-lg text-foreground/90">Feira - Campo de São Bento</p>
-              <p className="font-serif text-lg sm:text-xl font-semibold text-caramel-deep dark:text-caramel">Domingos · 09h às 15h</p>
-              <p className="font-sans text-sm text-muted-foreground mt-2">Estamos te esperando na feira!</p>
+            <div className="space-y-3 ml-0 sm:ml-14">
+              <p className="font-serif text-lg sm:text-xl text-foreground/90">Feira - Campo de São Bento</p>
+              <p className="font-serif text-2xl sm:text-3xl font-semibold text-rose-600 dark:text-rose-400">Domingos · 09h às 15h</p>
+              <p className="font-sans text-base sm:text-lg text-muted-foreground mt-3">Estamos te esperando na feira!</p>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-border bg-card p-6 sm:p-8 shadow-bloom">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-caramel/10 dark:bg-caramel/20 flex items-center justify-center">
-                <Icons.Heart className="h-5 w-5 sm:h-6 sm:w-6 text-caramel-deep dark:text-caramel" />
+          <div className="rounded-[2rem] border border-border bg-card p-8 sm:p-10 shadow-bloom">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-caramel/10 dark:bg-caramel/20 flex items-center justify-center shadow-soft">
+                <Icons.Heart className="h-6 w-6 sm:h-7 sm:w-7 text-caramel-deep dark:text-caramel" />
               </div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground">Sobre Nós</h3>
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-caramel-deep dark:text-white">Sobre Nós</h3>
             </div>
-            <div className="space-y-2 ml-0 sm:ml-13">
-              <p className="font-sans text-base sm:text-lg text-foreground/90 leading-relaxed">
+            <div className="space-y-3 ml-0 sm:ml-14">
+              <p className="font-serif text-lg sm:text-xl text-foreground/90 leading-relaxed">
                 Produtos artesanais feitos com amor e carinho, trazendo a essência da natureza para sua vida.
               </p>
-              <p className="font-script text-lg sm:text-xl text-caramel-deep dark:text-caramel mt-2">Alma e Essência 🌿</p>
+              <p className="font-script text-2xl sm:text-3xl text-caramel-deep dark:text-caramel mt-3">Alma e Essência 🌿</p>
             </div>
           </div>
         </div>
 
         <div className="text-center mb-8 sm:mb-10">
-          <div className="botanical-divider mb-6"><span>✿</span></div>
-          <p className="font-script text-xl sm:text-2xl text-caramel-deep dark:text-white mb-2">Siga-nos nas redes sociais</p>
-          <p className="font-sans text-sm sm:text-base text-muted-foreground">Acompanhe novidades e promoções exclusivas</p>
+          <div className="botanical-divider mb-6"><span className="text-4xl">✿</span></div>
+          <p className="font-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-caramel-deep dark:text-white mb-4 animate-fade-in-up">Siga-nos nas redes sociais</p>
+          <p className="font-sans text-lg sm:text-xl md:text-2xl text-foreground/80 font-medium">Acompanhe novidades e promoções exclusivas</p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
@@ -146,7 +146,7 @@ function Contact() {
             <Icons.Instagram className="h-5 w-5" />
             <span>@alma_e_essencia</span>
           </a>
-          <a href={whatsappLink("Olá! 🌿\n\nGostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?")} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white font-sans font-semibold text-sm sm:text-base hover:shadow-lg hover:-translate-y-1 transition-all">
+          <a href={whatsappLink("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?")} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white font-sans font-semibold text-sm sm:text-base hover:shadow-lg hover:-translate-y-1 transition-all">
             <Icons.MessageCircle className="h-5 w-5" />
             <span>WhatsApp</span>
           </a>

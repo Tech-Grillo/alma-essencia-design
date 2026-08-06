@@ -104,7 +104,7 @@ export function SearchBar() {
           )}
         </div>
         {searchQuery && suggestionOptions.length > 0 && (
-          <div className="absolute left-0 right-0 top-full z-10 mt-3 rounded-2xl border-2 border-border bg-background/98 p-3 shadow-2xl backdrop-blur-xl">
+          <div className="absolute left-0 right-0 top-full z-50 mt-3 rounded-2xl border-2 border-border bg-background/98 p-3 shadow-2xl backdrop-blur-xl">
             <div className="mb-2 px-3 py-1">
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-semibold">
                 Sugestões encontradas

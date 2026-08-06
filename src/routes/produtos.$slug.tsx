@@ -211,7 +211,7 @@ function ProductPage() {
               Ir para a compra do produto
             </a>
 
-            <p className="font-serif text-5xl font-bold bg-gradient-caramel bg-clip-text text-transparent mb-8">
+            <p className="font-serif text-5xl font-semibold text-caramel-deep dark:text-white mb-8">
               R$ {( (product.sizes.find((s: any) => s.label === size)?.price ?? product.price) * qty ).toFixed(2).replace(".", ",")}
             </p>
 
