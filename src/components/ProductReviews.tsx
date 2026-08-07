@@ -129,12 +129,12 @@ export function ProductReviews({ product }: { product: Product }) {
 
   return (
     <section className="mt-20 rounded-[2rem] border border-border bg-card shadow-soft overflow-hidden">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border px-6 py-5 lg:px-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border px-6 py-6 lg:px-8">
         <div className="inline-flex rounded-full bg-secondary p-1 w-fit">
           <button
             type="button"
             onClick={() => setActiveTab("details")}
-            className={`rounded-full px-5 py-2 text-sm transition-all ${
+            className={`rounded-full px-6 py-3 text-base transition-all ${
               activeTab === "details" ? "bg-background text-foreground shadow-soft" : "text-muted-foreground"
             }`}
           >
@@ -143,7 +143,7 @@ export function ProductReviews({ product }: { product: Product }) {
           <button
             type="button"
             onClick={() => setActiveTab("reviews")}
-            className={`rounded-full px-5 py-2 text-sm transition-all ${
+            className={`rounded-full px-6 py-3 text-base transition-all ${
               activeTab === "reviews" ? "bg-background text-foreground shadow-soft" : "text-muted-foreground"
             }`}
           >
@@ -151,9 +151,11 @@ export function ProductReviews({ product }: { product: Product }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Stars value={Math.round(average)} size="sm" />
-          <span className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-4">
+          <div className="p-2 rounded-lg bg-background/60 border border-border flex items-center justify-center text-caramel-deep">
+            <Stars value={Math.round(average)} size="lg" />
+          </div>
+          <span className="text-base text-muted-foreground font-medium">
             {average.toFixed(1).replace(".", ",")} de 5 ({reviews.length} avaliacoes)
           </span>
         </div>
@@ -162,16 +164,16 @@ export function ProductReviews({ product }: { product: Product }) {
       {activeTab === "details" ? (
         <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-8 p-6 lg:p-8">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep mb-3">{product.category}</p>
-            <h2 className="font-serif text-3xl mb-4">Sobre o produto</h2>
-            <p className="text-muted-foreground leading-relaxed text-lg">{product.description}</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-caramel-deep mb-3 font-semibold">{product.category}</p>
+            <h2 className="font-serif text-4xl mb-4">Sobre o produto</h2>
+            <p className="text-muted-foreground leading-relaxed text-xl">{product.description}</p>
           </div>
 
           <div className="rounded-[1.5rem] bg-secondary/45 p-6">
-            <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Aromas disponiveis</p>
+            <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Aromas disponiveis</p>
             <div className="flex flex-wrap gap-2">
               {product.scents.map((scent) => (
-                <span key={scent} className="rounded-full bg-background px-4 py-2 text-sm">
+                <span key={scent} className="rounded-full bg-background px-4 py-2 text-base font-medium">
                   {scent}
                 </span>
               ))}
@@ -180,38 +182,38 @@ export function ProductReviews({ product }: { product: Product }) {
         </div>
       ) : (
         <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-8 p-6 lg:p-8">
-          <form onSubmit={handleSubmit} className="rounded-[1.5rem] bg-secondary/45 p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="rounded-[1.5rem] bg-secondary/45 p-6 space-y-6">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-caramel-deep mb-2">Sua avaliação</p>
-              <h2 className="font-serif text-3xl">Conte como foi sua experiência</h2>
+              <p className="text-sm uppercase tracking-[0.18em] text-caramel-deep mb-2 font-semibold">Sua avaliação</p>
+              <h2 className="font-serif text-4xl">Conte como foi sua experiência</h2>
             </div>
 
             <div>
-              <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Estrelas</label>
+              <label className="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-2 block font-medium">Estrelas</label>
               <Stars value={rating} onChange={setRating} size="lg" />
             </div>
 
             <div>
-              <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Nome</label>
+              <label className="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-2 block font-medium">Nome</label>
               <div className="relative">
-                <Icons.User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Icons.User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Seu nome"
-                  className="w-full rounded-full bg-background border border-border pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+                  className="w-full rounded-full bg-background border border-border pl-12 pr-4 py-4 text-base focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Descricao</label>
+              <label className="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-2 block font-medium">Descricao</label>
               <textarea
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
                 placeholder="O que voce achou do produto?"
                 rows={5}
-                className="w-full resize-none rounded-[1.25rem] bg-background border border-border px-4 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+                className="w-full resize-none rounded-[1.25rem] bg-background border border-border px-4 py-4 text-base focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
               />
             </div>
 
@@ -219,25 +221,25 @@ export function ProductReviews({ product }: { product: Product }) {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-gradient-caramel text-primary-foreground py-4 text-sm uppercase tracking-[0.2em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all"
+              className="w-full rounded-full bg-gradient-caramel text-primary-foreground py-5 text-base uppercase tracking-[0.18em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all font-semibold"
             >
-              Enviar avaliacao
+              Enviar avaliação
             </button>
           </form>
 
-          <div className="space-y-4">
+            <div className="space-y-4">
             {reviews.map((review) => (
-              <article key={review.id} className="rounded-[1.5rem] border border-border bg-background p-5">
+              <article key={review.id} className="rounded-[1.5rem] border border-border bg-background p-6">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
                   <div>
-                    <h3 className="font-serif text-2xl">{review.name}</h3>
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    <h3 className="font-serif text-3xl">{review.name}</h3>
+                    <p className="text-sm uppercase tracking-[0.18em] text-muted-foreground">
                       {formatReviewDate(review.createdAt)}
                     </p>
                   </div>
                   <Stars value={review.rating} size="sm" />
                 </div>
-                <p className="text-muted-foreground leading-relaxed">{review.comment}</p>
+                <p className="text-muted-foreground leading-relaxed text-lg">{review.comment}</p>
               </article>
             ))}
           </div>

@@ -40,18 +40,15 @@ function Home() {
 
   useEffect(() => {
     getAllProducts().then(allProducts => {
-      const favoriteProducts = getTopFavoriteProducts(10);
-      
-      let featuredProducts: Product[];
-      
-      if (favoriteProducts.length > 0) {
-        featuredProducts = favoriteProducts
-          .map(item => allProducts.find(p => p.slug === item.slug))
-          .filter((p): p is Product => p !== undefined);
-      } else {
-        featuredProducts = allProducts.slice(0, 10);
-      }
-      
+      const favoriteProducts = getTopFavoriteProducts(8);
+
+      const featuredProducts = favoriteProducts.length > 0
+        ? favoriteProducts
+            .map(item => allProducts.find(p => p.slug === item.slug))
+            .filter((p): p is Product => p !== undefined)
+            .slice(0, 8)
+        : allProducts.slice(0, 8);
+
       setProducts(featuredProducts);
       setLoading(false);
     }).catch(error => {
@@ -175,10 +172,10 @@ function Home() {
       </section>
 
       {/* ABOUT */}
-      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-fade-in-up">
-        <div className="relative">
+      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-[1.05fr_0.95fr] gap-10 sm:gap-14 lg:gap-16 items-start animate-fade-in-up">
+        <div className="relative w-full max-w-[560px] mx-auto lg:mx-0">
           <div className="relative overflow-hidden rounded-[2rem] shadow-soft aspect-square">
-              <div className="flex transition-transform duration-700 ease-in-out will-change-transform" style={{ transform: `translateX(-${aboutIndex * 100}%)`, backfaceVisibility: 'hidden' }}>
+            <div className="flex transition-transform duration-700 ease-in-out will-change-transform" style={{ transform: `translateX(-${aboutIndex * 100}%)`, backfaceVisibility: 'hidden' }}>
               {aboutImages.map((image, index) => (
                 <img
                   key={index}
@@ -193,7 +190,6 @@ function Home() {
             </div>
           </div>
           <div className="absolute -top-5 -right-5 h-24 w-24 rounded-full border border-caramel/40 hidden md:block" />
-          {/* Navigation dots */}
           <div className="flex items-center justify-center gap-2 mt-4">
             {aboutImages.map((_, index) => (
               <button
@@ -208,108 +204,114 @@ function Home() {
             ))}
           </div>
         </div>
-        <div>
-          <p className="font-script text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-caramel-deep dark:text-white mb-6 animate-fade-in-up">— Quem somos</p>
-          <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl leading-tight mb-10 bg-gradient-caramel bg-clip-text text-transparent">
+        <div className="flex flex-col justify-center max-w-2xl">
+          <p className="font-script text-4xl sm:text-5xl text-caramel-deep dark:text-white mb-4 animate-fade-in-up">— Quem somos</p>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl leading-tight mb-6 bg-gradient-caramel bg-clip-text text-transparent">
             Alma e Essência
           </h2>
-          <div className="botanical-divider mb-10 max-w-xs ml-0">
-            <span className="text-6xl">✿</span>
+          <div className="botanical-divider mb-6 max-w-[120px] ml-0">
+            <span className="text-4xl">✿</span>
           </div>
-          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-8 font-medium">
-            Na Alma e Essência, cada produto é desenvolvido com carinho, dedicação e respeito ao bem-estar de quem usa.
-          </p>
-          <p className="text-chocolate dark:text-caramel-deep leading-relaxed text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-8 font-medium">
-            Nossos sabonetes, velas aromáticas, difusores de ambiente, águas para lençóis, hidratantes, esfoliantes e geleias de banho são produzidos com ingredientes de origem vegana, enriquecidos com óleos essenciais, óleos vegetais e extratos naturais cuidadosamente selecionados.
-          </p>
-          <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans text-[#8B4513] font-bold leading-relaxed">
-            Acreditamos que cuidar de si é um gesto pequeno, repetido todos os dias.
-          </p>
+          <div className="space-y-4 text-base sm:text-lg md:text-xl leading-relaxed text-chocolate dark:text-caramel-deep font-medium">
+            <p>
+              Na Alma e Essência, cada produto é desenvolvido com carinho, dedicação e respeito ao bem-estar de quem usa.
+            </p>
+            <p>
+              Nossos sabonetes, velas aromáticas, difusores de ambiente, águas para lençóis, hidratantes, esfoliantes e geleias de banho são produzidos com ingredientes de origem vegana, enriquecidos com óleos essenciais, óleos vegetais e extratos naturais cuidadosamente selecionados.
+            </p>
+            <p className="text-lg sm:text-xl font-semibold text-[#8B4513] leading-relaxed">
+              Acreditamos que cuidar de si é um gesto pequeno, repetido todos os dias.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* FEATURED PRODUCTS */}
-      <section className="relative mx-auto max-w-[1600px] px-6 lg:px-10 py-24 animate-fade-in-up">
+      <section className="relative mx-auto max-w-[1600px] px-6 lg:px-10 pt-24 pb-20 sm:pt-28 sm:pb-24 animate-fade-in-up">
         <div className="absolute inset-0 bg-gradient-to-b from-rose/10 via-transparent to-transparent pointer-events-none" />
-        <div className="relative text-center mb-16">
-          <div className="inline-flex items-center justify-center gap-3 mb-6">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-            <div className="relative">
-              <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white font-semibold relative z-10">Destaques</p>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose/20 to-transparent blur-sm -z-0" />
+        <div className="relative rounded-[2.5rem] border border-border/60 bg-card/70 backdrop-blur-sm px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 shadow-soft">
+          <div className="relative text-center mb-12">
+            <div className="inline-flex items-center justify-center gap-3 mb-6">
+              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
+              <div className="relative">
+                <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white font-semibold relative z-10">Destaques</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose/20 to-transparent blur-sm -z-0" />
+              </div>
+              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
             </div>
-            <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-          </div>
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 bg-gradient-caramel bg-clip-text text-transparent leading-tight">
-            Produtos favoritos
-          </h2>
-          <div className="botanical-divider mt-6 mb-6">
-            <span className="text-4xl inline-block animate-pulse">❀</span>
-          </div>
-          <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-            Selecionamos com carinho os produtos mais amados por vocês
-          </p>
-        </div>
-        <div className="relative">
-          <div className="absolute -inset-4 bg-gradient-to-r from-rose/5 via-caramel/5 to-rose/5 rounded-[2rem] blur-2xl -z-10" />
-          <FeaturedCarousel products={products} />
-        </div>
-        
-        {/* Signature */}
-        <div className="mt-16 flex flex-col items-center justify-center">
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-rose/10 via-caramel/10 to-rose/10 rounded-full blur-xl opacity-60" />
-            <p className="relative font-script text-5xl sm:text-6xl md:text-7xl text-caramel-deep dark:text-white italic">
-              Adriana Grillo
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 bg-gradient-caramel bg-clip-text text-transparent leading-tight">
+              Produtos favoritos
+            </h2>
+            <div className="botanical-divider mt-6 mb-6">
+              <span className="text-4xl inline-block animate-pulse">❀</span>
+            </div>
+            <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+              Selecionamos com carinho os produtos mais amados por vocês
             </p>
           </div>
-          <div className="mt-4 flex items-center gap-3">
-            <span className="h-px w-12 bg-gradient-to-r from-transparent to-caramel-deep/40" />
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">Fundadora & Artesã</p>
-            <span className="h-px w-12 bg-gradient-to-l from-transparent to-caramel-deep/40" />
+          <div className="relative">
+            <div className="absolute -inset-4 bg-gradient-to-r from-rose/5 via-caramel/5 to-rose/5 rounded-[2rem] blur-2xl -z-10" />
+            <FeaturedCarousel products={products} />
+          </div>
+          
+          {/* Signature */}
+          <div className="mt-16 flex flex-col items-center justify-center">
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-rose/10 via-caramel/10 to-rose/10 rounded-full blur-xl opacity-60" />
+              <p className="relative font-script text-5xl sm:text-6xl md:text-7xl text-caramel-deep dark:text-white italic">
+                Adriana Grillo
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <span className="h-px w-12 bg-gradient-to-r from-transparent to-caramel-deep/40" />
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">Fundadora & Artesã</p>
+              <span className="h-px w-12 bg-gradient-to-l from-transparent to-caramel-deep/40" />
+            </div>
           </div>
         </div>
       </section>
 
       {/* BEST SELLERS */}
-      <section className="relative mx-auto max-w-[1600px] px-6 lg:px-10 pt-32 pb-24 animate-fade-in-up">
+      <section className="relative mx-auto max-w-[1600px] px-6 lg:px-10 pt-12 pb-24 animate-fade-in-up">
         <div className="absolute inset-0 bg-gradient-to-b from-rose/10 via-transparent to-transparent pointer-events-none" />
-        <div className="relative text-center mb-16">
-          <div className="inline-flex items-center justify-center gap-3 mb-6">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-            <div className="relative">
-              <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white font-semibold relative z-10">Destaques</p>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose/20 to-transparent blur-sm -z-0" />
+        <div className="relative rounded-[2.5rem] border border-border/60 bg-card/70 backdrop-blur-sm px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 shadow-soft">
+          <div className="relative text-center mb-12">
+            <div className="inline-flex items-center justify-center gap-3 mb-6">
+              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
+              <div className="relative">
+                <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white font-semibold relative z-10">Destaques</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose/20 to-transparent blur-sm -z-0" />
+              </div>
+              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
             </div>
-            <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-          </div>
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 bg-gradient-caramel bg-clip-text text-transparent leading-tight">
-            Mais vendidos
-          </h2>
-          <div className="botanical-divider mt-6 mb-6">
-            <span className="text-4xl inline-block animate-pulse">✿</span>
-          </div>
-          <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-            Os produtos que fazem mais sucesso entre nossos clientes
-          </p>
-        </div>
-        <div className="relative">
-          <div className="absolute -inset-4 bg-gradient-to-r from-rose/5 via-caramel/5 to-rose/5 rounded-[2rem] blur-2xl -z-10" />
-          <BestSellersCarousel />
-        </div>
-        
-        {/* Signature */}
-        <div className="mt-16 flex flex-col items-center justify-center">
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-rose/10 via-caramel/10 to-rose/10 rounded-full blur-xl opacity-60" />
-            <p className="relative font-script text-5xl sm:text-6xl md:text-7xl text-caramel-deep dark:text-white italic">
-              Adriana Grillo
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 bg-gradient-caramel bg-clip-text text-transparent leading-tight">
+              Mais vendidos
+            </h2>
+            <div className="botanical-divider mt-6 mb-6">
+              <span className="text-4xl inline-block animate-pulse">✿</span>
+            </div>
+            <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+              Os produtos que fazem mais sucesso entre nossos clientes
             </p>
           </div>
-          <div className="mt-4 flex items-center gap-3">
-            <span className="h-px w-12 bg-gradient-to-r from-transparent to-caramel-deep/40" />
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">Fundadora & Artesã</p>
-            <span className="h-px w-12 bg-gradient-to-l from-transparent to-caramel-deep/40" />
+          <div className="relative">
+            <div className="absolute -inset-4 bg-gradient-to-r from-rose/5 via-caramel/5 to-rose/5 rounded-[2rem] blur-2xl -z-10" />
+            <BestSellersCarousel />
+          </div>
+          
+          {/* Signature */}
+          <div className="mt-16 flex flex-col items-center justify-center">
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-rose/10 via-caramel/10 to-rose/10 rounded-full blur-xl opacity-60" />
+              <p className="relative font-script text-5xl sm:text-6xl md:text-7xl text-caramel-deep dark:text-white italic">
+                Adriana Grillo
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <span className="h-px w-12 bg-gradient-to-r from-transparent to-caramel-deep/40" />
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">Fundadora & Artesã</p>
+              <span className="h-px w-12 bg-gradient-to-l from-transparent to-caramel-deep/40" />
+            </div>
           </div>
         </div>
       </section>
@@ -384,15 +386,6 @@ function FeaturedCarousel({ products }: { products: Product[] }) {
     };
   }, [emblaApi, onSelect]);
 
-  useEffect(() => {
-    if (!emblaApi) return;
-    const autoplay = window.setInterval(() => {
-      emblaApi.scrollNext();
-    }, 3000);
-
-    return () => window.clearInterval(autoplay);
-  }, [emblaApi]);
-
   return (
     <div className="relative">
         <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
@@ -407,17 +400,17 @@ function FeaturedCarousel({ products }: { products: Product[] }) {
 
       {/* Navigation Buttons */}
       <button
+        type="button"
         onClick={scrollPrev}
-        disabled={!canScrollPrev}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
         aria-label="Anterior"
       >
         <Icons.ChevronLeft className="h-6 w-6" />
       </button>
       <button
+        type="button"
         onClick={scrollNext}
-        disabled={!canScrollNext}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
         aria-label="Próximo"
       >
         <Icons.ChevronRight className="h-6 w-6" />
@@ -468,19 +461,10 @@ function BestSellersCarousel() {
     };
   }, [emblaApi, onSelect]);
 
-  useEffect(() => {
-    if (!emblaApi) return;
-    const autoplay = window.setInterval(() => {
-      emblaApi.scrollNext();
-    }, 3000);
-
-    return () => window.clearInterval(autoplay);
-  }, [emblaApi]);
-
   return (
     <div className="relative">
       <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
-        <div className="flex gap-10 px-4 sm:px-6">
+        <div className="flex gap-10">
           {bestSellers.map((item) => (
             <div
               key={item.name}
@@ -529,8 +513,7 @@ function BestSellersCarousel() {
       <button
         type="button"
         onClick={scrollPrev}
-        disabled={!canScrollPrev}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
         aria-label="Anterior"
       >
         <Icons.ChevronLeft className="h-6 w-6" />
@@ -538,8 +521,7 @@ function BestSellersCarousel() {
       <button
         type="button"
         onClick={scrollNext}
-        disabled={!canScrollNext}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
         aria-label="Próximo"
       >
         <Icons.ChevronRight className="h-6 w-6" />

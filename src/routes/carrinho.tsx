@@ -28,7 +28,6 @@ function RouteComponent() {
     
     message += `*💰 TOTAL: R$ ${getTotal().toFixed(2).replace(".", ",")}*\n\n`;
     message += "Por favor, confirme a disponibilidade e me envie mais informações sobre o envio. Obrigado! 😊";
-    
     return message;
   };
 

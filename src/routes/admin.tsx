@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { validateAdminLogin, isAdminLoggedIn, adminLogout } from "@/lib/admin-credentials";
@@ -9,9 +9,56 @@ import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
 import heroImg from "@/assets/imagens_inicio/hero.jpg";
 
 export const Route = createFileRoute("/admin")({
-  component: AdminDashboard,
+  component: AdminLayout,
   head: () => ({ meta: [{ title: "Área Administrativa — Alma e Essência." }] }),
 });
+
+function AdminLayout() {
+  const location = useLocation();
+  const isLoginRoute = location.pathname === "/admin/login";
+
+  return (
+    <div className="min-h-screen bg-background px-4 py-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <p className="text-sm uppercase tracking-[0.28em] text-muted-foreground">Área administrativa</p>
+            <h1 className="mt-2 text-4xl font-serif font-bold text-foreground">Painel Alma e Essência</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Gerencie produtos, vendas e métricas de forma clara e organizada. Todas as ações seguem o mesmo fluxo que já funciona no painel.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3 justify-start md:justify-end">
+            <Link
+              to="/"
+              className="rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
+            >
+              Voltar ao site
+            </Link>
+            {!isLoginRoute ? (
+              <Link
+                to="/admin/login"
+                className="rounded-full bg-caramel px-5 py-3 text-sm font-semibold text-primary-foreground shadow-soft hover:bg-caramel/90 transition"
+              >
+                Login dedicado
+              </Link>
+            ) : (
+              <Link
+                to="/admin"
+                className="rounded-full bg-background border border-border px-5 py-3 text-sm font-semibold text-foreground shadow-soft hover:bg-secondary transition"
+              >
+                Voltar ao painel
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {isLoginRoute ? <Outlet /> : <AdminDashboard />}
+      </div>
+    </div>
+  );
+}
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -29,8 +76,33 @@ function AdminDashboard() {
   const priceValueRef = useRef<{ raw: string }>({ raw: "" });
   const [productImages, setProductImages] = useState<string[]>([]);
   const [productImageNames, setProductImageNames] = useState<string[]>([]);
+
+  const formatCurrencyValue = (digits: string) => {
+    const onlyDigits = digits.replace(/\D/g, "");
+    if (!onlyDigits) return "";
+
+    const length = onlyDigits.length;
+    const cents = length > 2 ? onlyDigits.slice(-2) : onlyDigits.padStart(2, "0");
+    const rawInteger = length > 2 ? onlyDigits.slice(0, -2) : "0";
+    const integerNumber = Number(rawInteger) || 0;
+    const integerFormatted = integerNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    return `R$ ${integerFormatted},${cents}`;
+  };
+
+  const parseCurrencyString = (value: string) => {
+    const onlyDigits = value.replace(/\D/g, "");
+    if (!onlyDigits) return NaN;
+
+    const length = onlyDigits.length;
+    const cents = length > 2 ? onlyDigits.slice(-2) : onlyDigits.padStart(2, "0");
+    const rawInteger = length > 2 ? onlyDigits.slice(0, -2) : "0";
+    const integerNumber = Number(rawInteger) || 0;
+
+    return Number(`${integerNumber}.${cents}`);
+  };
+
   const [isDraggingImage, setIsDraggingImage] = useState(false);
-  const [productShort, setProductShort] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productScents, setProductScents] = useState("");
   const [productError, setProductError] = useState("");
@@ -44,7 +116,6 @@ function AdminDashboard() {
     category: "",
     price: "",
     images: "",
-    short: "",
     description: "",
     scents: ""
   });
@@ -193,7 +264,6 @@ function AdminDashboard() {
     setProductPrice("");
     setProductImages([]);
     setProductImageNames([]);
-    setProductShort("");
     setProductDescription("");
     setProductScents("");
     setProductError("");
@@ -202,7 +272,6 @@ function AdminDashboard() {
       category: "",
       price: "",
       images: "",
-      short: "",
       description: "",
       scents: ""
     });
@@ -210,9 +279,15 @@ function AdminDashboard() {
 
   // Price handler - just clean the input
   const handlePriceChange = (value: string) => {
-    // Only allow numbers and comma
-    const cleaned = value.replace(/[^\d,]/g, '');
-    setProductPrice(cleaned);
+    const cleanedDigits = value.replace(/\D/g, "");
+    priceValueRef.current.raw = cleanedDigits;
+    setProductPrice(formatCurrencyValue(cleanedDigits));
+  };
+
+  const handlePriceFocus = () => {
+    if (!productPrice) {
+      setProductPrice("R$ 0,00");
+    }
   };
 
   const validateForm = () => {
@@ -221,7 +296,6 @@ function AdminDashboard() {
       category: "",
       price: "",
       images: "",
-      short: "",
       description: "",
       scents: ""
     };
@@ -238,7 +312,7 @@ function AdminDashboard() {
     }
 
     // Validate price
-    const price = Number(productPrice.replace(",", "."));
+    const price = parseCurrencyString(productPrice);
     if (!productPrice.trim()) {
       newErrors.price = "Preço é obrigatório";
     } else if (Number.isNaN(price) || price <= 0) {
@@ -248,11 +322,6 @@ function AdminDashboard() {
     // Validate images
     if (productImages.length === 0) {
       newErrors.images = "Adicione pelo menos uma imagem";
-    }
-
-    // Validate short description
-    if (!productShort.trim()) {
-      newErrors.short = "Resumo é obrigatório";
     }
 
     // Validate description
@@ -282,7 +351,7 @@ function AdminDashboard() {
     }
 
     const category = newCategory.trim() || productCategory;
-    const price = Number(productPrice.replace(",", "."));
+    const price = parseCurrencyString(productPrice);
 
     const scents = productScents
       .split(",")
@@ -296,7 +365,6 @@ function AdminDashboard() {
         category,
         price,
         images: productImages.length > 0 ? productImages : [heroImg],
-        short: productShort.trim(),
         description: productDescription.trim(),
         scents: scents.length > 0 ? scents : ["Essencia especial"],
         sizes: [{ label: "Unico", price }],
@@ -478,11 +546,13 @@ function AdminDashboard() {
         <label className="space-y-2">
           <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Preco *</span>
           <input
+            type="text"
             value={productPrice}
             onChange={(e) => handlePriceChange(e.target.value)}
+            onFocus={handlePriceFocus}
             inputMode="numeric"
             className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-            placeholder="79,90"
+            placeholder="R$ 0,00"
             required
           />
           {errors.price && <p className="text-sm text-rose font-medium">{errors.price}</p>}
@@ -548,18 +618,6 @@ function AdminDashboard() {
             )}
           </label>
         </div>
-
-        <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Resumo *</span>
-          <input
-            value={productShort}
-            onChange={(e) => setProductShort(e.target.value)}
-            className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-lg font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-            placeholder="Frase curta que aparece no card do produto"
-            required
-          />
-          {errors.short && <p className="text-sm text-rose font-medium">{errors.short}</p>}
-        </label>
 
         <label className="space-y-2 lg:col-span-2">
           <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Descricao *</span>
@@ -680,98 +738,104 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Success Message */}
+    <div className="min-h-screen bg-background px-4 py-8">
+      <div className="mx-auto max-w-6xl">
         {successMessage && (
-          <div className="mb-6 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-800 flex items-center gap-3 animate-fade-in-up">
-            <Icons.CheckCircle className="h-5 w-5 flex-shrink-0" />
-            <p className="font-medium">{successMessage}</p>
+          <div className="mb-6 rounded-[2rem] border border-green-200 bg-green-50 px-6 py-4 text-green-800 shadow-sm transition-shadow">
+            <div className="flex items-center gap-3 text-sm font-medium">
+              <Icons.CheckCircle className="h-5 w-5 flex-shrink-0" />
+              <span>{successMessage}</span>
+            </div>
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="font-serif text-4xl">Painel Administrativo</h1>
-            <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-chocolate text-cream hover:bg-chocolate/90 transition"
-          >
-            <Icons.LogOut className="h-4 w-4" />
-            Sair
-          </button>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="rounded-2xl bg-card border border-border p-6">
-            <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-2">Produtos</h2>
-            <p className="font-serif text-3xl">{productCount}</p>
-            <p className="text-xs text-muted-foreground mt-2">Produtos cadastrados</p>
+        <div className="grid gap-6 lg:grid-cols-[1.5fr_auto] items-start mb-8">
+          <div className="rounded-[2rem] bg-card border border-border p-8 shadow-soft">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Painel Administrativo</p>
+                <h2 className="mt-3 text-4xl font-serif font-bold text-foreground">Visão Geral</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  Controle rápido sobre produtos, visitantes, vendas e todas as funcionalidades do painel.
+                </p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 rounded-full bg-chocolate px-5 py-3 text-sm font-semibold text-cream transition hover:bg-chocolate/90"
+              >
+                <Icons.LogOut className="h-4 w-4" />
+                Sair
+              </button>
+            </div>
           </div>
 
-          <div className="rounded-2xl bg-card border border-border p-6">
-            <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-2">Visitantes</h2>
-            <p className="font-serif text-3xl">{visitorsCount ?? "-"}</p>
-            <p className="text-xs text-muted-foreground mt-2">Dados em tempo real (atualiza a cada 5s)</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="rounded-[2rem] bg-card border border-border p-6 shadow-soft">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Produtos cadastrados</p>
+              <p className="mt-4 text-4xl font-serif font-bold text-foreground">{productCount}</p>
+            </div>
+            <div className="rounded-[2rem] bg-card border border-border p-6 shadow-soft">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Visitantes ativos</p>
+              <p className="mt-4 text-4xl font-serif font-bold text-foreground">{visitorsCount ?? "-"}</p>
+            </div>
+            <div className="rounded-[2rem] bg-card border border-border p-6 shadow-soft">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Status do painel</p>
+              <p className="mt-4 text-4xl font-serif font-bold text-foreground">Online</p>
+            </div>
           </div>
+        </div>
 
-          <div className="rounded-2xl bg-card border border-border p-6">
-            <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-2">Status</h2>
-            <p className="font-serif text-3xl text-green-600">Online</p>
-            <p className="text-xs text-muted-foreground mt-2">Sistema operacional</p>
+        <div className="rounded-[2rem] border border-border bg-card p-6 shadow-soft">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Seções</p>
+              <h3 className="mt-2 text-2xl font-semibold text-foreground">Navegação do painel</h3>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => setActiveSection("products")}
+                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
+                  activeSection === "products"
+                    ? "bg-caramel text-primary-foreground"
+                    : "bg-background text-foreground border border-border hover:bg-secondary"
+                }`}
+              >
+                Produtos
+              </button>
+              <button
+                onClick={() => setActiveSection("analytics")}
+                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
+                  activeSection === "analytics"
+                    ? "bg-caramel text-primary-foreground"
+                    : "bg-background text-foreground border border-border hover:bg-secondary"
+                }`}
+              >
+                Analytics
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Navegação por abas */}
-        <div className="mt-8 flex gap-4 border-b border-border">
-          <button
-            onClick={() => setActiveSection("products")}
-            className={`pb-3 px-4 font-semibold text-sm uppercase tracking-wider transition-all ${
-              activeSection === "products"
-                ? "border-b-2 border-caramel text-caramel-deep"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Icons.Package className="h-4 w-4 inline mr-2" />
-            Gerenciar Produtos
-          </button>
-          <button
-            onClick={() => setActiveSection("analytics")}
-            className={`pb-3 px-4 font-semibold text-sm uppercase tracking-wider transition-all ${
-              activeSection === "analytics"
-                ? "border-b-2 border-caramel text-caramel-deep"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Icons.BarChart3 className="h-4 w-4 inline mr-2" />
-            Estatísticas
-          </button>
+        <div className="mt-8 space-y-8">
+          {activeSection === "products" && newProductForm}
+
+          {activeSection === "products" && !loadingProducts && (
+            <ProductManagementSection
+              products={adminProducts}
+              categories={adminCategories}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              filterCategory={filterCategory}
+              setFilterCategory={setFilterCategory}
+              onEdit={startEdit}
+              onDelete={(slug) => setDeletingSlug(slug)}
+            />
+          )}
+
+          {activeSection === "analytics" && !loadingProducts && (
+            <AnalyticsTab products={adminProducts} />
+          )}
         </div>
-
-        <div className="mt-12 rounded-2xl bg-card border border-border p-8">
-          <h2 className="font-serif text-2xl mb-6">Bem-vindo à Área Administrativa!</h2>
-          <p className="text-muted-foreground leading-relaxed">
-            Esta é a área de gerência da Alma e Essência. Aqui você pode gerenciar produtos, pedidos e configurações da loja.
-          </p>
-        </div>
-
-        {activeSection === "products" && newProductForm}
-
-        {activeSection === "products" && !loadingProducts && (
-          <ProductManagementSection
-            products={adminProducts}
-            categories={adminCategories}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filterCategory={filterCategory}
-            setFilterCategory={setFilterCategory}
-            onEdit={startEdit}
-            onDelete={(slug) => setDeletingSlug(slug)}
-          />
-        )}
-
-        {activeSection === "analytics" && !loadingProducts && (
-          <AnalyticsTab products={adminProducts} />
-        )}
       </div>
 
       {editingProduct && !loadingProducts && (
@@ -1119,7 +1183,7 @@ function EditProductModal({
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Descricao</span>
+            <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Descrição</span>
             <textarea
               value={product.description}
               onChange={(e) => onChange("description", e.target.value)}

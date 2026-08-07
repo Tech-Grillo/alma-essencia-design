@@ -103,34 +103,48 @@ const defaultProducts: Product[] = [
   },
 ];
 
+// Categorias principais organizadas por linha de produto
 export const categories = [
+  // Velas
   "Velas aromáticas",
   "Velas de massagem",
+  "Velas",
+  // Sabonetes
   "Sabonetes",
   "Sabonetes glicerinados",
   "Sabonetes fitoterápicos",
   "Sabonete líquido",
+  // Home Spray
   "Home Spray",
   "Home spray 250ml",
   "Home spray 60ml",
+  // Difusores
   "Difusores",
   "Difusores de ambiente 250ml",
+  // Hidratantes
   "Hidratantes",
   "Sugar Cream",
   "Creme para mãos e pés",
   "Manteigas corporais",
   "Óleo corporal",
+  // Esfoliantes
   "Esfoliante corporal",
+  // Kits
   "Kits",
+  // Águas de lençóis
   "Águas de lençóis",
+  // Body Splash
   "Body Splash",
+  // Banho
   "Geleia de banho",
   "Escalda-pés",
   "Whalts Melts",
   "Sais de banho",
-  "Velas",
+  // Cabelo
   "Perfume para cabelo",
+  // Spa
   "Spa para os pés",
+  // Aromáticos
   "Sachês aromáticos",
   "Pastilhas aromáticas",
 ];
@@ -207,10 +221,12 @@ export async function saveProduct(product: any): Promise<Product> {
     // purchaseLink não existe como coluna no banco — é sempre derivado do slug,
     // então não deve ser enviado no insert.
     const { purchaseLink, ...rest } = product;
+    const shortFallback = (rest.description && rest.description.slice(0, 120)) || rest.name || "";
     const productData = {
       ...rest,
       slug,
       images: imageUrls,
+      short: rest.short || shortFallback,
     };
 
     const saved = await createProduct(productData);
@@ -276,6 +292,8 @@ export async function updateProductInDb(id: number, product: any): Promise<Produ
 
     const slug = productData.slug || slugifyProductName(productData.name);
     productData.slug = slug;
+    // Ensure short is set (some forms may omit the resumo field)
+    productData.short = productData.short || (productData.description && (productData.description as string).slice(0, 120)) || productData.name || "";
     delete productData.purchaseLink;
 
     const updated = await updateProduct(id, productData);

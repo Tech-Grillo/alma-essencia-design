@@ -203,84 +203,115 @@ function ProductPage() {
               ))}
               <span className="text-sm text-muted-foreground ml-2">(48 avaliações)</span>
             </div>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-4">{product.description}</p>
-            <a
-              href={product.purchaseLink}
-              className="inline-flex text-sm font-medium text-caramel-deep underline underline-offset-4 hover:text-foreground transition-colors mb-8"
-            >
-              Ir para a compra do produto
-            </a>
-
-            <p className="font-serif text-5xl font-semibold text-caramel-deep dark:text-white mb-8">
-              R$ {( (product.sizes.find((s: any) => s.label === size)?.price ?? product.price) * qty ).toFixed(2).replace(".", ",")}
-            </p>
-
-            {/* Scent */}
-            <div id="comprar" className="mb-7 scroll-mt-28">
-              <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Aroma</p>
-              <div className="flex flex-wrap gap-2">
-                {product.scents.map((s: string) => (
-                  <button
-                    key={s}
-                    onClick={() => setScent(s)}
-                    className={`rounded-full px-5 py-2.5 text-sm transition-all duration-300 border ${
-                      scent === s
-                        ? "bg-rose border-caramel text-foreground scale-105 shadow-soft"
-                        : "bg-card border-border hover:border-caramel/60"
-                    }`}
-                  >{s}</button>
-                ))}
-              </div>
-            </div>
-
-            {/* Size */}
-            <div className="mb-7">
-              <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Tamanho</p>
-              <div className="inline-flex p-1 rounded-full bg-secondary">
-                {product.sizes.map((s: any) => (
-                  <button
-                    key={s.label}
-                    onClick={() => setSize(s.label)}
-                    className={`rounded-full px-6 py-2 text-sm transition-all ${
-                      size === s.label ? "bg-background shadow-soft text-foreground" : "text-muted-foreground"
-                    }`}
-                  >{s.label}</button>
-                ))}
-              </div>
-            </div>
-
-            {/* Qty */}
-            <div className="mb-9 flex items-end gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-foreground/70 mb-3">Quantidade</p>
-                <div className="inline-flex items-center rounded-full border border-border bg-card">
-                  <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3 hover:text-caramel-deep">
-                    <Icons.Minus className="h-4 w-4" />
-                  </button>
-                  <span className="w-10 text-center font-serif text-lg">{qty}</span>
-                  <button onClick={() => setQty((q) => q + 1)} className="p-3 hover:text-caramel-deep">
-                    <Icons.Plus className="h-4 w-4" />
-                  </button>
+            {product.short ? (
+              <p className="text-lg text-muted-foreground leading-relaxed mb-4">{product.short}</p>
+            ) : null}
+            <div className="grid gap-6">
+              <div className="rounded-[2rem] border border-border bg-card p-6 shadow-soft">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground mb-1">Preço estimado</p>
+                    <p className="font-serif text-5xl font-semibold text-caramel-deep">
+                      R$ {((product.sizes.find((s: any) => s.label === size)?.price ?? product.price) * qty).toFixed(2).replace(".", ",")}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-rose/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-rose">
+                    Escolha confortável
+                  </span>
                 </div>
+                <p className="mt-5 text-base leading-7 text-muted-foreground font-medium">
+                  Selecione aroma, tamanho e quantidade para enviar a mensagem automaticamente via WhatsApp.
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className="rounded-full px-6 py-3 text-sm bg-rose text-white hover:bg-rose/90 transition-colors font-medium opacity-90 hover:opacity-100 shadow-soft hover:shadow-bloom"
-              >
-                Adicionar ao carrinho
-              </button>
-            </div>
 
-            <a
-              href={whatsappLink(message)}
-              target="_blank" rel="noreferrer"
-              className="w-full flex items-center justify-center gap-3 rounded-full bg-whatsapp text-white py-5 text-base font-medium shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all"
-            >
-              <WhatsAppIcon className="h-5 w-5" />
-              Comprar pelo WhatsApp
-            </a>
-            <p className="text-xs text-center text-muted-foreground mt-3">Atendimento personalizado · Resposta em minutos</p>
+              <div className="rounded-[2rem] border border-border bg-background p-6 shadow-soft">
+                <div id="comprar" className="space-y-6 scroll-mt-28">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Descrição</p>
+                    <p className="text-base text-foreground leading-relaxed">{product.description}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Aroma</p>
+                    <div className="flex flex-wrap gap-3">
+                      {product.scents.map((s: string) => (
+                        <button
+                          key={s}
+                          onClick={() => setScent(s)}
+                          className={`rounded-full border px-6 py-3 text-base font-semibold transition-all ${
+                            scent === s
+                              ? "border-caramel bg-caramel/10 text-foreground shadow-soft"
+                              : "border-border bg-background text-muted-foreground hover:border-caramel/70 hover:text-foreground"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Tamanho</p>
+                    <div className="flex flex-wrap gap-3">
+                      {product.sizes.map((s: any) => (
+                        <button
+                          key={s.label}
+                          onClick={() => setSize(s.label)}
+                          className={`rounded-full border px-6 py-3 text-base font-semibold transition-all ${
+                            size === s.label
+                              ? "border-caramel bg-caramel/10 text-foreground shadow-soft"
+                              : "border-border bg-background text-muted-foreground hover:border-caramel/70 hover:text-foreground"
+                          }`}
+                        >
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Quantidade</p>
+                    <div className="inline-flex items-center rounded-full border border-border bg-card">
+                      <button
+                        onClick={() => setQty((q) => Math.max(1, q - 1))}
+                        className="px-5 py-3 text-foreground transition hover:text-caramel-deep"
+                      >
+                        <Icons.Minus className="h-5 w-5" />
+                      </button>
+                      <span className="min-w-[3rem] text-center font-serif text-lg font-semibold">{qty}</span>
+                      <button
+                        onClick={() => setQty((q) => q + 1)}
+                        className="px-5 py-3 text-foreground transition hover:text-caramel-deep"
+                      >
+                        <Icons.Plus className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-3">
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="w-full rounded-full bg-gradient-caramel text-primary-foreground py-5 text-base font-semibold uppercase tracking-[0.18em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 transition-all"
+                  >
+                    Adicionar ao carrinho
+                  </button>
+                  <a
+                    href={whatsappLink(message)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-gradient-caramel text-primary-foreground py-5 text-base font-semibold uppercase tracking-[0.18em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 transition-all"
+                  >
+                    <WhatsAppIcon className="h-5 w-5" />
+                    Comprar pelo WhatsApp
+                  </a>
+                </div>
+
+                <p className="mt-4 text-center text-xs text-muted-foreground">
+                  Atendimento personalizado · Finalize seu pedido com rapidez e segurança.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

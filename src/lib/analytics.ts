@@ -138,13 +138,12 @@ export function getCommentCountsByProduct(): Map<string, { comments: number; pro
       const raw = window.localStorage.getItem(key);
       if (!raw) continue;
 
-      const reviews = JSON.parse(raw) as Array<{ name: string; rating: number; comment: string; createdAt: string }>;
+      const reviews = JSON.parse(raw) as any;
       const comments = Array.isArray(reviews) ? reviews.length : 0;
-      const productName = reviews?.[0]?.productName || "";
 
       map.set(productSlug, {
         comments,
-        productName: productName || "",
+        productName: "",
       });
     } catch {
       // ignore invalid stored review data
@@ -197,8 +196,23 @@ export function getTopFavoriteProducts(limit: number = 10) {
 }
 
 export function getTopSellingProducts(limit: number = 10) {
-  const sales = getSales();
-  return sales.reduce((total, sale) => total + (sale.price * sale.quantity), 0);
+  const salesByProduct = getSalesByProduct();
+  return Array.from(salesByProduct.entries())
+    .map(([slug, data]) => ({
+      slug,
+      productName: data.productName,
+      quantity: data.quantity,
+      revenue: data.revenue,
+    }))
+    .sort((a, b) => {
+      if (b.quantity !== a.quantity) return b.quantity - a.quantity;
+      return b.revenue - a.revenue;
+    })
+    .slice(0, limit);
+}
+
+export function getTotalRevenue(): number {
+  return getSales().reduce((total, sale) => total + sale.price * sale.quantity, 0);
 }
 
 export function getTotalSales(): number {

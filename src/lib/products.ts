@@ -90,23 +90,13 @@ export const products: Product[] = [
   },
 ];
 
-export const categories = [
+// Categorias principais (nível superior) - organizadas por linha de produto
+export const topLevelCategories = [
   "Velas aromáticas",
-  "Velas de massagem",
   "Sabonetes",
-  "Sabonetes glicerinados",
-  "Sabonetes fitoterápicos",
-  "Sabonete líquido",
   "Home Spray",
-  "Home spray 250ml",
-  "Home spray 60ml",
   "Difusores",
-  "Difusores de ambiente 250ml",
   "Hidratantes",
-  "Sugar Cream",
-  "Creme para mãos e pés",
-  "Manteigas corporais",
-  "Óleo corporal",
   "Esfoliante corporal",
   "Kits",
   "Águas de lençóis",
@@ -122,28 +112,36 @@ export const categories = [
   "Pastilhas aromáticas",
 ];
 
+// Grupos de categorias com subcategorias
 export const categoryGroups = [
-  { parent: "Velas aromáticas", children: ["Velas de massagem"] },
-  { parent: "Sabonetes", children: ["Sabonetes glicerinados", "Sabonetes fitoterápicos", "Sabonete líquido"] },
-  { parent: "Home Spray", children: ["Home spray 250ml", "Home spray 60ml"] },
-  { parent: "Difusores", children: ["Difusores de ambiente 250ml"] },
-  { parent: "Hidratantes", children: ["Sugar Cream", "Creme para mãos e pés", "Manteigas corporais", "Óleo corporal"] },
-  { parent: "Esfoliante corporal", children: [] },
-  { parent: "Kits", children: [] },
-  { parent: "Águas de lençóis", children: [] },
-  { parent: "Body Splash", children: [] },
-  { parent: "Geleia de banho", children: [] },
-  { parent: "Escalda-pés", children: [] },
-  { parent: "Whalts Melts", children: [] },
-  { parent: "Sais de banho", children: [] },
-  { parent: "Velas", children: [] },
-  { parent: "Perfume para cabelo", children: [] },
-  { parent: "Spa para os pés", children: [] },
-  { parent: "Sachês aromáticos", children: [] },
-  { parent: "Pastilhas aromáticas", children: [] },
+  { 
+    parent: "Velas aromáticas", 
+    children: ["Velas de massagem"] 
+  },
+  { 
+    parent: "Sabonetes", 
+    children: ["Sabonetes glicerinados", "Sabonetes fitoterápicos", "Sabonete líquido"] 
+  },
+  { 
+    parent: "Home Spray", 
+    children: ["Home spray 250ml", "Home spray 60ml"] 
+  },
+  { 
+    parent: "Difusores", 
+    children: ["Difusores de ambiente 250ml"] 
+  },
+  { 
+    parent: "Hidratantes", 
+    children: ["Sugar Cream", "Creme para mãos e pés", "Manteigas corporais", "Óleo corporal"] 
+  },
 ];
 
-export const topLevelCategories = categoryGroups.map((group) => group.parent);
+// Lista completa de categorias (para compatibilidade)
+export const categories = [
+  ...topLevelCategories,
+  ...categoryGroups.flatMap((group) => group.children),
+];
+
 
 export function getCategoryGroup(category: string) {
   return categoryGroups.find((group) => group.parent === category || group.children.includes(category));
