@@ -19,7 +19,7 @@ function About() {
         <div className="text-center mb-10 sm:mb-14">
           <p className="font-script text-2xl sm:text-3xl text-caramel-deep dark:text-white">— Nossa história</p>
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl mt-1">Pequeno, feito com tempo.</h1>
-          <div className="botanical-divider mt-6"><span>✿</span></div>
+          <div className="botanical-divider mt-6"></div>
         </div>
         <img src={aboutImg} alt="Mãos artesanais" loading="lazy" className="rounded-[2rem] w-full h-auto object-contain shadow-soft mb-8 sm:mb-12" />
         <div className="prose prose-lg mx-auto max-w-2xl text-muted-foreground leading-relaxed space-y-6">

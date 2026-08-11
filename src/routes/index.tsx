@@ -210,7 +210,7 @@ function Home() {
             Alma e Essência
           </h2>
           <div className="botanical-divider mb-6 max-w-[120px] ml-0">
-            <span className="text-4xl">✿</span>
+            <span className="text-4xl"></span>
           </div>
           <div className="space-y-4 text-base sm:text-lg md:text-xl leading-relaxed text-chocolate dark:text-caramel-deep font-medium">
             <p>
@@ -243,7 +243,7 @@ function Home() {
               Produtos favoritos
             </h2>
             <div className="botanical-divider mt-6 mb-6">
-              <span className="text-4xl inline-block animate-pulse">❀</span>
+              <span className="text-4xl inline-block animate-pulse"></span>
             </div>
             <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
               Selecionamos com carinho os produtos mais amados por vocês
@@ -288,7 +288,7 @@ function Home() {
               Mais vendidos
             </h2>
             <div className="botanical-divider mt-6 mb-6">
-              <span className="text-4xl inline-block animate-pulse">✿</span>
+              <span className="text-4xl inline-block animate-pulse"></span>
             </div>
             <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
               Os produtos que fazem mais sucesso entre nossos clientes
@@ -334,6 +334,12 @@ function Home() {
               </p>
               <p className="text-base sm:text-lg md:text-xl font-medium text-foreground/80 leading-tight">
                 RIO DE JANEIRO · RJ
+              </p>
+            </div>
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl px-4 py-3 mb-4">
+              <p className="text-sm sm:text-base text-amber-800 dark:text-amber-200 font-medium flex items-start gap-2">
+                <Icons.AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <span><span className="font-bold">Atenção:</span> <span className="font-bold">Somos visitantes</span> — feira temporária na maioria dos domingos, mas confirme presença pelo WhatsApp para evitar imprevistos.</span>
               </p>
             </div>
             <p className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-caramel-deep dark:text-white">

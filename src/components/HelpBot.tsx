@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { X, ChevronRight, ShoppingBag, MapPin, Phone, Mail, Instagram, Package, Info, Heart } from "lucide-react";
+import { X, ChevronRight, ShoppingBag, MapPin, Phone, Mail, Instagram, Package, Info, Heart, Flame, Droplets, Wind, Flower2, Leaf, Recycle, Hand, AlertTriangle } from "lucide-react";
 
 type GuideSection = "home" | "products" | "about" | "contact" | "cart";
 
@@ -37,7 +37,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   {
     icon: <MapPin className="h-5 w-5" />,
     label: "Localização",
-    description: "Feira de Icaraí - RJ",
+    description: "Feira temporária - Icaraí (domingos)",
     to: "/contato",
     color: "bg-blue-100 text-blue-700",
   },
@@ -74,7 +74,7 @@ export default function HelpBot() {
         return (
           <div className="space-y-4">
             <div>
-              <h3 className="font-serif text-lg mb-3">Bem-vindo! 👋</h3>
+              <h3 className="font-serif text-lg mb-3">Bem-vindo!</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Explore as seções principais do nosso site:
               </p>
@@ -128,7 +128,7 @@ export default function HelpBot() {
         return (
           <div className="space-y-4">
             <div>
-              <h3 className="font-serif text-lg mb-1">Nossos Produtos 🛍️</h3>
+              <h3 className="font-serif text-lg mb-1">Nossos Produtos</h3>
               <p className="text-sm text-muted-foreground">
                 Todos feitos à mão com amor e ingredientes naturais
               </p>
@@ -150,7 +150,7 @@ export default function HelpBot() {
                   onClick={() => setOpen(false)}
                   className="p-3 rounded-xl bg-card border border-border hover:border-caramel/50 transition-all text-center"
                 >
-                  <p className="text-2xl mb-1">🕯️</p>
+                  <Flame className="h-6 w-6 mx-auto mb-1 text-caramel-deep" />
                   <p className="text-xs font-semibold">Velas</p>
                 </Link>
                 <Link
@@ -158,7 +158,7 @@ export default function HelpBot() {
                   onClick={() => setOpen(false)}
                   className="p-3 rounded-xl bg-card border border-border hover:border-caramel/50 transition-all text-center"
                 >
-                  <p className="text-2xl mb-1">🧼</p>
+                  <Droplets className="h-6 w-6 mx-auto mb-1 text-caramel-deep" />
                   <p className="text-xs font-semibold">Sabonetes</p>
                 </Link>
                 <Link
@@ -166,7 +166,7 @@ export default function HelpBot() {
                   onClick={() => setOpen(false)}
                   className="p-3 rounded-xl bg-card border border-border hover:border-caramel/50 transition-all text-center"
                 >
-                  <p className="text-2xl mb-1">💨</p>
+                  <Wind className="h-6 w-6 mx-auto mb-1 text-caramel-deep" />
                   <p className="text-xs font-semibold">Home Sprays</p>
                 </Link>
                 <Link
@@ -174,7 +174,7 @@ export default function HelpBot() {
                   onClick={() => setOpen(false)}
                   className="p-3 rounded-xl bg-card border border-border hover:border-caramel/50 transition-all text-center"
                 >
-                  <p className="text-2xl mb-1">🌸</p>
+                  <Flower2 className="h-6 w-6 mx-auto mb-1 text-caramel-deep" />
                   <p className="text-xs font-semibold">Difusores</p>
                 </Link>
               </div>
@@ -182,7 +182,7 @@ export default function HelpBot() {
 
             <div className="p-3 rounded-xl bg-rose/10 border border-rose/20">
               <p className="text-xs text-caramel-deep">
-                💡 <strong>Dica:</strong> Todos os produtos são artesanais e feitos sob encomenda
+                <strong>Dica:</strong> Todos os produtos são artesanais e feitos sob encomenda
               </p>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function HelpBot() {
         return (
           <div className="space-y-4">
             <div>
-              <h3 className="font-serif text-lg mb-1">Nossa História 💝</h3>
+              <h3 className="font-serif text-lg mb-1">Nossa História</h3>
               <p className="text-sm text-muted-foreground">
                 Pequenos rituais feitos à mão, com tempo e cuidado
               </p>
@@ -213,24 +213,24 @@ export default function HelpBot() {
               </div>
             </Link>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 rounded-xl bg-secondary/50 text-center">
-                <p className="text-2xl mb-1">🌱</p>
-                <p className="text-xs font-semibold">100% Natural</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 rounded-xl bg-secondary/50 text-center">
+                  <Leaf className="h-6 w-6 mx-auto mb-1 text-green-600" />
+                  <p className="text-xs font-semibold">100% Natural</p>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50 text-center">
+                  <Heart className="h-6 w-6 mx-auto mb-1 text-rose" />
+                  <p className="text-xs font-semibold">Cruelty Free</p>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50 text-center">
+                  <Hand className="h-6 w-6 mx-auto mb-1 text-caramel-deep" />
+                  <p className="text-xs font-semibold">Artesanal</p>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50 text-center">
+                  <Recycle className="h-6 w-6 mx-auto mb-1 text-green-600" />
+                  <p className="text-xs font-semibold">Sustentável</p>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-secondary/50 text-center">
-                <p className="text-2xl mb-1">🐰</p>
-                <p className="text-xs font-semibold">Cruelty Free</p>
-              </div>
-              <div className="p-3 rounded-xl bg-secondary/50 text-center">
-                <p className="text-2xl mb-1">✋</p>
-                <p className="text-xs font-semibold">Artesanal</p>
-              </div>
-              <div className="p-3 rounded-xl bg-secondary/50 text-center">
-                <p className="text-2xl mb-1">💚</p>
-                <p className="text-xs font-semibold">Sustentável</p>
-              </div>
-            </div>
           </div>
         );
 
@@ -238,7 +238,7 @@ export default function HelpBot() {
         return (
           <div className="space-y-4">
             <div>
-              <h3 className="font-serif text-lg mb-1">Fale Conosco 💬</h3>
+              <h3 className="font-serif text-lg mb-1">Fale Conosco</h3>
               <p className="text-sm text-muted-foreground">
                 Estamos aqui para te atender!
               </p>
@@ -274,11 +274,12 @@ export default function HelpBot() {
               <p className="font-semibold text-sm">Ver todas as formas de contato</p>
             </Link>
 
-            <div className="p-3 rounded-xl bg-secondary/50">
-              <p className="text-xs text-muted-foreground">
-                📍 <strong>Localização:</strong> Feira de Icaraí - Campo de São Bento, Rio de Janeiro. Aos domingos das 9h às 15h.
-              </p>
-            </div>
+              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50">
+                <p className="text-xs text-amber-800 dark:text-amber-200 font-medium flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span><strong>Atenção:</strong> <span className="font-bold">Somos visitantes</span> — feira temporária em Icaraí (Campo de São Bento) na maioria dos domingos, das 9h às 15h. Confirme presença pelo WhatsApp!</span>
+                </p>
+              </div>
           </div>
         );
 
@@ -286,7 +287,7 @@ export default function HelpBot() {
         return (
           <div className="space-y-4">
             <div>
-              <h3 className="font-serif text-lg mb-1">Meu Carrinho 🛒</h3>
+              <h3 className="font-serif text-lg mb-1">Meu Carrinho</h3>
               <p className="text-sm text-muted-foreground">
                 Seus produtos selecionados
               </p>
@@ -303,7 +304,7 @@ export default function HelpBot() {
 
             <div className="p-3 rounded-xl bg-rose/10 border border-rose/20">
               <p className="text-xs text-caramel-deep">
-                💡 <strong>Formas de pagamento:</strong> Cartão, PIX ou Boleto. Parcelamos em até 3x sem juros!
+                <strong>Formas de pagamento:</strong> Cartão, PIX ou Boleto. Parcelamos em até 3x sem juros!
               </p>
             </div>
           </div>

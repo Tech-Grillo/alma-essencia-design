@@ -3,7 +3,7 @@ import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export function FloatingWhatsApp() {
   const message =
-    "Olá! 🌿\n\nGostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?";
+    "Olá!\n\nGostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?";
 
   return (
     <a

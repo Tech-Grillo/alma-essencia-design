@@ -167,6 +167,13 @@ export function Header() {
                   RIO DE JANEIRO · RJ
                 </p>
                 
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-3 py-2 mt-2">
+                  <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200 font-medium flex items-start gap-2">
+                    <Icons.AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span><span className="font-bold">Somos visitantes</span> — feira temporária na maioria dos domingos, mas confirme presença pelo WhatsApp.</span>
+                  </p>
+                </div>
+
                 <div className="pt-3 border-t border-caramel/20">
                   <p className="text-lg font-bold text-caramel-deep flex items-center gap-2">
                     <Icons.Clock className="h-5 w-5" />

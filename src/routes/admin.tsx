@@ -105,6 +105,7 @@ function AdminDashboard() {
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [productDescription, setProductDescription] = useState("");
   const [productScents, setProductScents] = useState("");
+  const [productSizes, setProductSizes] = useState<SizeOption[]>([]);
   const [productError, setProductError] = useState("");
   const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -266,6 +267,7 @@ function AdminDashboard() {
     setProductImageNames([]);
     setProductDescription("");
     setProductScents("");
+    setProductSizes([]);
     setProductError("");
     setErrors({
       name: "",
@@ -358,6 +360,10 @@ function AdminDashboard() {
       .map((scent) => scent.trim())
       .filter(Boolean);
 
+    const sizes = productSizes.length > 0
+      ? productSizes
+      : [{ label: "Único", unit: "", price }];
+
     setIsSubmittingProduct(true);
     try {
       const savedProduct = await saveProduct({
@@ -367,7 +373,7 @@ function AdminDashboard() {
         images: productImages.length > 0 ? productImages : [heroImg],
         description: productDescription.trim(),
         scents: scents.length > 0 ? scents : ["Essencia especial"],
-        sizes: [{ label: "Unico", price }],
+        sizes: sizes,
       });
 
       const products = await getAllProducts();
@@ -633,7 +639,7 @@ function AdminDashboard() {
         </label>
 
         <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Aromas *</span>
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Aromas (separados por virgula)</span>
           <input
             value={productScents}
             onChange={(e) => setProductScents(e.target.value)}
@@ -643,6 +649,34 @@ function AdminDashboard() {
           />
           {errors.scents && <p className="text-sm text-rose font-medium">{errors.scents}</p>}
         </label>
+
+        <div className="space-y-2 lg:col-span-2">
+          <span className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Tamanhos e unidades (ex: 150ml, 200g)</span>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <input
+              type="text"
+              value={productSizes.map(s => `${s.label}${s.unit ? ` (${s.unit})` : ''}: R$ ${s.price.toFixed(2).replace('.', ',')}`).join(', ')}
+              onChange={(e) => {
+                const parts = e.target.value.split(',').map(p => p.trim()).filter(Boolean);
+                const newSizes: SizeOption[] = parts.map(part => {
+                  const match = part.match(/(.+?)(?:\s*\((.+?)\))?\s*:\s*R\$\s*([\d,]+)/);
+                  if (match) {
+                    return {
+                      label: match[1].trim(),
+                      unit: match[2]?.trim() || "",
+                      price: Number(match[3].replace(',', '.'))
+                    };
+                  }
+                  return { label: part, unit: "", price: 0 };
+                });
+                setProductSizes(newSizes);
+              }}
+              className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-base font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+              placeholder="Ex: Pequeno (150ml): R$ 59,90, Médio (250ml): R$ 79,90"
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">Formato: Nome (unidade): R$ preço. Ex: <strong>Pequeno (150ml): R$ 59,90</strong></p>
+        </div>
 
         {productError && <p className="lg:col-span-2 text-base font-bold text-rose">{productError}</p>}
 
@@ -730,7 +764,7 @@ function AdminDashboard() {
             </button>
           </form>
 
-          <div className="botanical-divider mt-8"><span>✿</span></div>
+          <div className="botanical-divider mt-8"></div>
         </div>
 
       </div>
@@ -1120,7 +1154,7 @@ function EditProductModal({
             <div className="grid sm:grid-cols-3 gap-4">
               {sizes.map((s, index) => (
                 <label key={`${s.label}-${index}`} className="space-y-1">
-                  <span className="text-xs font-semibold text-muted-foreground">{s.label}</span>
+                  <span className="text-xs font-semibold text-muted-foreground">{s.label} {s.unit && <span className="text-caramel-deep">({s.unit})</span>}</span>
                   <input
                     type="text"
                     defaultValue={s.price.toString().replace(".", ",")}

@@ -5,7 +5,7 @@ import {
   updateProduct as updateProductLocal,
   deleteProduct as deleteProductLocal,
 } from './products';
-export type SizeOption = { label: string; price: number };
+export type SizeOption = { label: string; unit?: string; price: number };
 
 export type Product = { 
   id?: number;

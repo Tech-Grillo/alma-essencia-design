@@ -23,7 +23,7 @@ function Contact() {
         <div className="text-center mb-12 sm:mb-16">
           <p className="font-script text-2xl sm:text-3xl text-caramel-deep dark:text-white mb-3">— Conecte-se</p>
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl mb-4">Fale com a gente</h1>
-          <div className="botanical-divider mt-4"><span>✿</span></div>
+          <div className="botanical-divider mt-4"></div>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12 sm:mb-16">
@@ -88,15 +88,26 @@ function Contact() {
         </div>
 
         <div className="rounded-[2rem] overflow-hidden border border-border shadow-bloom mb-12 sm:mb-16">
-          <div className="p-6 sm:p-8 bg-gradient-to-br from-secondary/60 to-secondary/30 flex items-center gap-4">
-            <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-caramel/20 dark:bg-caramel/30 flex items-center justify-center">
-              <Icons.MapPin className="h-6 w-6 sm:h-7 sm:w-7 text-caramel-deep dark:text-caramel" />
+          <div className="p-6 sm:p-8 bg-gradient-to-br from-secondary/60 to-secondary/30">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-caramel/20 dark:bg-caramel/30 flex items-center justify-center">
+                <Icons.MapPin className="h-6 w-6 sm:h-7 sm:w-7 text-caramel-deep dark:text-caramel" />
+              </div>
+              <div className="flex-1">
+                <p className="font-serif text-xl sm:text-2xl font-bold text-foreground leading-tight">BAIRRO DE ICARAÍ</p>
+                <p className="font-serif text-base sm:text-lg font-semibold text-caramel-deep dark:text-caramel leading-tight">FEIRA - CAMPO DE SÃO BENTO</p>
+                <p className="font-serif text-sm sm:text-base font-medium text-foreground/80 leading-tight">RIO DE JANEIRO · RJ</p>
+              </div>
             </div>
-            <div className="space-y-1 flex-1">
-              <p className="font-serif text-xl sm:text-2xl font-bold text-foreground leading-tight">BAIRRO DE ICARAÍ</p>
-              <p className="font-serif text-base sm:text-lg font-semibold text-caramel-deep dark:text-caramel leading-tight">FEIRA - CAMPO DE SÃO BENTO</p>
-              <p className="font-serif text-sm sm:text-base font-medium text-foreground/80 leading-tight">RIO DE JANEIRO · RJ</p>
-              <p className="font-serif text-base sm:text-lg font-bold text-caramel-deep dark:text-caramel mt-2">
+            <div className="ml-0 sm:ml-[4.5rem] space-y-3">
+              <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl px-4 py-3">
+                <Icons.AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                <p className="text-sm sm:text-base text-amber-800 dark:text-amber-200 font-medium">
+                  <span className="font-bold">Atenção:</span> Esta é uma feira temporária. <span className="font-bold">Somos visitantes</span> — estamos lá na maioria dos domingos, mas a localização pode variar.
+                </p>
+              </div>
+              <p className="font-serif text-base sm:text-lg font-bold text-caramel-deep dark:text-caramel flex items-center gap-2">
+                <Icons.Clock className="h-5 w-5" />
                 Domingos · 09h às 15h
               </p>
             </div>
@@ -115,7 +126,12 @@ function Contact() {
             <div className="space-y-3 ml-0 sm:ml-14">
               <p className="font-serif text-lg sm:text-xl text-foreground/90">Feira - Campo de São Bento</p>
               <p className="font-serif text-2xl sm:text-3xl font-semibold text-rose-600 dark:text-rose-400">Domingos · 09h às 15h</p>
-              <p className="font-sans text-base sm:text-lg text-muted-foreground mt-3">Estamos te esperando na feira!</p>
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl px-4 py-3 mt-3">
+                <p className="text-sm sm:text-base text-amber-800 dark:text-amber-200 font-medium flex items-start gap-2">
+                  <Icons.AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span><span className="font-bold">Importante:</span> <span className="font-bold">Somos visitantes</span> — feira temporária na maioria dos domingos, mas confirme presença pelo WhatsApp para evitar imprevistos.</span>
+                </p>
+              </div>
             </div>
           </div>
 
@@ -130,13 +146,13 @@ function Contact() {
               <p className="font-serif text-lg sm:text-xl text-foreground/90 leading-relaxed">
                 Produtos artesanais feitos com amor e carinho, trazendo a essência da natureza para sua vida.
               </p>
-              <p className="font-script text-2xl sm:text-3xl text-caramel-deep dark:text-caramel mt-3">Alma e Essência 🌿</p>
+              <p className="font-script text-2xl sm:text-3xl text-caramel-deep dark:text-caramel mt-3">Alma e Essência</p>
             </div>
           </div>
         </div>
 
         <div className="text-center mb-8 sm:mb-10">
-          <div className="botanical-divider mb-6"><span className="text-4xl">✿</span></div>
+          <div className="botanical-divider mb-6"></div>
           <p className="font-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-caramel-deep dark:text-white mb-4 animate-fade-in-up">Siga-nos nas redes sociais</p>
           <p className="font-sans text-lg sm:text-xl md:text-2xl text-foreground/80 font-medium">Acompanhe novidades e promoções exclusivas</p>
         </div>

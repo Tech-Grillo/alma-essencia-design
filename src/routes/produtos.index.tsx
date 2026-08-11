@@ -225,7 +225,7 @@ function ProductsList() {
         <div className="text-center mb-10 sm:mb-12">
           <p className="font-script text-2xl sm:text-3xl text-caramel-deep">— Coleção</p>
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl">Nossos produtos</h1>
-          <div className="botanical-divider mt-5"><span>❀</span></div>
+          <div className="botanical-divider mt-5"></div>
         </div>
         <div className="flex flex-col items-center gap-4 mb-10 sm:mb-12">
           <div className="w-full max-w-2xl">
@@ -394,7 +394,7 @@ function ProductsList() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 sm:gap-7">
           {list.map((p) => <ProductCard key={p.slug} product={p} />)}
           {list.length === 0 && (
-            <p className="col-span-full text-center text-muted-foreground py-20">Em breve novidades nesta categoria ✿</p>
+            <p className="col-span-full text-center text-muted-foreground py-20">Em breve novidades nesta categoria</p>
           )}
         </div>
       </section>

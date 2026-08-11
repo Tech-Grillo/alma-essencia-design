@@ -3,7 +3,7 @@ import p2 from "@/assets/imagens_produtos/p2.jpg";
 import p3 from "@/assets/imagens_produtos/p3.jpg";
 import p4 from "@/assets/imagens_produtos/p4.jpg";
 
-export type SizeOption = { label: string; price: number };
+export type SizeOption = { label: string; unit?: string; price: number };
 
 export type Product = { 
   slug: string;

@@ -86,7 +86,7 @@ export function Footer() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
               <p className="text-xs font-light tracking-wide text-cream/50">© {new Date().getFullYear()} Alma e Essência — Todos os direitos reservados</p>
               <div className="flex items-center gap-4">
-                <p className="text-sm font-light tracking-wide text-cream/60 italic">Feito à mão, com amor. 🌿</p>
+                <p className="text-sm font-light tracking-wide text-cream/60 italic">Feito à mão, com amor.</p>
                   <div className="flex items-center gap-3">
                     <img src={visaIcon} alt="Visa" className="h-6 p-1 rounded bg-cream/6" />
                     <img src={mastercardIcon} alt="Mastercard" className="h-6 p-1 rounded bg-cream/6" />

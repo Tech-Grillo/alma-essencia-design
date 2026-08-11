@@ -16,7 +16,7 @@ function RouteComponent() {
   const buildWhatsAppMessage = () => {
     if (items.length === 0) return "";
     
-    let message = "🛍️ *Olá! Gostaria de fazer o seguinte pedido:*\n\n";
+    let message = "*Olá! Gostaria de fazer o seguinte pedido:*\n\n";
     
     items.forEach((item, index) => {
       message += `*${index + 1}. ${item.name}*\n`;
@@ -26,8 +26,8 @@ function RouteComponent() {
       message += `   Subtotal: R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}\n\n`;
     });
     
-    message += `*💰 TOTAL: R$ ${getTotal().toFixed(2).replace(".", ",")}*\n\n`;
-    message += "Por favor, confirme a disponibilidade e me envie mais informações sobre o envio. Obrigado! 😊";
+    message += `*TOTAL: R$ ${getTotal().toFixed(2).replace(".", ",")}*\n\n`;
+    message += "Por favor, confirme a disponibilidade e me envie mais informações sobre o envio. Obrigado!";
     return message;
   };
 
