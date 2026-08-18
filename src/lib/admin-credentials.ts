@@ -17,9 +17,9 @@ async function isUserAdmin(userId: string): Promise<boolean> {
   return !!data;
 }
 
-// Login real via Supabase Auth — cria uma sessão autenticada de fato,
-// mas só é considerado válido se o usuário também estiver em admin_users.
-export async function validateAdminLogin(email: string, senha: string): Promise<boolean> {
+// Valida somente as credenciais do administrador.
+// A sessão ativa não é liberada ainda; o acesso real só acontece depois do OTP.
+export async function validateAdminCredentials(email: string, senha: string): Promise<boolean> {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password: senha,
@@ -33,13 +33,60 @@ export async function validateAdminLogin(email: string, senha: string): Promise<
   if (!data.session) return false;
 
   const admin = await isUserAdmin(data.session.user.id);
+  await supabase.auth.signOut();
+
+  return admin;
+}
+
+// Envia o código de verificação para o e-mail do administrador.
+export async function requestAdminOtp(email: string): Promise<boolean> {
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: false,
+      emailRedirectTo:
+        typeof window !== "undefined" ? `${window.location.origin}/admin` : undefined,
+    },
+  });
+
+  if (error) {
+    console.error("Erro ao enviar código de verificação:", error.message);
+    return false;
+  }
+
+  return true;
+}
+
+// Confirma o código enviado por e-mail e só então libera a sessão do painel.
+export async function verifyAdminOtp(email: string, code: string): Promise<boolean> {
+  const token = code.trim();
+  if (!token) return false;
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: "email",
+  });
+
+  if (error) {
+    console.error("Erro ao validar código admin:", error.message);
+    return false;
+  }
+
+  if (!data.session) return false;
+
+  const admin = await isUserAdmin(data.session.user.id);
   if (!admin) {
-    // Autenticou, mas não é admin — encerra a sessão e nega o acesso.
     await supabase.auth.signOut();
     return false;
   }
 
   return true;
+}
+
+// Mantém a antiga função para compatibilidade com outros pontos do código.
+export async function validateAdminLogin(email: string, senha: string): Promise<boolean> {
+  return validateAdminCredentials(email, senha);
 }
 
 // Verifica se já existe uma sessão ativa E se essa sessão é de um admin

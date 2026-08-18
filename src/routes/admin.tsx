@@ -1,7 +1,13 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { validateAdminLogin, isAdminLoggedIn, adminLogout } from "@/lib/admin-credentials";
+import {
+  validateAdminCredentials,
+  requestAdminOtp,
+  verifyAdminOtp,
+  isAdminLoggedIn,
+  adminLogout,
+} from "@/lib/admin-credentials";
 import { categories, categoryGroups, topLevelCategories } from "@/lib/products";
 import type { Product, SizeOption } from "@/lib/products-supabase";
 import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
@@ -66,6 +72,9 @@ function AdminDashboard() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [loginStep, setLoginStep] = useState<"credentials" | "otp">("credentials");
   const [erro, setErro] = useState("");
   const [visitorsCount, setVisitorsCount] = useState<number | null>(null);
   const [productCount, setProductCount] = useState(4);
@@ -176,12 +185,35 @@ function AdminDashboard() {
     e.preventDefault();
     setErro("");
 
-    const success = await validateAdminLogin(email, senha);
-    if (success) {
-      setAuthenticated(true);
-    } else {
-      setErro("Email ou senha incorretos");
+    if (loginStep === "credentials") {
+      const valid = await validateAdminCredentials(email, senha);
+      if (!valid) {
+        setErro("Email ou senha incorretos ou você não tem permissão administrativa.");
+        return;
+      }
+
+      const codeSent = await requestAdminOtp(email);
+      if (!codeSent) {
+        setErro("Não foi possível enviar o código para o e-mail informado.");
+        return;
+      }
+
+      setPendingEmail(email);
+      setLoginStep("otp");
+      setOtpCode("");
+      return;
     }
+
+    const validOtp = await verifyAdminOtp(pendingEmail, otpCode);
+    if (validOtp) {
+      setAuthenticated(true);
+      setLoginStep("credentials");
+      setOtpCode("");
+      setPendingEmail("");
+      return;
+    }
+
+    setErro("Código inválido ou expirado. Solicite um novo código.");
   };
 
   const handleLogout = async () => {
@@ -189,6 +221,9 @@ function AdminDashboard() {
     setAuthenticated(false);
     setEmail("");
     setSenha("");
+    setOtpCode("");
+    setPendingEmail("");
+    setLoginStep("credentials");
     setErro("");
   };
 
@@ -707,53 +742,117 @@ function AdminDashboard() {
         <div className="relative w-full max-w-md rounded-[2rem] bg-card/95 backdrop-blur-xl border border-border shadow-bloom p-10 animate-fade-in-up">
           <div className="flex flex-col items-center text-center mb-8">
             <h1 className="mt-7 font-serif text-3xl">Painel Administrativo acesso restrito </h1>
-            <p className="mt-2 text-sm text-muted-foreground">Digite seu e-mail e senha para acessar.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {loginStep === "credentials"
+                ? "Digite seu e-mail e senha para prosseguir."
+                : "Digite o código enviado para seu e-mail para concluir o acesso."}
+            </p>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
-            <div>
-              <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">E-mail</label>
-              <div className="relative">
-                <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@almaeessencia.com"
-                  className="w-full rounded-full bg-background border border-border pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-                />
-              </div>
-            </div>
+            {loginStep === "credentials" ? (
+              <>
+                <div>
+                  <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">E-mail</label>
+                  <div className="relative">
+                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="admin@almaeessencia.com"
+                      className="w-full rounded-full bg-background border border-border pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Senha</label>
-              <div className="relative">
-                <Icons.Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full rounded-full bg-background border border-border pl-11 pr-12 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-                />
+                <div>
+                  <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Senha</label>
+                  <div className="relative">
+                    <Icons.Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full rounded-full bg-background border border-border pl-11 pr-12 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((state) => !state)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-caramel-deep"
+                    >
+                      {showPassword ? <Icons.EyeOff className="h-4 w-4" /> : <Icons.Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded-full bg-gradient-caramel text-primary-foreground py-4 text-sm uppercase tracking-[0.2em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all mt-2"
+                >
+                  Continuar
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="rounded-full border border-border bg-background px-4 py-3 text-center text-sm text-muted-foreground">
+                  Código enviado para <span className="font-semibold text-foreground">{pendingEmail}</span>
+                </div>
+
+                <div>
+                  <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Código de verificação</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="123456"
+                    className="w-full rounded-full bg-background border border-border px-4 py-3.5 text-center text-lg font-semibold tracking-[0.4em] focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={otpCode.length < 6}
+                    className="flex-1 rounded-full bg-gradient-caramel text-primary-foreground py-4 text-sm uppercase tracking-[0.2em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const sent = await requestAdminOtp(pendingEmail || email);
+                      if (!sent) {
+                        setErro("Não foi possível reenviar o código.");
+                        return;
+                      }
+                      setOtpCode("");
+                      setErro("");
+                    }}
+                    className="rounded-full border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
+                  >
+                    Reenviar
+                  </button>
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setShowPassword((state) => !state)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-caramel-deep"
+                  onClick={() => {
+                    setLoginStep("credentials");
+                    setOtpCode("");
+                    setErro("");
+                  }}
+                  className="w-full text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <Icons.EyeOff className="h-4 w-4" /> : <Icons.Eye className="h-4 w-4" />}
+                  Voltar para login
                 </button>
-              </div>
-            </div>
+              </>
+            )}
 
             {erro && <p className="text-sm text-rose">{erro}</p>}
-
-            <button
-              type="submit"
-              className="w-full rounded-full bg-gradient-caramel text-primary-foreground py-4 text-sm uppercase tracking-[0.2em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all mt-2"
-            >
-              Entrar
-            </button>
 
             <button
               type="button"

@@ -31,7 +31,7 @@ function Contact() {
             { 
               icon: WhatsAppIcon, 
               label: "WhatsApp", 
-              value: "(21) 989794503", 
+              value: "(21) 98716-3045", 
               href: whatsappLink("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?"),
               iconColor: "text-green-600 dark:text-green-400",
               labelColor: "text-green-700 dark:text-green-300",
@@ -153,7 +153,7 @@ function Contact() {
 
         <div className="text-center mb-8 sm:mb-10">
           <div className="botanical-divider mb-6"></div>
-          <p className="font-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-caramel-deep dark:text-white mb-4 animate-fade-in-up">Siga-nos nas redes sociais</p>
+          <p className="font-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-caramel-deep dark:text-white mb-4 animate-fade-in-up">Nos siga nas redes sociais</p>
           <p className="font-sans text-lg sm:text-xl md:text-2xl text-foreground/80 font-medium">Acompanhe novidades e promoções exclusivas</p>
         </div>
 
