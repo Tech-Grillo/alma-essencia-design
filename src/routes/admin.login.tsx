@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import * as Icons from 'lucide-react'
 import { useState } from 'react'
-import { requestAdminOtp, validateAdminCredentials, verifyAdminOtp } from '@/lib/admin-credentials'
+import { validateAdminCredentials } from '@/lib/admin-credentials'
 
 export const Route = createFileRoute('/admin/login')({
   component: AdminLoginPage,
@@ -12,44 +12,16 @@ function AdminLoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [otp, setOtp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState('');
-  const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
   const [erro, setErro] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');
     setIsLoading(true);
 
     const valid = await validateAdminCredentials(email, senha);
-    if (!valid) {
-      setIsLoading(false);
-      setErro('E-mail ou senha incorretos ou você não tem permissão administrativa.');
-      return;
-    }
-
-    const codeSent = await requestAdminOtp(email);
-    setIsLoading(false);
-
-    if (!codeSent) {
-      setErro('Não foi possível enviar o código para o e-mail informado. Tente novamente.');
-      return;
-    }
-
-    setPendingEmail(email);
-    setStep('otp');
-    setOtp('');
-  }
-
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErro('');
-    setIsLoading(true);
-
-    const valid = await verifyAdminOtp(pendingEmail, otp);
     setIsLoading(false);
 
     if (valid) {
@@ -57,22 +29,7 @@ function AdminLoginPage() {
       return;
     }
 
-    setErro('Código inválido ou expirado. Solicite um novo código e tente novamente.');
-  }
-
-  const handleResendCode = async () => {
-    setErro('');
-    setIsLoading(true);
-
-    const codeSent = await requestAdminOtp(pendingEmail || email);
-    setIsLoading(false);
-
-    if (!codeSent) {
-      setErro('Não foi possível reenviar o código. Verifique o e-mail e tente novamente.');
-      return;
-    }
-
-    setOtp('');
+    setErro('E-mail ou senha incorretos ou você não tem permissão administrativa.');
   }
 
   return (
@@ -84,17 +41,14 @@ function AdminLoginPage() {
         <div className="mb-8 space-y-4 text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">Acesso administrativo</p>
           <h1 className="text-4xl font-serif font-bold text-foreground">
-            {step === 'credentials' ? 'Login do painel' : 'Verificação por e-mail'}
+            Login do painel
           </h1>
           <p className="mx-auto max-w-lg text-sm leading-6 text-muted-foreground">
-            {step === 'credentials'
-              ? 'Use seu e-mail de administrador para acessar o painel principal e gerenciar produtos, vendas e métricas.'
-              : 'Enviamos um código de 6 dígitos para o e-mail informado. Digite o código para concluir o acesso.'}
+            Use seu e-mail e senha de administrador para acessar o painel principal e gerenciar produtos, vendas e métricas.
           </p>
         </div>
 
-        {step === 'credentials' ? (
-          <form className="space-y-5" onSubmit={handleCredentialsSubmit}>
+        <form className="space-y-5" onSubmit={handleSubmit}>
             <label className="space-y-2">
               <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">E-mail</span>
               <div className="relative">
@@ -140,7 +94,7 @@ function AdminLoginPage() {
                 disabled={isLoading}
                 className="inline-flex items-center justify-center rounded-[1.5rem] bg-caramel px-6 py-4 text-sm font-semibold text-primary-foreground transition hover:bg-caramel/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isLoading ? 'Verificando...' : 'Continuar'}
+                {isLoading ? 'Entrando...' : 'Entrar'}
               </button>
               <button
                 type="button"
@@ -151,60 +105,6 @@ function AdminLoginPage() {
               </button>
             </div>
           </form>
-        ) : (
-          <form className="space-y-5" onSubmit={handleOtpSubmit}>
-            <div className="rounded-[1.5rem] border border-border bg-background px-4 py-3 text-sm text-muted-foreground">
-              Código enviado para <span className="font-semibold text-foreground">{pendingEmail}</span>
-            </div>
-
-            <label className="space-y-2">
-              <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Código de verificação</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="123456"
-                className="w-full rounded-[1.5rem] border border-border bg-background px-4 py-4 text-center text-lg font-semibold tracking-[0.5em] text-foreground outline-none transition focus:border-caramel focus:ring-2 focus:ring-caramel/20"
-                required
-              />
-            </label>
-
-            {erro && <p className="rounded-2xl bg-rose/10 border border-rose/20 px-4 py-3 text-sm text-rose">{erro}</p>}
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <button
-                type="submit"
-                disabled={isLoading || otp.length < 6}
-                className="inline-flex items-center justify-center rounded-[1.5rem] bg-caramel px-6 py-4 text-sm font-semibold text-primary-foreground transition hover:bg-caramel/90 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isLoading ? 'Validando...' : 'Confirmar código'}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleResendCode}
-                disabled={isLoading}
-                className="inline-flex items-center justify-center rounded-[1.5rem] border border-border bg-background px-6 py-4 text-sm font-semibold text-foreground transition hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isLoading ? 'Enviando...' : 'Reenviar'}
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setStep('credentials');
-                setOtp('');
-                setErro('');
-              }}
-              className="w-full text-sm font-medium text-muted-foreground transition hover:text-foreground"
-            >
-              Voltar para login
-            </button>
-          </form>
-        )}
       </div>
     </div>
   )
