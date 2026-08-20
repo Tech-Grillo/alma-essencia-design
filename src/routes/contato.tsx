@@ -42,8 +42,8 @@ function Contact() {
             { 
               icon: Icons.Mail, 
               label: "E-mail", 
-              value: "alamaeessencia36@gmail.com", 
-              href: "mailto:alamaeessencia36@gmail.com",
+              value: "almaeessencia36@gmail.com", 
+              href: "mailto:almaeessencia36@gmail.com",
               iconColor: "text-caramel-deep dark:text-caramel",
               labelColor: "text-caramel-deep dark:text-caramel",
               valueColor: "text-foreground",
