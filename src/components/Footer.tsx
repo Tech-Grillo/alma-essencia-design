@@ -7,7 +7,7 @@ import visaIcon from "@/assets/icons/visa.svg";
 import mastercardIcon from "@/assets/icons/mastercard.svg";
 import pixIcon from "@/assets/icons/pix.svg";
 
-const CONTACT_EMAIL = "alamaeessencia36@gmail.com";
+const CONTACT_EMAIL = "almaeessencia36@gmail.com";
 const CONTACT_PHONE = "(21) 98716-3045";
 
 export function Footer() {

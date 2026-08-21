@@ -114,7 +114,7 @@ function AdminDashboard() {
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [productDescription, setProductDescription] = useState("");
   const [productScents, setProductScents] = useState("");
-  const [productSizes, setProductSizes] = useState<SizeOption[]>([]);
+  const [productSizesInput, setProductSizesInput] = useState("");
   const [productError, setProductError] = useState("");
   const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -302,7 +302,7 @@ function AdminDashboard() {
     setProductImageNames([]);
     setProductDescription("");
     setProductScents("");
-    setProductSizes([]);
+    setProductSizesInput("");
     setProductError("");
     setErrors({
       name: "",
@@ -325,6 +325,23 @@ function AdminDashboard() {
     if (!productPrice) {
       setProductPrice("R$ 0,00");
     }
+  };
+
+  const parseProductSizes = (value: string, defaultPrice: number): SizeOption[] | null => {
+    const entries = value.split(/[;\n]/).map((entry) => entry.trim()).filter(Boolean);
+    const sizes = entries.map((entry) => {
+      const match = entry.match(/^(.+?)(?:\s*\(([^)]+)\))?(?:\s*:\s*R\$\s*(\d+(?:[.,]\d{1,2})?))?$/i);
+      const hasPriceSyntax = entry.includes(":") || /R\$/i.test(entry);
+
+      if (!match || (hasPriceSyntax && !match[3])) return null;
+
+      const price = match[3] ? Number(match[3].replace(",", ".")) : defaultPrice;
+      if (!match[1].trim() || !Number.isFinite(price) || price <= 0) return null;
+
+      return { label: match[1].trim(), unit: match[2]?.trim() || "", price };
+    });
+
+    return sizes.every((size): size is SizeOption => size !== null) ? sizes : null;
   };
 
   const validateForm = () => {
@@ -389,14 +406,20 @@ function AdminDashboard() {
 
     const category = newCategory.trim() || productCategory;
     const price = parseCurrencyString(productPrice);
+    const parsedSizes = parseProductSizes(productSizesInput, price);
+
+    if (parsedSizes === null) {
+      setProductError("Informe os tamanhos separados por ponto e virgula. Ex.: 150ml; 200g ou Pequeno (150ml): R$ 59,90");
+      return;
+    }
 
     const scents = productScents
       .split(",")
       .map((scent) => scent.trim())
       .filter(Boolean);
 
-    const sizes = productSizes.length > 0
-      ? productSizes
+    const sizes = parsedSizes.length > 0
+      ? parsedSizes
       : [{ label: "Único", unit: "", price }];
 
     setIsSubmittingProduct(true);
@@ -690,27 +713,13 @@ function AdminDashboard() {
           <div className="grid sm:grid-cols-2 gap-3">
             <input
               type="text"
-              value={productSizes.map(s => `${s.label}${s.unit ? ` (${s.unit})` : ''}: R$ ${s.price.toFixed(2).replace('.', ',')}`).join(', ')}
-              onChange={(e) => {
-                const parts = e.target.value.split(',').map(p => p.trim()).filter(Boolean);
-                const newSizes: SizeOption[] = parts.map(part => {
-                  const match = part.match(/(.+?)(?:\s*\((.+?)\))?\s*:\s*R\$\s*([\d,]+)/);
-                  if (match) {
-                    return {
-                      label: match[1].trim(),
-                      unit: match[2]?.trim() || "",
-                      price: Number(match[3].replace(',', '.'))
-                    };
-                  }
-                  return { label: part, unit: "", price: 0 };
-                });
-                setProductSizes(newSizes);
-              }}
+              value={productSizesInput}
+              onChange={(e) => setProductSizesInput(e.target.value)}
               className="w-full rounded-2xl bg-background border border-border px-5 py-4 text-base font-semibold focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-              placeholder="Ex: Pequeno (150ml): R$ 59,90, Médio (250ml): R$ 79,90"
+              placeholder="Ex.: 150ml; 200g"
             />
           </div>
-          <p className="text-xs text-muted-foreground">Formato: Nome (unidade): R$ preço. Ex: <strong>Pequeno (150ml): R$ 59,90</strong></p>
+          <p className="text-xs text-muted-foreground">Digite livremente, por exemplo <strong>150ml; 200g</strong>. Para preços diferentes: <strong>Pequeno (150ml): R$ 59,90; Médio (250ml): R$ 79,90</strong>.</p>
         </div>
 
         {productError && <p className="lg:col-span-2 text-base font-bold text-rose">{productError}</p>}
