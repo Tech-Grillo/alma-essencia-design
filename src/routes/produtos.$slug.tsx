@@ -8,6 +8,7 @@ import { type MouseEvent, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { site } from "@/config/site";
+import { ProductReviews, Stars, formatAverage, useProductReviews } from "@/components/ProductReviews";
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: ProductPage,
@@ -30,6 +31,7 @@ function ProductPage() {
   const navigate = useNavigate();
   const { slug } = Route.useParams();
   const { addItem } = useCart();
+  const reviewData = useProductReviews(slug);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -211,7 +213,17 @@ function ProductPage() {
           {/* Info */}
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep mb-3">{product.category}</p>
-            <h1 className="font-serif text-5xl mb-5">{product.name}</h1>
+            <h1 className="font-serif text-5xl mb-3">{product.name}</h1>
+            {reviewData.count > 0 ? (
+              <a href="#avaliacoes" className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-caramel-deep">
+                <Stars value={Math.round(reviewData.average)} size="sm" />
+                <span>
+                  {formatAverage(reviewData.average)} · {reviewData.count} {reviewData.count === 1 ? "avaliação" : "avaliações"}
+                </span>
+              </a>
+            ) : (
+              <div className="mb-5" />
+            )}
             <div className="grid gap-6">
               <div className="rounded-[2rem] border border-border bg-card p-6 shadow-soft">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -353,7 +365,7 @@ function ProductPage() {
           </div>
         </div>
 
-        {/* Avaliações voltam na Etapa 3, quando forem salvas no Supabase (hoje só existiam no navegador de quem avaliou). */}
+        <ProductReviews reviews={reviewData.reviews} average={reviewData.average} />
 
         {/* Related */}
         <div className="mt-32">

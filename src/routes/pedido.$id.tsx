@@ -7,6 +7,7 @@ import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { site, whatsappLink } from "@/config/site";
 import { useCart } from "@/lib/cart";
 import { getOrderStatus } from "@/lib/checkout/functions";
+import { OrderReviews } from "@/components/OrderReviews";
 import type { OrderStatus, OrderSummary } from "@/lib/checkout/types";
 
 export const Route = createFileRoute("/pedido/$id")({
@@ -124,6 +125,7 @@ function OrderPage() {
             </>
           )}
         </div>
+        {order?.status === "paid" && <OrderReviews orderId={order.id} />}
       </div>
       <Footer />
     </div>

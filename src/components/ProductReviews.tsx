@@ -1,247 +1,155 @@
+// Avaliações de produtos. Só quem comprou e pagou pelo site pode avaliar
+// (pela página do pedido); aqui elas são exibidas com o selo de compra verificada.
+import { useEffect, useState } from "react";
 import * as Icons from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { type Product } from "@/lib/products";
+import { supabase } from "@/lib/supabase";
+import type { PublicReview } from "@/lib/reviews/types";
 
-type Review = {
-  id: string;
-  name: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-};
-
-const initialReviews: Review[] = [
-  {
-    id: "sample-1",
-    name: "Cliente Alma",
-    rating: 5,
-    comment: "Produto muito cheiroso, bem embalado e com acabamento lindo.",
-    createdAt: "2026-06-01T12:00:00.000Z",
-  },
-];
-
-function getStorageKey(productSlug: string) {
-  return `alma-essencia-reviews:${productSlug}`;
-}
-
-function Stars({
+export function Stars({
   value,
   onChange,
   size = "md",
 }: {
   value: number;
-  onChange?: (rating: number) => void;
+  onChange?: (value: number) => void;
   size?: "sm" | "md" | "lg";
 }) {
-  const iconSize = size === "lg" ? "h-7 w-7" : size === "sm" ? "h-4 w-4" : "h-5 w-5";
-
+  const [hover, setHover] = useState(0);
+  const dim = size === "lg" ? "h-7 w-7" : size === "sm" ? "h-4 w-4" : "h-5 w-5";
+  const shown = hover || value;
   return (
-    <div className="flex items-center gap-1" aria-label={`${value} de 5 estrelas`}>
-      {[1, 2, 3, 4, 5].map((rating) => {
-        const active = rating <= value;
-        const Icon = Icons.Star;
-
-        if (!onChange) {
-          return (
-            <Icon
-              key={rating}
-              className={`${iconSize} ${active ? "fill-caramel text-caramel" : "text-muted-foreground/40"}`}
-            />
-          );
-        }
-
-        return (
+    <div
+      className="flex items-center gap-0.5"
+      role={onChange ? "radiogroup" : "img"}
+      aria-label={`${value} de 5 estrelas`}
+      onMouseLeave={() => setHover(0)}
+    >
+      {[1, 2, 3, 4, 5].map((n) => {
+        const star = (
+          <Icons.Star className={`${dim} ${n <= shown ? "fill-caramel text-caramel" : "text-muted-foreground/40"}`} />
+        );
+        return onChange ? (
           <button
-            key={rating}
+            key={n}
             type="button"
-            onClick={() => onChange(rating)}
-            className="rounded-full p-1 text-caramel hover:bg-rose/40"
-            aria-label={`Dar ${rating} estrela${rating > 1 ? "s" : ""}`}
+            role="radio"
+            aria-checked={value === n}
+            aria-label={`${n} estrela${n > 1 ? "s" : ""}`}
+            onClick={() => onChange(n)}
+            onMouseEnter={() => setHover(n)}
+            className="rounded-full p-1 transition hover:scale-110"
           >
-            <Icon className={`${iconSize} ${active ? "fill-caramel" : "text-muted-foreground/45"}`} />
+            {star}
           </button>
+        ) : (
+          <span key={n}>{star}</span>
         );
       })}
     </div>
   );
 }
 
-function formatReviewDate(value: string) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
+export function useProductReviews(slug: string | undefined) {
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!slug) return;
+    let active = true;
+    supabase
+      .from("product_reviews")
+      .select("id, rating, comment, author_name, created_at")
+      .eq("product_slug", slug)
+      .eq("visible", true)
+      .order("created_at", { ascending: false })
+      .limit(100)
+      .then(({ data }) => {
+        if (!active) return;
+        setReviews((data ?? []) as PublicReview[]);
+        setLoaded(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+
+  const count = reviews.length;
+  const average = count ? reviews.reduce((sum, r) => sum + r.rating, 0) / count : 0;
+  return { reviews, count, average, loaded };
 }
 
-export function ProductReviews({ product }: { product: Product }) {
-  const [activeTab, setActiveTab] = useState<"details" | "reviews">("reviews");
-  const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [name, setName] = useState("");
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [message, setMessage] = useState("");
+export const formatAverage = (n: number) => n.toFixed(1).replace(".", ",");
 
-  useEffect(() => {
-    const savedReviews = window.localStorage.getItem(getStorageKey(product.slug));
-    if (!savedReviews) return;
-
-    try {
-      setReviews(JSON.parse(savedReviews) as Review[]);
-    } catch {
-      setReviews(initialReviews);
-    }
-  }, [product.slug]);
-
-  useEffect(() => {
-    window.localStorage.setItem(getStorageKey(product.slug), JSON.stringify(reviews));
-  }, [product.slug, reviews]);
-
-  const average = useMemo(() => {
-    if (!reviews.length) return 0;
-
-    return reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
-  }, [reviews]);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setMessage("");
-
-    if (!name.trim() || !comment.trim()) {
-      setMessage("Preencha seu nome e escreva sua avaliacao.");
-      return;
-    }
-
-    const review: Review = {
-      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      name: name.trim(),
-      rating,
-      comment: comment.trim(),
-      createdAt: new Date().toISOString(),
-    };
-
-    setReviews((current) => [review, ...current]);
-    setName("");
-    setRating(5);
-    setComment("");
-    setMessage("Avaliacao enviada. Obrigado pelo carinho!");
-  };
+export function ProductReviews({ reviews, average }: { reviews: PublicReview[]; average: number }) {
+  const count = reviews.length;
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? reviews : reviews.slice(0, 5);
 
   return (
-    <section className="mt-20 rounded-[2rem] border border-border bg-card shadow-soft overflow-hidden">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border px-6 py-6 lg:px-8">
-        <div className="inline-flex rounded-full bg-secondary p-1 w-fit">
-          <button
-            type="button"
-            onClick={() => setActiveTab("details")}
-            className={`rounded-full px-6 py-3 text-base transition-all ${
-              activeTab === "details" ? "bg-background text-foreground shadow-soft" : "text-muted-foreground"
-            }`}
-          >
-            Detalhes
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("reviews")}
-            className={`rounded-full px-6 py-3 text-base transition-all ${
-              activeTab === "reviews" ? "bg-background text-foreground shadow-soft" : "text-muted-foreground"
-            }`}
-          >
-            Avaliacoes
-          </button>
-        </div>
+    <section id="avaliacoes" className="mt-20 scroll-mt-24 rounded-[2rem] border border-border bg-card p-6 shadow-soft sm:p-10">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-caramel-deep">Avaliações</p>
+      <h2 className="mb-8 font-serif text-4xl">O que diz quem comprou</h2>
 
-        <div className="flex items-center gap-4">
-          <div className="p-2 rounded-lg bg-background/60 border border-border flex items-center justify-center text-caramel-deep">
-            <Stars value={Math.round(average)} size="lg" />
-          </div>
-          <span className="text-base text-muted-foreground font-medium">
-            {average.toFixed(1).replace(".", ",")} de 5 ({reviews.length} avaliacoes)
-          </span>
-        </div>
-      </div>
-
-      {activeTab === "details" ? (
-        <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-8 p-6 lg:p-8">
-          <div>
-            <p className="text-sm uppercase tracking-[0.24em] text-caramel-deep mb-3 font-semibold">{product.category}</p>
-            <h2 className="font-serif text-4xl mb-4">Sobre o produto</h2>
-            <p className="text-muted-foreground leading-relaxed text-xl">{product.description}</p>
-          </div>
-
-          <div className="rounded-[1.5rem] bg-secondary/45 p-6">
-            <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Aromas disponiveis</p>
-            <div className="flex flex-wrap gap-2">
-              {product.scents.map((scent) => (
-                <span key={scent} className="rounded-full bg-background px-4 py-2 text-base font-medium">
-                  {scent}
-                </span>
-              ))}
-            </div>
-          </div>
+      {count === 0 ? (
+        <div className="rounded-2xl bg-secondary/40 p-6 text-center">
+          <Stars value={0} size="lg" />
+          <p className="mt-3 text-muted-foreground">
+            Este produto ainda não tem avaliações. Quem compra pelo site pode avaliar pela página do pedido.
+          </p>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-8 p-6 lg:p-8">
-          <form onSubmit={handleSubmit} className="rounded-[1.5rem] bg-secondary/45 p-6 space-y-6">
-            <div>
-              <p className="text-sm uppercase tracking-[0.18em] text-caramel-deep mb-2 font-semibold">Sua avaliação</p>
-              <h2 className="font-serif text-4xl">Conte como foi sua experiência</h2>
+        <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
+          <div>
+            <p className="font-serif text-6xl leading-none">{formatAverage(average)}</p>
+            <div className="my-3">
+              <Stars value={Math.round(average)} />
             </div>
+            <p className="mb-6 text-sm text-muted-foreground">
+              {count} {count === 1 ? "avaliação" : "avaliações"}
+            </p>
+            <ul className="space-y-1.5">
+              {[5, 4, 3, 2, 1].map((n) => {
+                const total = reviews.filter((r) => r.rating === n).length;
+                return (
+                  <li key={n} className="flex items-center gap-2 text-sm">
+                    <span className="w-3 text-muted-foreground">{n}</span>
+                    <Icons.Star className="h-3.5 w-3.5 fill-caramel text-caramel" />
+                    <span className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
+                      <span className="block h-full rounded-full bg-caramel" style={{ width: `${(total / count) * 100}%` }} />
+                    </span>
+                    <span className="w-6 text-right text-muted-foreground">{total}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
-            <div>
-              <label className="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-2 block font-medium">Estrelas</label>
-              <Stars value={rating} onChange={setRating} size="lg" />
-            </div>
-
-            <div>
-              <label className="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-2 block font-medium">Nome</label>
-              <div className="relative">
-                <Icons.User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Seu nome"
-                  className="w-full rounded-full bg-background border border-border pl-12 pr-4 py-4 text-base focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-2 block font-medium">Descricao</label>
-              <textarea
-                value={comment}
-                onChange={(event) => setComment(event.target.value)}
-                placeholder="O que voce achou do produto?"
-                rows={5}
-                className="w-full resize-none rounded-[1.25rem] bg-background border border-border px-4 py-4 text-base focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-              />
-            </div>
-
-            {message && <p className="text-sm text-caramel-deep">{message}</p>}
-
-            <button
-              type="submit"
-              className="w-full rounded-full bg-gradient-caramel text-primary-foreground py-5 text-base uppercase tracking-[0.18em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all font-semibold"
-            >
-              Enviar avaliação
-            </button>
-          </form>
-
-            <div className="space-y-4">
-            {reviews.map((review) => (
-              <article key={review.id} className="rounded-[1.5rem] border border-border bg-background p-6">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-                  <div>
-                    <h3 className="font-serif text-3xl">{review.name}</h3>
-                    <p className="text-sm uppercase tracking-[0.18em] text-muted-foreground">
-                      {formatReviewDate(review.createdAt)}
-                    </p>
+          <div>
+            <ul className="divide-y divide-border">
+              {visible.map((r) => (
+                <li key={r.id} className="py-5 first:pt-0">
+                  <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <Stars value={r.rating} size="sm" />
+                    <span className="font-medium">{r.author_name}</span>
+                    <span className="inline-flex items-center gap-1 text-xs text-green-700 dark:text-green-400">
+                      <Icons.BadgeCheck className="h-3.5 w-3.5" /> Compra verificada
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}
+                    </span>
                   </div>
-                  <Stars value={review.rating} size="sm" />
-                </div>
-                <p className="text-muted-foreground leading-relaxed text-lg">{review.comment}</p>
-              </article>
-            ))}
+                  {r.comment && <p className="leading-relaxed text-muted-foreground">{r.comment}</p>}
+                </li>
+              ))}
+            </ul>
+            {count > 5 && !showAll && (
+              <button
+                onClick={() => setShowAll(true)}
+                className="mt-2 rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-secondary"
+              >
+                Ver todas as {count} avaliações
+              </button>
+            )}
           </div>
         </div>
       )}

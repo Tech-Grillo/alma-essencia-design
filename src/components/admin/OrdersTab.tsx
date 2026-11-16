@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import * as Icons from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { OrderStatus } from "@/lib/checkout/types";
+import { site } from "@/config/site";
 
 type OrderItem = { name: string; size: string | null; quantity: number; unitPrice: number; lineTotal: number };
 
@@ -123,6 +124,18 @@ export function OrdersTab() {
                     <p className="mt-2 text-muted-foreground">
                       {o.delivery_type === "pickup" ? "Retirada na feira" : `Entrega: ${o.address} — ${o.neighborhood}`}
                     </p>
+                    {o.status === "paid" && (
+                      <a
+                        href={`https://wa.me/55${phone}?text=${encodeURIComponent(
+                          `Oi, ${o.customer_name.split(" ")[0]}! Obrigado por comprar na ${site.name}. Quando puder, conta pra gente o que achou: ${window.location.origin}/pedido/${o.id}`,
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-secondary"
+                      >
+                        <Icons.Star className="h-3.5 w-3.5" /> Pedir avaliação
+                      </a>
+                    )}
                   </div>
                   <div>
                     <ul className="space-y-1">

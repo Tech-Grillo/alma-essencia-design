@@ -7,6 +7,7 @@ import type { Product, SizeOption } from "@/lib/products-supabase";
 import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
 import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
 import { OrdersTab } from "@/components/admin/OrdersTab";
+import { ReviewsTab } from "@/components/admin/ReviewsTab";
 import placeholderProduto from "@/assets/placeholder-produto.webp";
 
 export const Route = createFileRoute("/admin")({
@@ -120,7 +121,7 @@ function AdminDashboard() {
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("todas");
-  const [activeSection, setActiveSection] = useState<"products" | "orders" | "analytics">("products");
+  const [activeSection, setActiveSection] = useState<"products" | "orders" | "reviews" | "analytics">("products");
   const [adminProducts, setAdminProducts] = useState<Product[]>([]);
   const [adminCategories, setAdminCategories] = useState<string[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -749,6 +750,16 @@ function AdminDashboard() {
                 Pedidos
               </button>
               <button
+                onClick={() => setActiveSection("reviews")}
+                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
+                  activeSection === "reviews"
+                    ? "bg-caramel text-primary-foreground"
+                    : "bg-background text-foreground border border-border hover:bg-secondary"
+                }`}
+              >
+                Avaliações
+              </button>
+              <button
                 onClick={() => setActiveSection("analytics")}
                 className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
                   activeSection === "analytics"
@@ -779,6 +790,8 @@ function AdminDashboard() {
           )}
 
           {activeSection === "orders" && <OrdersTab />}
+
+          {activeSection === "reviews" && <ReviewsTab />}
 
           {activeSection === "analytics" && !loadingProducts && (
             <AnalyticsTab products={adminProducts} />
