@@ -11,7 +11,7 @@ export const Route = createFileRoute("/carrinho")({
 });
 
 function RouteComponent() {
-  const { items, updateQuantity, removeItem, clearCart, getTotal, getCount } = useCart();
+  const { items, updateQuantity, removeItem, clearCart, getTotal, getCount, ready } = useCart();
 
   const buildWhatsAppMessage = () => {
     if (items.length === 0) return "";
@@ -45,7 +45,11 @@ function RouteComponent() {
         <h1 className="font-serif text-4xl sm:text-5xl mb-2">Meu Carrinho</h1>
         <p className="text-muted-foreground mb-8">{getCount()} {getCount() === 1 ? "item" : "itens"}</p>
 
-        {items.length === 0 ? (
+        {!ready ? (
+          <p className="flex items-center gap-2 py-16 text-muted-foreground">
+            <Icons.Loader2 className="h-5 w-5 animate-spin" /> Carregando...
+          </p>
+        ) : items.length === 0 ? (
           <div className="rounded-3xl border-2 border-dashed border-caramel/30 bg-gradient-to-b from-rose/5 to-transparent p-8 sm:p-12 text-center">
             <Icons.ShoppingBag className="h-20 w-20 text-caramel-deep/40 mx-auto mb-6" />
             <p className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-caramel-deep mb-4">Seu carrinho está vazio</p>
@@ -125,7 +129,7 @@ function RouteComponent() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Frete</span>
-                    <span className="font-medium">A combinar</span>
+                    <span className="font-medium">Calculado no checkout</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Desconto</span>
@@ -138,10 +142,21 @@ function RouteComponent() {
                     <span className="font-serif text-xl">Total</span>
                     <span className="font-serif text-3xl font-semibold text-caramel-deep dark:text-white">R$ {getTotal().toFixed(2).replace(".", ",")}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">Frete será calculado com o vendedor</p>
+                  <p className="text-xs text-muted-foreground">Retirada grátis na feira ou entrega com taxa por bairro</p>
                 </div>
 
                 <div className="space-y-3">
+                  <Link
+                    to="/checkout"
+                    className="w-full flex items-center justify-center gap-2 rounded-full bg-caramel text-primary-foreground py-4 font-semibold hover:bg-caramel/90 transition shadow-soft hover:shadow-bloom"
+                  >
+                    <Icons.Lock className="h-5 w-5" />
+                    Finalizar compra
+                  </Link>
+                  <p className="text-xs text-center text-muted-foreground">Pix ou cartão de crédito · pagamento seguro</p>
+                  <div className="flex items-center gap-3 py-1 text-xs text-muted-foreground">
+                    <span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" />
+                  </div>
                   <a
                     href={whatsappLink(buildWhatsAppMessage())}
                     target="_blank" rel="noreferrer"

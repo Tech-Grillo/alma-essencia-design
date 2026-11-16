@@ -6,6 +6,7 @@ import { categories, categoryGroups, topLevelCategories } from "@/lib/products";
 import type { Product, SizeOption } from "@/lib/products-supabase";
 import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
 import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
+import { OrdersTab } from "@/components/admin/OrdersTab";
 import placeholderProduto from "@/assets/placeholder-produto.webp";
 
 export const Route = createFileRoute("/admin")({
@@ -119,7 +120,7 @@ function AdminDashboard() {
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("todas");
-  const [activeSection, setActiveSection] = useState<"products" | "analytics">("products");
+  const [activeSection, setActiveSection] = useState<"products" | "orders" | "analytics">("products");
   const [adminProducts, setAdminProducts] = useState<Product[]>([]);
   const [adminCategories, setAdminCategories] = useState<string[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -738,6 +739,16 @@ function AdminDashboard() {
                 Produtos
               </button>
               <button
+                onClick={() => setActiveSection("orders")}
+                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
+                  activeSection === "orders"
+                    ? "bg-caramel text-primary-foreground"
+                    : "bg-background text-foreground border border-border hover:bg-secondary"
+                }`}
+              >
+                Pedidos
+              </button>
+              <button
                 onClick={() => setActiveSection("analytics")}
                 className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
                   activeSection === "analytics"
@@ -766,6 +777,8 @@ function AdminDashboard() {
               onDelete={(slug) => setDeletingSlug(slug)}
             />
           )}
+
+          {activeSection === "orders" && <OrdersTab />}
 
           {activeSection === "analytics" && !loadingProducts && (
             <AnalyticsTab products={adminProducts} />

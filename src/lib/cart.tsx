@@ -19,6 +19,8 @@ type CartContextType = {
   getTotal: () => number;
   getCount: () => number;
   isInCart: (slug: string, size?: string | null) => boolean;
+  /** true depois que o carrinho salvo no navegador foi carregado */
+  ready: boolean;
 };
 
 const CART_KEY = "cart_v1";
@@ -44,11 +46,19 @@ function load(): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = React.useState<CartItem[]>(() => load());
+  // Começa vazio no servidor e no primeiro render do navegador (evita erro de hydration);
+  // o carrinho salvo é carregado logo depois de montar.
+  const [items, setItems] = React.useState<CartItem[]>([]);
+  const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
-    save(items);
-  }, [items]);
+    setItems(load());
+    setReady(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (ready) save(items);
+  }, [items, ready]);
 
   const addItem = React.useCallback(
     (item: Omit<CartItem, "quantity">, quantity = 1) => {
@@ -94,8 +104,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const value: CartContextType = React.useMemo(
-    () => ({ items, addItem, removeItem, updateQuantity, clearCart, getTotal, getCount, isInCart }),
-    [items, addItem, removeItem, updateQuantity, clearCart, getTotal, getCount, isInCart]
+    () => ({ items, addItem, removeItem, updateQuantity, clearCart, getTotal, getCount, isInCart, ready }),
+    [items, addItem, removeItem, updateQuantity, clearCart, getTotal, getCount, isInCart, ready]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -15,6 +15,14 @@ export const site = {
     email: "almaeessencia36@gmail.com",
     instagram: "alma_e_essencia",
   },
+  checkout: {
+    /** Texto mostrado na opção de retirada (sem custo). */
+    pickup: "Retirada na feira do Campo de São Bento (Icaraí), aos domingos, das 9h às 15h",
+    /** Máximo de parcelas oferecidas no cartão. */
+    maxInstallments: 3,
+    /** Minutos até o Pix gerado expirar. */
+    pixExpirationMinutes: 30,
+  },
 } as const;
 
 export const instagramUrl = `https://www.instagram.com/${site.contact.instagram}/`;
