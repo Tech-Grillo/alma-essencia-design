@@ -110,7 +110,7 @@ function Contact() {
               </p>
             </div>
           </div>
-          <SimpleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" className="w-full h-80" />
+          <SimpleMap className="w-full h-80" />
         </div>
 
         <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16">

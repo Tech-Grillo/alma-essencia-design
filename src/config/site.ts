@@ -15,6 +15,11 @@ export const site = {
     email: "almaeessencia36@gmail.com",
     instagram: "alma_e_essencia",
   },
+  location: {
+    name: "Feira do Campo de São Bento, Icaraí",
+    /** Texto buscado no Google Maps para posicionar o mapa. */
+    mapsQuery: "Campo de São Bento, Icaraí, Niterói - RJ",
+  },
   checkout: {
     /** Texto mostrado na opção de retirada (sem custo). */
     pickup: "Retirada na feira do Campo de São Bento (Icaraí), aos domingos, das 9h às 15h",

@@ -346,7 +346,7 @@ function Home() {
             </p>
           </div>
           <div className="aspect-[4/3] md:aspect-auto">
-            <SimpleMap lat={-22.9041} lng={-43.1075} title="Alma e Essência - Icaraí" />
+            <SimpleMap />
           </div>
         </div>
       </section>

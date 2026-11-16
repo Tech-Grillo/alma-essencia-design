@@ -1,69 +1,32 @@
-import { useEffect, useRef } from "react";
+// Mapa da feira via Google Maps incorporado (gratuito, sem chave de API).
+// Antes usava os servidores do OpenStreetMap, que bloqueiam sites em produção.
+import * as Icons from "lucide-react";
+import { site } from "@/config/site";
 
 interface SimpleMapProps {
-  lat: number;
-  lng: number;
-  title: string;
   className?: string;
 }
 
-export function SimpleMap({ lat, lng, title, className = "w-full h-full min-h-[300px]" }: SimpleMapProps) {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-
-  useEffect(() => {
-    // Carregar Leaflet CSS e JS dinamicamente
-    const loadLeaflet = async () => {
-      // Carregar CSS
-      if (!document.querySelector('link[href*="leaflet"]')) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        link.crossOrigin = '';
-        document.head.appendChild(link);
-      }
-
-      // Carregar JS
-      if (!(window as any).L) {
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-        script.crossOrigin = '';
-        
-        await new Promise((resolve, reject) => {
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-
-      // Inicializar mapa
-      if (mapContainer.current && !mapRef.current) {
-        const L = (window as any).L;
-        
-        mapRef.current = L.map(mapContainer.current).setView([lat, lng], 15);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(mapRef.current);
-
-        L.marker([lat, lng])
-          .addTo(mapRef.current)
-          .bindPopup(title)
-          .openPopup();
-      }
-    };
-
-    loadLeaflet();
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, [lat, lng, title]);
-
-  return <div ref={mapContainer} className={className} />;
+export function SimpleMap({ className = "w-full h-full min-h-[300px]" }: SimpleMapProps) {
+  const query = encodeURIComponent(site.location.mapsQuery);
+  return (
+    <div className={`relative ${className}`}>
+      <iframe
+        title={`Mapa: ${site.location.name}`}
+        src={`https://www.google.com/maps?q=${query}&z=16&output=embed`}
+        className="absolute inset-0 h-full w-full border-0"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        allowFullScreen
+      />
+      <a
+        href={`https://www.google.com/maps/search/?api=1&query=${query}`}
+        target="_blank"
+        rel="noreferrer"
+        className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-card/95 px-4 py-2 text-xs font-semibold text-foreground shadow-soft backdrop-blur hover:bg-card"
+      >
+        <Icons.Navigation className="h-3.5 w-3.5" /> Como chegar
+      </a>
+    </div>
+  );
 }
