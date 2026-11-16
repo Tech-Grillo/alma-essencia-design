@@ -1,14 +1,12 @@
+import { Fragment } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SimpleMap } from "@/components/SimpleMap";
 import * as Icons from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { site, instagramUrl, instagramHandle, whatsappLink } from "@/config/site";
 
-export const whatsappLink = (message: string) => {
-  const phoneNumber = "5521987163045"; // 55 (Brasil) + 21 (DDD) + Número
-  return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-};
 
 export const Route = createFileRoute("/contato")({
   component: Contact,
@@ -31,7 +29,7 @@ function Contact() {
             { 
               icon: WhatsAppIcon, 
               label: "WhatsApp", 
-              value: "(21) 98716-3045", 
+              value: site.contact.whatsappDisplay, 
               href: whatsappLink("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?"),
               iconColor: "text-green-600 dark:text-green-400",
               labelColor: "text-green-700 dark:text-green-300",
@@ -42,8 +40,8 @@ function Contact() {
             { 
               icon: Icons.Mail, 
               label: "E-mail", 
-              value: "almaeessencia36@gmail.com", 
-              href: "mailto:almaeessencia36@gmail.com",
+              value: site.contact.email, 
+              href: `mailto:${site.contact.email}`,
               iconColor: "text-caramel-deep dark:text-caramel",
               labelColor: "text-caramel-deep dark:text-caramel",
               valueColor: "text-foreground",
@@ -53,8 +51,8 @@ function Contact() {
             { 
               icon: Icons.Instagram, 
               label: "Instagram", 
-              value: "@alma_e_essencia", 
-              href: "https://www.instagram.com/alma_e_essencia/",
+              value: instagramHandle, 
+              href: instagramUrl,
               iconColor: "text-purple-600 dark:text-purple-400",
               labelColor: "text-purple-700 dark:text-purple-300",
               valueColor: "text-foreground",
@@ -81,7 +79,7 @@ function Contact() {
               <a key={c.label} href={c.href} target="_blank" rel="noreferrer" className={`rounded-3xl bg-card border-2 ${c.borderColor} p-8 sm:p-10 shadow-bloom hover:shadow-bloom hover:-translate-y-1 transition-all flex flex-col items-center justify-center text-center min-h-[240px]`}>
                 <Icon className={`h-12 w-12 sm:h-14 sm:w-14 ${c.iconColor} mb-4`} />
                 <p className={`text-base uppercase tracking-[0.25em] ${c.labelColor} mb-3 font-bold`}>{c.label}</p>
-                <p className={`font-sans text-lg sm:text-xl font-semibold tracking-widest ${c.valueColor} break-all`}>{c.value}</p>
+                <p className={`font-sans text-base sm:text-lg font-semibold tracking-wide ${c.valueColor} `}>{c.value.split(/(?=[@_])/).map((part, i) => (<Fragment key={i}>{i > 0 && <wbr />}{part}</Fragment>))}</p>
               </a>
             );
           })}
@@ -96,7 +94,7 @@ function Contact() {
               <div className="flex-1">
                 <p className="font-serif text-xl sm:text-2xl font-bold text-foreground leading-tight">BAIRRO DE ICARAÍ</p>
                 <p className="font-serif text-base sm:text-lg font-semibold text-caramel-deep dark:text-caramel leading-tight">FEIRA - CAMPO DE SÃO BENTO</p>
-                <p className="font-serif text-sm sm:text-base font-medium text-foreground/80 leading-tight">RIO DE JANEIRO · RJ</p>
+                <p className="font-serif text-sm sm:text-base font-medium text-foreground/80 leading-tight">NITERÓI · RJ</p>
               </div>
             </div>
             <div className="ml-0 sm:ml-[4.5rem] space-y-3">
@@ -158,9 +156,9 @@ function Contact() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-          <a href="https://www.instagram.com/alma_e_essencia/" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-sans font-semibold text-sm sm:text-base hover:shadow-lg hover:-translate-y-1 transition-all">
+          <a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-sans font-semibold text-sm sm:text-base hover:shadow-lg hover:-translate-y-1 transition-all">
             <Icons.Instagram className="h-5 w-5" />
-            <span>@alma_e_essencia</span>
+            <span>{instagramHandle}</span>
           </a>
           <a href={whatsappLink("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência. Poderia me ajudar?")} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white font-sans font-semibold text-sm sm:text-base hover:shadow-lg hover:-translate-y-1 transition-all">
             <Icons.MessageCircle className="h-5 w-5" />

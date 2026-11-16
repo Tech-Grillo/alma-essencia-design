@@ -3,8 +3,8 @@ import * as Icons from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { useCart } from "@/lib/cart";
-import logo from "@/assets/imagens_inicio/logo_da_marca_sem_fundo.png";
-import { WHATSAPP_NUMBER } from "@/lib/products";
+import logo from "@/assets/imagens_inicio/logo-da-marca-sem-fundo.webp";
+import { site, whatsappLink } from "@/config/site";
 
 
 
@@ -96,7 +96,7 @@ export function Header() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <a
-                href={`https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}`}
+                href={whatsappLink()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative"
@@ -143,7 +143,7 @@ export function Header() {
               </p>
               <div className="space-y-3 text-sm">
                 <a 
-                  href={`https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}?text=${encodeURIComponent("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência.")}`}
+                  href={whatsappLink("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência.")}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-foreground hover:text-chocolate-deep dark:hover:text-white transition-colors"
@@ -153,11 +153,11 @@ export function Header() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">WhatsApp</p>
-                    <p className="font-semibold">(21) 98716-3045</p>
+                    <p className="font-semibold">{site.contact.whatsappDisplay}</p>
                   </div>
                 </a>
                 <a 
-                  href="mailto:almaeessencia36@gmail.com" 
+                  href={`mailto:${site.contact.email}`} 
                   className="flex items-center gap-3 text-foreground hover:text-chocolate-deep dark:hover:text-white transition-colors"
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-full bg-caramel/10 dark:bg-caramel/20 flex items-center justify-center">
@@ -165,7 +165,7 @@ export function Header() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">E-mail</p>
-                    <p className="font-semibold">almaeessencia36@gmail.com</p>
+                    <p className="font-semibold">{site.contact.email}</p>
                   </div>
                 </a>
               </div>
@@ -199,7 +199,7 @@ export function Header() {
                   FEIRA - CAMPO DE SÃO BENTO
                 </p>
                 <p className="text-sm font-medium text-foreground/80 leading-tight">
-                  RIO DE JANEIRO · RJ
+                  NITERÓI · RJ
                 </p>
                 
                 <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-3 py-2 mt-2">
@@ -217,13 +217,13 @@ export function Header() {
                 </div>
 
                 <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}`}
+                  href={whatsappLink()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-caramel-deep transition-colors pt-2"
                 >
                   <Icons.MessageCircle className="h-4 w-4" />
-                  {WHATSAPP_NUMBER}
+                  {site.contact.whatsappDisplay}
                 </a>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import placeholderProduto from "@/assets/placeholder-produto.svg";
+import placeholderProduto from "@/assets/placeholder-produto.webp";
 
 export type SizeOption = { label: string; unit?: string; price: number };
 
@@ -148,7 +148,7 @@ export function getCategoryChildren(parent: string) {
   return categoryGroups.find((group) => group.parent === parent)?.children ?? [];
 }
 
-export const WHATSAPP_NUMBER = "+55 (21) 98716-3045";
+export { whatsappLink } from "@/config/site";
 const CUSTOM_PRODUCTS_KEY = "almaEssenciaCustomProducts";
 const EDITED_PRODUCTS_KEY = "almaEssenciaEditedProducts";
 const DELETED_PRODUCTS_KEY = "almaEssenciaDeletedProducts";
@@ -278,7 +278,7 @@ export function saveCustomProduct(product: Omit<Product, "slug" | "purchaseLink"
     purchaseLink: `/produtos/${slug}#comprar`,
     images: product.images && product.images.length > 0 
       ? product.images 
-      : ["/src/assets/imagens_inicio/hero.jpg"],
+      : [placeholderProduto],
   };
 
   if (isBrowser()) {
@@ -323,10 +323,6 @@ export function deleteProduct(slug: string) {
 }
 
 
-export function whatsappLink(message: string) {
-  const phone = WHATSAPP_NUMBER.replace(/\D/g, ""); // limpa o número: 5521987163045
-  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-}
 
 export interface WhatsappProductParams {
   productName: string;

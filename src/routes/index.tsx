@@ -7,19 +7,19 @@ import { getAllProducts } from "@/lib/products-supabase";
 import type { Product } from "@/lib/products-supabase";
 import { getTopFavoriteProducts } from "@/lib/analytics";
 import { SimpleMap } from "@/components/SimpleMap";
-import heroImg from "@/assets/imagens_inicio/imagem_barraca.png";
-import heroImgFront from "@/assets/imagens_inicio/imagem_frente_mae.png";
-import barraca02Img from "@/assets/imagens_inicio/imagem barraca02.jpg";
-import produtosImg from "@/assets/imagens_inicio/produtos.png";
-import aboutImg from "@/assets/imagens_inicio/body.png";
-import gregoImg from "@/assets/imagens_inicio/imagem-grego.jpg";
-import velasImg from "@/assets/imagens_inicio/imagem_velas_o.png";
-import difusorImg from "@/assets/imagens_inicio/imagem_difusor_Home.png";
-import linhaAzulImg from "@/assets/imagens_inicio/linhaazul.png";
-import difusorLAImg from "@/assets/imagens_inicio/difusor_LA.png";
-import tuboLataImg from "@/assets/imagens_inicio/tubo_de_lata.png";
-import velasImg2 from "@/assets/imagens_inicio/velas.png";
-import waltsMeltsImg from "@/assets/imagens_inicio/walts_melts.png";
+import heroImg from "@/assets/imagens_inicio/imagem-barraca.webp";
+import heroImgFront from "@/assets/imagens_inicio/imagem-frente-mae.webp";
+import barraca02Img from "@/assets/imagens_inicio/imagem-barraca-02.webp";
+import produtosImg from "@/assets/imagens_inicio/produtos.webp";
+import aboutImg from "@/assets/imagens_inicio/body.webp";
+import gregoImg from "@/assets/imagens_inicio/imagem-grego.webp";
+import velasImg from "@/assets/imagens_inicio/imagem-velas-o.webp";
+import difusorImg from "@/assets/imagens_inicio/imagem-difusor-home.webp";
+import linhaAzulImg from "@/assets/imagens_inicio/linhaazul.webp";
+import difusorLAImg from "@/assets/imagens_inicio/difusor-la.webp";
+import tuboLataImg from "@/assets/imagens_inicio/tubo-de-lata.webp";
+import velasImg2 from "@/assets/imagens_inicio/velas.webp";
+import waltsMeltsImg from "@/assets/imagens_inicio/walts-melts.webp";
 import * as Icons from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ShoppingBag } from "lucide-react";
@@ -332,7 +332,7 @@ function Home() {
                 FEIRA - CAMPO DE SÃO BENTO
               </p>
               <p className="text-base sm:text-lg md:text-xl font-medium text-foreground/80 leading-tight">
-                RIO DE JANEIRO · RJ
+                NITERÓI · RJ
               </p>
             </div>
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl px-4 py-3 mb-4">

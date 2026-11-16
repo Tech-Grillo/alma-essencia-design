@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCart, productToCartItem } from "@/lib/cart";
-import { whatsappLink } from "@/lib/products";
+import { whatsappLink } from "@/config/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import * as Icons from "lucide-react";

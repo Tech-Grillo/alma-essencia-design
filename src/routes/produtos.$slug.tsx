@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { ProductReviews } from "@/components/ProductReviews";
 import { getAllProducts, getProductBySlug, whatsappLink, type Product } from "@/lib/products-supabase";
 import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
@@ -211,13 +210,7 @@ function ProductPage() {
           {/* Info */}
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep mb-3">{product.category}</p>
-            <h1 className="font-serif text-5xl mb-3">{product.name}</h1>
-            <div className="flex items-center gap-2 mb-5">
-              {[1,2,3,4,5].map((i) => (
-                <Icons.Star key={i} className={`h-4 w-4 ${i <= 4 ? "fill-caramel text-caramel" : "text-muted-foreground"}`} />
-              ))}
-              <span className="text-sm text-muted-foreground ml-2">(48 avaliações)</span>
-            </div>
+            <h1 className="font-serif text-5xl mb-5">{product.name}</h1>
             <div className="grid gap-6">
               <div className="rounded-[2rem] border border-border bg-card p-6 shadow-soft">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -369,7 +362,7 @@ function ProductPage() {
           </div>
         </div>
 
-        <ProductReviews product={product} />
+        {/* Avaliações voltam na Etapa 3, quando forem salvas no Supabase (hoje só existiam no navegador de quem avaliou). */}
 
         {/* Related */}
         <div className="mt-32">

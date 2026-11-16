@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import aboutImg from "@/assets/imagens_inicio/imagem-quemsomos.jpg";
+import aboutImg from "@/assets/imagens_inicio/imagem-quemsomos.webp";
 
 export const Route = createFileRoute("/quem-somos")({
   component: About,

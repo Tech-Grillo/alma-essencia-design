@@ -293,12 +293,8 @@ export function slugifyProductName(value: string): string {
 }
 
 // Função WhatsApp
-export const WHATSAPP_NUMBER = "+55 (21) 98716-3045";
+export { whatsappLink } from "@/config/site";
 
-export function whatsappLink(message: string): string {
-  const phone = WHATSAPP_NUMBER.replace(/\D/g, "");
-  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-}
 
 export interface WhatsappProductParams {
   productName: string;

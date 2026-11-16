@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { X, ChevronRight, ShoppingBag, MapPin, Phone, Mail, Instagram, Package, Info, Heart, Flame, Droplets, Wind, Flower2, Leaf, Recycle, Hand, AlertTriangle } from "lucide-react";
+import { site, instagramUrl, instagramHandle, whatsappLink } from "@/config/site";
 
 type GuideSection = "home" | "products" | "about" | "contact" | "cart";
 
@@ -47,20 +48,20 @@ const CONTACT_OPTIONS = [
   {
     icon: <Phone className="h-4 w-4" />,
     label: "WhatsApp",
-    value: "(21) 989794503",
-    href: "https://wa.me/5521987163045",
+    value: site.contact.whatsappDisplay,
+    href: whatsappLink(),
   },
   {
     icon: <Mail className="h-4 w-4" />,
     label: "E-mail",
-    value: "ola@almaeessencia.com",
-    href: "mailto:ola@almaeessencia.com",
+    value: site.contact.email,
+    href: `mailto:${site.contact.email}`,
   },
   {
     icon: <Instagram className="h-4 w-4" />,
     label: "Instagram",
-    value: "@almaeessencia",
-    href: "https://www.instagram.com/alma_e_essencia/",
+    value: instagramHandle,
+    href: instagramUrl,
   },
 ];
 

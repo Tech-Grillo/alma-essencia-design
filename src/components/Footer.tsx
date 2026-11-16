@@ -1,14 +1,15 @@
 import * as Icons from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { whatsappLink, categories } from "@/lib/products";
+import { categories } from "@/lib/products";
+import { site, instagramUrl, whatsappLink } from "@/config/site";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
-import logo from "@/assets/imagens_inicio/logo_da_marca_sem_fundo.png";
+import logo from "@/assets/imagens_inicio/logo-da-marca-sem-fundo.webp";
 import visaIcon from "@/assets/icons/visa.svg";
 import mastercardIcon from "@/assets/icons/mastercard.svg";
 import pixIcon from "@/assets/icons/pix.svg";
 
-const CONTACT_EMAIL = "almaeessencia36@gmail.com";
-const CONTACT_PHONE = "(21) 98716-3045";
+const CONTACT_EMAIL = site.contact.email;
+const CONTACT_PHONE = site.contact.whatsappDisplay;
 
 export function Footer() {
   return (
@@ -27,22 +28,17 @@ export function Footer() {
                 />
                 <div className="text-center md:text-left">
                   <p className="font-serif italic text-cream/80 leading-relaxed text-sm sm:text-base max-w-sm mx-auto md:mx-0">
-                    Pequenos rituais que perfumam a casa e acalmam a alma.
+                    {site.slogan}
                   </p>
                   <div className="flex items-center justify-center md:justify-start gap-3 mt-5">
                     <a 
-                      href="https://www.instagram.com/alma_e_essencia/" 
+                      href={instagramUrl}
+                      target="_blank"
+                      rel="noreferrer" 
                       aria-label="Instagram" 
                       className="rounded-full p-2.5 border border-cream/15 hover:bg-rose hover:border-rose hover:text-white transition-all"
                     >
                       <Icons.Instagram className="h-4 w-4" />
-                    </a>
-                    <a 
-                      href="https://www.facebook.com/almaeessencia" 
-                      aria-label="Facebook" 
-                      className="rounded-full p-2.5 border border-cream/15 hover:bg-rose hover:border-rose hover:text-white transition-all"
-                    >
-                      <Icons.Facebook className="h-4 w-4" />
                     </a>
                     <a 
                       href={whatsappLink("Olá! Gostaria de saber mais sobre os produtos.")} 

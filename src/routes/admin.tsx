@@ -6,7 +6,7 @@ import { categories, categoryGroups, topLevelCategories } from "@/lib/products";
 import type { Product, SizeOption } from "@/lib/products-supabase";
 import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
 import { AnalyticsTab } from "@/components/admin/AnalyticsTab";
-import heroImg from "@/assets/imagens_inicio/hero.jpg";
+import placeholderProduto from "@/assets/placeholder-produto.webp";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -354,7 +354,7 @@ function AdminDashboard() {
         name: productName.trim(),
         category,
         price,
-        images: productImages.length > 0 ? productImages : [heroImg],
+        images: productImages.length > 0 ? productImages : [placeholderProduto],
         description: productDescription.trim(),
         scents: scents.length > 0 ? scents : ["Essencia especial"],
         sizes: sizes,
@@ -871,7 +871,7 @@ function ProductManagementSection({
                 className="flex-1 min-w-0 flex items-center gap-4 no-underline"
               >
                 <img
-                  src={product.images[0] || "/src/assets/imagens_inicio/hero.jpg"}
+                  src={product.images[0] || placeholderProduto}
                   alt={product.name}
                   className="h-20 w-20 rounded-xl object-cover shadow-soft"
                 />

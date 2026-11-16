@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { site } from "@/config/site";
 import { ThemeProvider } from "@/lib/theme";
 import HelpBot from "@/components/HelpBot";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
@@ -77,20 +78,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#f7f2ea" },
-      { title: "Alma e Essência — Aromaterapia Artesanal" },
-      { name: "description", content: "Velas, sabonetes, home sprays e difusores feitos à mão com amor. Pequenos rituais para perfumar a casa e acalmar a alma." },
-      { name: "author", content: "Alma e Essência" },
-      { property: "og:title", content: "Alma e Essência — Aromaterapia Artesanal" },
-      { property: "og:description", content: "Pequenos rituais que perfumam a casa e acalmam a alma." },
+      { title: `${site.name} — ${site.tagline}` },
+      { name: "description", content: site.description },
+      { name: "author", content: site.name },
+      { property: "og:site_name", content: site.name },
+      { property: "og:title", content: `${site.name} — ${site.tagline}` },
+      { property: "og:description", content: site.slogan },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:locale", content: "pt_BR" },
+      { property: "og:image", content: "/og-image.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/og-image.jpg" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,

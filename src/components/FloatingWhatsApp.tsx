@@ -1,4 +1,4 @@
-import { whatsappLink } from "@/lib/products";
+import { whatsappLink } from "@/config/site";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export function FloatingWhatsApp() {
