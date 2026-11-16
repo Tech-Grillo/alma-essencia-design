@@ -41,30 +41,13 @@ function ProductPage() {
 
     const loadProduct = async () => {
       try {
-        // Buscar diretamente do Supabase (ignorar cache)
         const [products, foundProduct] = await Promise.all([
-          fetch('https://vjznmeoftbgyebhclibb.supabase.co/rest/v1/products?select=*', {
-            headers: {
-              'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-            }
-          }).then(res => res.json()).then(data => {
-            return data.map((p: any) => ({
-              ...p,
-              purchaseLink: `/produtos/${p.slug}#comprar`
-            }));
-          }),
-          fetch(`https://vjznmeoftbgyebhclibb.supabase.co/rest/v1/products?select=*&slug=eq.${slug}`, {
-            headers: {
-              'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-            }
-          }).then(res => res.json()).then(data => data[0] || null)
+          getAllProducts(),
+          getProductBySlug(slug),
         ]);
-        
         if (!mounted) return;
         setAllProducts(products);
-        setProduct(foundProduct || null);
+        setProduct(foundProduct ?? null);
       } catch (error) {
         if (!mounted) return;
         console.error('Erro ao carregar produto:', error);

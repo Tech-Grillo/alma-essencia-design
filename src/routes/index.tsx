@@ -16,7 +16,6 @@ import gregoImg from "@/assets/imagens_inicio/imagem-grego.jpg";
 import velasImg from "@/assets/imagens_inicio/imagem_velas_o.png";
 import difusorImg from "@/assets/imagens_inicio/imagem_difusor_Home.png";
 import linhaAzulImg from "@/assets/imagens_inicio/linhaazul.png";
-import bombaAromaImg from "@/assets/imagens_inicio/bomba_de_aroma.png";
 import difusorLAImg from "@/assets/imagens_inicio/difusor_LA.png";
 import tuboLataImg from "@/assets/imagens_inicio/tubo_de_lata.png";
 import velasImg2 from "@/assets/imagens_inicio/velas.png";

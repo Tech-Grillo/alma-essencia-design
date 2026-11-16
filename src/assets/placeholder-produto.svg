@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Produto sem foto">
+  <rect width="400" height="400" fill="#f3e9df"/>
+  <path d="M200 120c-30 0-54 24-54 54 0 40 54 106 54 106s54-66 54-106c0-30-24-54-54-54zm0 74a20 20 0 1 1 0-40 20 20 0 0 1 0 40z" fill="#b8917a"/>
+  <text x="200" y="300" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#7a5a48">Foto em breve</text>
+</svg>

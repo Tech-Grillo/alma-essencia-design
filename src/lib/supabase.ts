@@ -8,7 +8,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('⚠️ Supabase credentials not found. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file');
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+// Com a configuração ausente usa um host de placeholder, para o app abrir e cair no catálogo local.
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-anon-key',
+);
 
 // Função para fazer upload de imagem
 export async function uploadImage(file: File, path: string): Promise<string> {
