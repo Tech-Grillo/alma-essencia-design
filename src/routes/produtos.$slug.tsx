@@ -7,6 +7,7 @@ import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { site } from "@/config/site";
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: ProductPage,
@@ -320,43 +321,33 @@ function ProductPage() {
                 </p>
               </div>
 
-              {/* Delivery Options */}
-              <div className="rounded-[2rem] border-2 border-caramel/30 bg-gradient-to-br from-card via-card to-rose/5 p-8 shadow-bloom">
-                <div className="flex items-center justify-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-caramel to-rose flex items-center justify-center shadow-lg">
-                    <Icons.Truck className="h-6 w-6 text-white" />
-                  </div>
-                  <p className="text-base font-bold uppercase tracking-[0.25em] text-caramel-deep">Opções de Entrega</p>
-                </div>
-                <div className="grid gap-4 mb-6">
-                  <div className="flex items-start gap-4 bg-white/80 dark:bg-background/80 rounded-2xl p-5 border-2 border-rose/20 shadow-soft hover:shadow-bloom transition-all">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-rose to-rose/80 flex items-center justify-center shadow-md">
-                      <Icons.Zap className="h-6 w-6 text-white" />
-                    </div>
+              {/* Frete e entrega */}
+              <div className="rounded-[2rem] border border-border bg-card p-6 shadow-soft sm:p-8">
+                <p className="mb-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-caramel-deep">
+                  <Icons.Truck className="h-4 w-4" /> Frete e entrega
+                </p>
+                <ul className="divide-y divide-border">
+                  <li className="flex items-start gap-4 pb-4">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-caramel/30 text-caramel-deep">
+                      <Icons.MapPin className="h-5 w-5" />
+                    </span>
                     <div className="flex-1">
-                      <p className="font-bold text-base text-foreground mb-2">Entrega Expressa por App (Uber/99)</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed">Receba no mesmo dia com taxa calculada na hora.</p>
+                      <p className="flex flex-wrap items-baseline justify-between gap-x-3 font-medium text-foreground">
+                        Retirada na feira <span className="text-sm font-semibold text-green-700 dark:text-green-400">Grátis</span>
+                      </p>
+                      <p className="text-sm text-muted-foreground">{site.checkout.pickup}</p>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-4 bg-white/80 dark:bg-background/80 rounded-2xl p-5 border-2 border-caramel/20 shadow-soft hover:shadow-bloom transition-all">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-caramel to-caramel/80 flex items-center justify-center shadow-md">
-                      <Icons.Calendar className="h-6 w-6 text-white" />
-                    </div>
+                  </li>
+                  <li className="flex items-start gap-4 pt-4">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-caramel/30 text-caramel-deep">
+                      <Icons.Truck className="h-5 w-5" />
+                    </span>
                     <div className="flex-1">
-                      <p className="font-bold text-base text-foreground mb-2">Entrega Agendada (Rota Local)</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed">Economize no frete com entregas semanais em dias fixos por taxa única.</p>
+                      <p className="font-medium text-foreground">Entrega em Niterói</p>
+                      <p className="text-sm text-muted-foreground">Taxa fixa por bairro, calculada no checkout.</p>
                     </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-caramel/10 via-rose/10 to-caramel/10 rounded-2xl p-5 border-2 border-caramel/30 shadow-soft">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Icons.MessageCircle className="h-5 w-5 text-caramel-deep" />
-                    <p className="text-sm font-bold text-caramel-deep">Entre em contato pelo WhatsApp</p>
-                  </div>
-                  <p className="text-center text-base text-foreground font-medium leading-relaxed">
-                    para escolher a melhor opção de entrega para você.
-                  </p>
-                </div>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
