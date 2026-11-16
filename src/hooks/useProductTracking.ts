@@ -1,12 +1,11 @@
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { trackProductClick } from "@/lib/analytics";
 
 export function useProductTracking(productSlug: string, productName: string) {
-  useEffect(() => {
-    // Não executa tracking se os dados estiverem vazios
+  const handleClick = useCallback(() => {
     if (!productSlug || !productName) return;
-    
-    // Track quando o componente montar (usuário viu o produto)
     trackProductClick(productSlug, productName);
   }, [productSlug, productName]);
+
+  return { handleClick };
 }

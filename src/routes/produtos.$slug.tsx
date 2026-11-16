@@ -7,7 +7,6 @@ import { getAllProducts, getProductBySlug, whatsappLink, type Product } from "@/
 import { useCart, productToCartItem } from "@/lib/cart";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
-import { useProductTracking } from "@/hooks/useProductTracking";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export const Route = createFileRoute("/produtos/$slug")({

@@ -4,7 +4,7 @@ import { type Product } from "@/lib/products";
 import { useProductTracking } from "@/hooks/useProductTracking";
 
 export function ProductCard({ product }: { product: Product }) {
-  useProductTracking(product.slug, product.name);
+  const { handleClick } = useProductTracking(product.slug, product.name);
   
   return (
     <article className="group relative rounded-3xl bg-card border border-border/60 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-bloom h-full flex flex-col">
@@ -12,6 +12,7 @@ export function ProductCard({ product }: { product: Product }) {
         <Link
           to="/produtos/$slug"
           params={{ slug: product.slug }}
+          onClick={handleClick}
           className="block h-full w-full"
         >
           <img
@@ -36,6 +37,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Link
             to="/produtos/$slug"
             params={{ slug: product.slug }}
+            onClick={handleClick}
             className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8B4513] text-white text-sm py-3 font-medium transition-all hover:bg-[#6B3410] hover:shadow-lg"
           >
             <Icons.ShoppingBag className="h-4 w-4" /> COMPRAR
