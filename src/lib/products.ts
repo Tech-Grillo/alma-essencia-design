@@ -1,7 +1,4 @@
-import p1 from "@/assets/imagens_produtos/p1.jpg";
-import p2 from "@/assets/imagens_produtos/p2.jpg";
-import p3 from "@/assets/imagens_produtos/p3.jpg";
-import p4 from "@/assets/imagens_produtos/p4.jpg";
+import placeholderProduto from "@/assets/placeholder-produto.svg";
 
 export type SizeOption = { label: string; unit?: string; price: number };
 
@@ -25,7 +22,7 @@ export const products: Product[] = [
     category: "Velas aromáticas",
     // price kept as medium size price
     price: 79.9,
-    images: [p1],
+    images: [placeholderProduto],
     short: "Cera de soja natural, queima limpa por até 40 horas.",
     description:
       "Vela artesanal feita com cera de soja 100% natural e óleos essenciais puros. Acende rituais de calma e perfuma o ambiente com delicadeza.",
@@ -42,7 +39,7 @@ export const products: Product[] = [
     name: "Sabonete em Barra de Rosas",
     category: "Sabonetes",
     price: 32.0,
-    images: [p2],
+    images: [placeholderProduto],
     short: "Glicerina pura com pétalas de rosa para um banho ritual.",
     description:
       "Sabonete artesanal nutritivo, com glicerina vegetal e óleos botânicos. Perfuma a pele e transforma o banho em um momento de cuidado.",
@@ -59,7 +56,7 @@ export const products: Product[] = [
     name: "Home Spray Eucalipto",
     category: "Home Spray",
     price: 64.5,
-    images: [p3],
+    images: [placeholderProduto],
     short: "Bruma perfumada para tecidos e ambientes.",
     description:
       "Bruma aromática feita com extratos botânicos e álcool de cereais. Perfuma tecidos, cortinas e ambientes com frescor sereno.",
@@ -76,7 +73,7 @@ export const products: Product[] = [
     name: "Difusor de Ambiente",
     category: "Difusores",
     price: 119.0,
-    images: [p4],
+    images: [placeholderProduto],
     short: "Aroma contínuo por até 9 dias com varetas de rattan.",
     description:
       "Difusor de varetas com fragrância concentrada. Liberação suave e contínua, ideal para espaços íntimos como quartos e salas de leitura.",
@@ -149,23 +146,6 @@ export function getCategoryGroup(category: string) {
 
 export function getCategoryChildren(parent: string) {
   return categoryGroups.find((group) => group.parent === parent)?.children ?? [];
-}
-
-export const categoryImagePaths: Record<string, string> = {
-  "Velas aromáticas": "/src/assets/imagens_produtos/velas/",
-  "Sabonetes": "/src/assets/imagens_produtos/sabonetes/",
-  "Home Spray": "/src/assets/imagens_produtos/home-spray/",
-  "Difusores": "/src/assets/imagens_produtos/difusores/",
-  "Kits": "/src/assets/imagens_produtos/kits/",
-  "Hidratantes": "/src/assets/imagens_produtos/hidratantes/",
-  "Esfoliante corporal": "/src/assets/imagens_produtos/hidratantes/",
-  "Home spray 250ml": "/src/assets/imagens_produtos/home-spray/",
-  "Home spray 60ml": "/src/assets/imagens_produtos/home-spray/",
-  "Difusores de ambiente 250ml": "/src/assets/imagens_produtos/difusores/",
-};
-
-export function getCategoryImagePath(category: string): string {
-  return categoryImagePaths[category] || "/src/assets/imagens_produtos/";
 }
 
 export const WHATSAPP_NUMBER = "+55 (21) 98716-3045";

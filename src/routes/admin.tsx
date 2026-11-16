@@ -1,13 +1,7 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  validateAdminCredentials,
-  requestAdminOtp,
-  verifyAdminOtp,
-  isAdminLoggedIn,
-  adminLogout,
-} from "@/lib/admin-credentials";
+import { isAdminLoggedIn, adminLogout } from "@/lib/admin-credentials";
 import { categories, categoryGroups, topLevelCategories } from "@/lib/products";
 import type { Product, SizeOption } from "@/lib/products-supabase";
 import { getAllProducts, getAllCategories, saveProduct, updateProductInDb, deleteProductFromDb } from "@/lib/products-supabase";
@@ -69,14 +63,7 @@ function AdminLayout() {
 function AdminDashboard() {
   const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [otpCode, setOtpCode] = useState("");
-  const [pendingEmail, setPendingEmail] = useState("");
-  const [loginStep, setLoginStep] = useState<"credentials" | "otp">("credentials");
-  const [erro, setErro] = useState("");
-  const [visitorsCount, setVisitorsCount] = useState<number | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [productCount, setProductCount] = useState(4);
   const [productName, setProductName] = useState("");
   const [productCategory, setProductCategory] = useState(categories[0]);
@@ -138,8 +125,12 @@ function AdminDashboard() {
   const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
-    isAdminLoggedIn().then(setAuthenticated);
-  }, []);
+    isAdminLoggedIn().then((ok) => {
+      setAuthenticated(ok);
+      setAuthChecked(true);
+      if (!ok) navigate({ to: "/admin/login" });
+    });
+  }, [navigate]);
 
   useEffect(() => {
     if (authenticated) {
@@ -156,75 +147,10 @@ function AdminDashboard() {
     }
   }, [authenticated]);
 
-  useEffect(() => {
-    let mounted = true;
-    let timer: number | undefined;
-
-    async function fetchVisitors() {
-      try {
-        const res = await fetch('/api/visitors');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (mounted) setVisitorsCount(typeof data.count === 'number' ? data.count : null);
-      } catch (e) {
-        // ignore
-      } finally {
-        timer = window.setTimeout(fetchVisitors, 5000);
-      }
-    }
-
-    if (authenticated) fetchVisitors();
-
-    return () => {
-      mounted = false;
-      if (timer) clearTimeout(timer);
-    };
-  }, [authenticated]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErro("");
-
-    if (loginStep === "credentials") {
-      const valid = await validateAdminCredentials(email, senha);
-      if (!valid) {
-        setErro("Email ou senha incorretos ou você não tem permissão administrativa.");
-        return;
-      }
-
-      const codeSent = await requestAdminOtp(email);
-      if (!codeSent) {
-        setErro("Não foi possível enviar o código para o e-mail informado.");
-        return;
-      }
-
-      setPendingEmail(email);
-      setLoginStep("otp");
-      setOtpCode("");
-      return;
-    }
-
-    const validOtp = await verifyAdminOtp(pendingEmail, otpCode);
-    if (validOtp) {
-      setAuthenticated(true);
-      setLoginStep("credentials");
-      setOtpCode("");
-      setPendingEmail("");
-      return;
-    }
-
-    setErro("Código inválido ou expirado. Solicite um novo código.");
-  };
-
   const handleLogout = async () => {
     await adminLogout();
     setAuthenticated(false);
-    setEmail("");
-    setSenha("");
-    setOtpCode("");
-    setPendingEmail("");
-    setLoginStep("credentials");
-    setErro("");
+    navigate({ to: "/admin/login" });
   };
 
   const handleProductImageFile = (files?: FileList | null) => {
@@ -729,143 +655,14 @@ function AdminDashboard() {
     </div>
   );
 
-  if (!authenticated) {
+  if (authChecked && !authenticated) {
+    return null;
+  }
+
+  if (!authChecked) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center px-5 overflow-hidden">
-        <img
-          src={heroImg}
-          alt="Fundo aromático"
-          className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
-        />
-        <div className="absolute inset-0 bg-background/80" />
-
-        <div className="relative w-full max-w-md rounded-[2rem] bg-card/95 backdrop-blur-xl border border-border shadow-bloom p-10 animate-fade-in-up">
-          <div className="flex flex-col items-center text-center mb-8">
-            <h1 className="mt-7 font-serif text-3xl">Painel Administrativo acesso restrito </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {loginStep === "credentials"
-                ? "Digite seu e-mail e senha para prosseguir."
-                : "Digite o código enviado para seu e-mail para concluir o acesso."}
-            </p>
-          </div>
-
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {loginStep === "credentials" ? (
-              <>
-                <div>
-                  <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">E-mail</label>
-                  <div className="relative">
-                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@almaeessencia.com"
-                      className="w-full rounded-full bg-background border border-border pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Senha</label>
-                  <div className="relative">
-                    <Icons.Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full rounded-full bg-background border border-border pl-11 pr-12 py-3.5 text-sm focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((state) => !state)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-caramel-deep"
-                    >
-                      {showPassword ? <Icons.EyeOff className="h-4 w-4" /> : <Icons.Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-gradient-caramel text-primary-foreground py-4 text-sm uppercase tracking-[0.2em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all mt-2"
-                >
-                  Continuar
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="rounded-full border border-border bg-background px-4 py-3 text-center text-sm text-muted-foreground">
-                  Código enviado para <span className="font-semibold text-foreground">{pendingEmail}</span>
-                </div>
-
-                <div>
-                  <label className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 block">Código de verificação</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                    placeholder="123456"
-                    className="w-full rounded-full bg-background border border-border px-4 py-3.5 text-center text-lg font-semibold tracking-[0.4em] focus:outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20 transition"
-                  />
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    disabled={otpCode.length < 6}
-                    className="flex-1 rounded-full bg-gradient-caramel text-primary-foreground py-4 text-sm uppercase tracking-[0.2em] shadow-soft hover:shadow-bloom hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    Confirmar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      const sent = await requestAdminOtp(pendingEmail || email);
-                      if (!sent) {
-                        setErro("Não foi possível reenviar o código.");
-                        return;
-                      }
-                      setOtpCode("");
-                      setErro("");
-                    }}
-                    className="rounded-full border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
-                  >
-                    Reenviar
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginStep("credentials");
-                    setOtpCode("");
-                    setErro("");
-                  }}
-                  className="w-full text-sm font-medium text-muted-foreground hover:text-foreground"
-                >
-                  Voltar para login
-                </button>
-              </>
-            )}
-
-            {erro && <p className="text-sm text-rose">{erro}</p>}
-
-            <button
-              type="button"
-              onClick={() => navigate({ to: "/" })}
-              className="w-full rounded-full border border-border bg-background mt-3 py-3 text-sm uppercase tracking-[0.12em] text-muted-foreground hover:bg-secondary transition"
-            >
-              Voltar
-            </button>
-          </form>
-
-          <div className="botanical-divider mt-8"></div>
-        </div>
-
+      <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">
+        Verificando acesso...
       </div>
     );
   }
@@ -906,10 +703,6 @@ function AdminDashboard() {
             <div className="rounded-[2rem] bg-card border border-border p-6 shadow-soft">
               <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Produtos cadastrados</p>
               <p className="mt-4 text-4xl font-serif font-bold text-foreground">{productCount}</p>
-            </div>
-            <div className="rounded-[2rem] bg-card border border-border p-6 shadow-soft">
-              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Visitantes ativos</p>
-              <p className="mt-4 text-4xl font-serif font-bold text-foreground">{visitorsCount ?? "-"}</p>
             </div>
             <div className="rounded-[2rem] bg-card border border-border p-6 shadow-soft">
               <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Status do painel</p>
