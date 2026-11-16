@@ -56,8 +56,8 @@ export function Header() {
                 key={n.to}
                 to={n.to}
                 activeOptions={{ exact: n.to === "/" }}
-                activeProps={{ className: "text-base lg:text-lg font-semibold text-white bg-white/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2" }}
-                className="text-base lg:text-lg font-semibold tracking-wide uppercase text-white/90 px-4 lg:px-5 py-1.5 lg:py-2 rounded-full transition-all hover:text-white hover:bg-white/10"
+                activeProps={{ className: "text-lg lg:text-xl font-semibold text-white bg-white/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2" }}
+                className="text-lg lg:text-xl font-semibold tracking-wide uppercase text-white/90 px-4 lg:px-5 py-1.5 lg:py-2 rounded-full transition-all hover:text-white hover:bg-white/10"
               >
                 {n.label}
               </Link>
@@ -128,13 +128,48 @@ export function Header() {
                     id="inicio"
                     to={n.to}
                     onClick={() => setOpen(false)}
-                    className="font-serif text-[1.15rem] sm:text-[1.25rem] font-bold text-foreground px-4 py-3 rounded-full block transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
+                    className="font-serif text-lg sm:text-xl font-bold text-foreground px-4 py-3 rounded-full block transition-all hover:text-chocolate-deep dark:hover:text-white hover:bg-chocolate/10 dark:hover:bg-chocolate/30 hover:shadow-soft"
                   >
                     {n.label}
                   </Link>
                 </li>
               ))}
             </ul>
+
+            {/* Contato rápido */}
+            <div className="rounded-2xl border border-border/70 bg-secondary/40 p-5 space-y-4">
+              <p className="font-serif text-base font-semibold text-foreground">
+                Fale conosco
+              </p>
+              <div className="space-y-3 text-sm">
+                <a 
+                  href={`https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}?text=${encodeURIComponent("Olá! Gostaria de saber mais sobre os produtos artesanais da Alma e Essência.")}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-foreground hover:text-chocolate-deep dark:hover:text-white transition-colors"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <Icons.MessageCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">WhatsApp</p>
+                    <p className="font-semibold">(21) 98716-3045</p>
+                  </div>
+                </a>
+                <a 
+                  href="mailto:almaeessencia36@gmail.com" 
+                  className="flex items-center gap-3 text-foreground hover:text-chocolate-deep dark:hover:text-white transition-colors"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-caramel/10 dark:bg-caramel/20 flex items-center justify-center">
+                    <Icons.Mail className="h-5 w-5 text-caramel-deep dark:text-caramel" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">E-mail</p>
+                    <p className="font-semibold">almaeessencia36@gmail.com</p>
+                  </div>
+                </a>
+              </div>
+            </div>
 
             <div className="rounded-2xl border border-border/70 bg-secondary/40 p-4 space-y-3">
               <p className="font-serif text-base font-semibold text-foreground">

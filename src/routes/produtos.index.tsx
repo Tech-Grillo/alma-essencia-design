@@ -170,17 +170,7 @@ function ProductsList() {
 
     const loadProducts = async () => {
       try {
-        const products = await fetch('https://vjznmeoftbgyebhclibb.supabase.co/rest/v1/products?select=*', {
-          headers: {
-            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-          }
-        }).then(res => res.json()).then(data => {
-          return data.map((p: any) => ({
-            ...p,
-            purchaseLink: `/produtos/${p.slug}#comprar`
-          }));
-        });
+        const products = await getAllProducts();
         
         if (!mounted) return;
         setAllProducts(products);

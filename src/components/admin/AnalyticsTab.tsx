@@ -6,6 +6,7 @@ import {
   getTotalRevenue,
   getTotalSales,
   getSalesByProduct,
+  getClicksByProduct,
   registerSale,
   getSales,
   clearAnalytics,
@@ -28,6 +29,7 @@ export function AnalyticsTab({ products }: AnalyticsTabProps) {
   const totalRevenue = getTotalRevenue();
   const totalSales = getTotalSales();
   const salesByProduct = getSalesByProduct();
+  const totalClicks = Array.from(getClicksByProduct().values()).reduce((acc, item) => acc + item.clicks, 0);
 
   const handleRegisterSale = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +74,7 @@ export function AnalyticsTab({ products }: AnalyticsTabProps) {
             </div>
             <div>
               <h3 className="text-sm uppercase tracking-widest text-muted-foreground">Total de Cliques</h3>
-              <p className="font-serif text-3xl">{topClicked.reduce((acc, item) => acc + item.clicks, 0)}</p>
+              <p className="font-serif text-3xl">{totalClicks}</p>
             </div>
           </div>
           <p className="text-xs text-muted-foreground">Cliques em produtos</p>
@@ -325,7 +327,8 @@ export function AnalyticsTab({ products }: AnalyticsTabProps) {
                     <div>
                       <p className="font-semibold">{sale.productName}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(sale.timestamp).toLocaleDateString("pt-BR")} às{" "}
+                        {new Date(sale.timestamp).toLocaleDateString("pt-BR")}{" "}
+                        às{" "}
                         {new Date(sale.timestamp).toLocaleTimeString("pt-BR")}
                       </p>
                     </div>
