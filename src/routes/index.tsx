@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import * as Icons from "lucide-react";
 import { Header } from "@/components/Header";
-import { SearchBar } from "@/components/SearchBar";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { getAllProducts } from "@/lib/products-supabase";
-import type { Product } from "@/lib/products-supabase";
-import { getTopFavoriteProducts } from "@/lib/analytics";
 import { SimpleMap } from "@/components/SimpleMap";
+import { getAllProducts, type Product } from "@/lib/products-supabase";
+import { categoryGroups } from "@/lib/products";
+import { getBestSellers } from "@/lib/home/functions";
+import { site } from "@/config/site";
+import placeholderProduto from "@/assets/placeholder-produto.webp";
 import heroImg from "@/assets/imagens_inicio/imagem-barraca.webp";
 import heroImgFront from "@/assets/imagens_inicio/imagem-frente-mae.webp";
 import barraca02Img from "@/assets/imagens_inicio/imagem-barraca-02.webp";
@@ -19,518 +22,321 @@ import linhaAzulImg from "@/assets/imagens_inicio/linhaazul.webp";
 import difusorLAImg from "@/assets/imagens_inicio/difusor-la.webp";
 import tuboLataImg from "@/assets/imagens_inicio/tubo-de-lata.webp";
 import velasImg2 from "@/assets/imagens_inicio/velas.webp";
-import waltsMeltsImg from "@/assets/imagens_inicio/walts-melts.webp";
-import * as Icons from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ShoppingBag } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
+import waxMeltsImg from "@/assets/imagens_inicio/walts-melts.webp";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const heroImages = [heroImg, heroImgFront, barraca02Img, produtosImg];
+const aboutImages = [aboutImg, gregoImg, velasImg, difusorImg, linhaAzulImg];
+
+/** Fotos reais da marca usadas como capa de algumas categorias. As demais usam a foto do primeiro produto. */
+const CATEGORY_PHOTOS: Record<string, string> = {
+  "velas aromaticas": velasImg2,
+  velas: velasImg2,
+  difusores: difusorLAImg,
+  kits: tuboLataImg,
+  "whalts melts": waxMeltsImg,
+  "wax melts": waxMeltsImg,
+};
+
+const normalize = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim();
+const parentOf = (category: string) => categoryGroups.find((g) => g.children.includes(category))?.parent ?? category;
+
 function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [heroIndex, setHeroIndex] = useState(0);
-  const [aboutIndex, setAboutIndex] = useState(0);
-  const heroImages = [heroImg, heroImgFront, barraca02Img, produtosImg];
-  const aboutImages = [aboutImg, gregoImg, velasImg, difusorImg, linhaAzulImg];
+  const [products, setProducts] = useState<Product[] | null>(null);
+  const [bestSlugs, setBestSlugs] = useState<string[]>([]);
 
   useEffect(() => {
-    getAllProducts().then(allProducts => {
-      const favoriteProducts = getTopFavoriteProducts(8);
-
-      const featuredProducts = favoriteProducts.length > 0
-        ? favoriteProducts
-            .map(item => allProducts.find(p => p.slug === item.slug))
-            .filter((p): p is Product => p !== undefined)
-            .slice(0, 8)
-        : allProducts.slice(0, 8);
-
-      setProducts(featuredProducts);
-      setLoading(false);
-    }).catch(error => {
-      console.error('Erro ao carregar produtos:', error);
-      setLoading(false);
-    });
+    getAllProducts()
+      .then(setProducts)
+      .catch((error) => {
+        console.error("Erro ao carregar produtos:", error);
+        setProducts([]);
+      });
+    getBestSellers()
+      .then(setBestSlugs)
+      .catch(() => setBestSlugs([]));
   }, []);
 
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setHeroIndex((current) => (current + 1) % heroImages.length);
-    }, 4000);
+  // Mais vendidos de verdade (pedidos pagos). Sem vendas ainda, mostra as novidades.
+  const { title, subtitle, list } = useMemo(() => {
+    const all = products ?? [];
+    const best = bestSlugs.map((slug) => all.find((p) => p.slug === slug)).filter((p): p is Product => !!p);
+    if (best.length >= 4) {
+      return { title: "Mais vendidos", subtitle: "Os produtos que os clientes mais levam.", list: best.slice(0, 8) };
+    }
+    const newest = [...all].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+    return { title: "Novidades", subtitle: "Os produtos que acabaram de chegar à loja.", list: newest.slice(0, 8) };
+  }, [products, bestSlugs]);
 
-    return () => window.clearInterval(timer);
-  }, [heroImages.length]);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setAboutIndex((current) => (current + 1) % aboutImages.length);
-    }, 4000);
-
-    return () => window.clearInterval(timer);
-  }, [aboutImages.length]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl">Carregando produtos...</p>
-      </div>
-    );
-  }
+  const categories = useMemo(() => {
+    const map = new Map<string, Product[]>();
+    for (const p of products ?? []) {
+      const key = parentOf(p.category);
+      map.set(key, [...(map.get(key) ?? []), p]);
+    }
+    return [...map.entries()]
+      .sort((a, b) => b[1].length - a[1].length)
+      .slice(0, 8)
+      .map(([name, items]) => ({
+        name,
+        image: CATEGORY_PHOTOS[normalize(name)] ?? items.find((p) => p.images?.[0] && !p.images[0].includes("placeholder"))?.images[0] ?? placeholderProduto,
+      }));
+  }, [products]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-clip">
       <Header />
+      <Hero />
+      <TrustBar />
 
-      {/* SEARCH BAR */}
-      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 pb-12">
-        <div className="flex flex-col items-center gap-4">
-          <SearchBar />
+      {/* PRODUTOS */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
+        <SectionTitle eyebrow="Loja" title={title} subtitle={subtitle} />
+        {!products ? (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-square rounded-2xl bg-secondary/70" />
+                <div className="mt-3 h-4 w-3/4 rounded bg-secondary/70" />
+                <div className="mt-3 h-11 rounded-full bg-secondary/70" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
+            {list.map((p) => (
+              <ProductCard key={p.slug} product={p} />
+            ))}
+          </div>
+        )}
+        <div className="mt-10 text-center">
+          <Link
+            to="/produtos"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-caramel px-7 py-3 text-base font-semibold text-caramel-deep transition hover:bg-caramel hover:text-primary-foreground dark:text-white"
+          >
+            Ver todos os produtos <Icons.ArrowRight className="h-5 w-5" />
+          </Link>
         </div>
       </section>
 
-      {/* HERO */}
-      <section className="relative">
-        <div className="absolute inset-0 bg-gradient-warm opacity-80" />
-        <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 pt-14 pb-20 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-10 sm:gap-14 items-center">
-          <div className="relative z-10 animate-slide-in-left space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-rose/10 via-caramel/10 to-rose/10 backdrop-blur-md px-6 py-3 text-sm uppercase tracking-[0.3em] text-caramel-deep dark:text-white border-2 border-caramel/20 shadow-lg">
-              <Icons.Sparkles className="h-5 w-5 text-caramel-deep" />
-              <span className="font-bold">Artesanal · Natural</span>
-              <Icons.Sparkles className="h-5 w-5 text-caramel-deep" />
-            </div>
-            
-            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] text-foreground">
-              Feito com <em className="font-script text-caramel-deep dark:text-white not-italic">amor</em>,<br />
-              sentido na pele.
-            </h1>
-            
-            <p className="max-w-lg text-lg sm:text-xl text-muted-foreground leading-relaxed">
-              <span className="font-serif text-caramel-deep dark:text-white font-semibold text-2xl sm:text-3xl tracking-tight block">
-                velas, sabonetes, hidratantes, home spray, difusores de ambiente e muito mais
-              </span>
-              que transformam o ordinário em ritual. Pequenas pausas para respirar.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
-              <Link
-                to="/produtos"
-                className="group relative w-full sm:w-auto rounded-full bg-gradient-caramel text-primary-foreground px-10 sm:px-12 py-4 sm:py-5 shadow-2xl hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-base uppercase tracking-[0.5em] text-center font-bold"
-              >
-                <span className="relative z-10">Explorar Produtos</span>
-              </Link>
-              <Link 
-                to="/quem-somos" 
-                className="group relative w-full sm:w-auto text-center px-10 py-4 text-base uppercase tracking-[0.3em] font-bold text-foreground/80 hover:text-caramel-deep transition-all duration-300"
-              >
-                <span className="relative z-10">Nossa história</span>
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-caramel-deep group-hover:w-3/4 transition-all duration-300" />
-              </Link>
-            </div>
-          </div>
-
-          <div className="relative animate-slide-in-right">
-            <div className="absolute -inset-6 bg-rose/40 rounded-[3rem] rotate-3 blur-2xl" />
-            <div className="relative overflow-hidden rounded-[2.5rem] shadow-bloom">
-              <div className="flex transition-transform duration-[2200ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform" style={{ transform: `translateX(-${heroIndex * 100}%)`, backfaceVisibility: 'hidden' }}>
-                {heroImages.map((image, index) => (
+      {/* COMPRE POR CATEGORIA */}
+      {categories.length > 1 && (
+        <section className="bg-secondary/40 py-16 sm:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+            <SectionTitle eyebrow="Explore" title="Compre por categoria" />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+              {categories.map((c) => (
+                <a
+                  key={c.name}
+                  href={`/produtos?categoria=${encodeURIComponent(c.name)}`}
+                  className="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-secondary"
+                >
                   <img
-                    key={`${image}-${index}`}
-                    src={image}
-                    alt={`Imagem ilustrativa da marca em destaque ${index + 1}`}
-                    width={1600}
-                    height={1024}
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                    className="min-w-full object-cover aspect-[5/4] w-full h-auto"
+                    src={c.image}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                ))}
-              </div>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
-                {heroImages.map((_, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    aria-label={`Selecionar imagem ${index + 1}`}
-                    onClick={() => setHeroIndex(index)}
-                    className={`h-2.5 w-2.5 rounded-full border border-white/80 transition-all duration-300 ${
-                      heroIndex === index ? "scale-125 bg-white" : "bg-white/50 hover:bg-white/80"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-            {/* Floating badge */}
-            <div className="absolute -bottom-6 -left-6 bg-card border border-border rounded-2xl shadow-soft px-5 py-3 hidden md:block">
-              <p className="font-script text-2xl text-caramel-deep leading-none">100%</p>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Natural</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ABOUT */}
-      <section className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32 grid lg:grid-cols-[1.05fr_0.95fr] gap-10 sm:gap-14 lg:gap-16 items-start animate-fade-in-up">
-        <div className="relative w-full max-w-[560px] mx-auto lg:mx-0">
-          <div className="relative overflow-hidden rounded-[2rem] shadow-soft aspect-square">
-            <div className="flex transition-transform duration-700 ease-in-out will-change-transform" style={{ transform: `translateX(-${aboutIndex * 100}%)`, backfaceVisibility: 'hidden' }}>
-              {aboutImages.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={index === 0 ? "Mãos segurando sabonete artesanal" : "Imagem grega"}
-                  width={1024}
-                  height={1024}
-                  loading="lazy"
-                  className="min-w-full object-cover aspect-square w-full h-auto"
-                />
+                  <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-3 sm:p-4">
+                    <span className="text-base font-semibold text-white sm:text-lg">{c.name}</span>
+                    <Icons.ArrowRight className="h-5 w-5 flex-shrink-0 text-white transition group-hover:translate-x-1" />
+                  </span>
+                </a>
               ))}
             </div>
           </div>
-          <div className="absolute -top-5 -right-5 h-24 w-24 rounded-full border border-caramel/40 hidden md:block" />
-          <div className="flex items-center justify-center gap-2 mt-4">
-            {aboutImages.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                aria-label={`Selecionar imagem ${index + 1}`}
-                onClick={() => setAboutIndex(index)}
-                className={`h-2.5 w-2.5 rounded-full border border-caramel/60 transition-all duration-300 ${
-                  aboutIndex === index ? "scale-125 bg-caramel-deep" : "bg-caramel/40 hover:bg-caramel/80"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col justify-center max-w-2xl">
-          <p className="font-script text-4xl sm:text-5xl text-caramel-deep dark:text-white mb-4 animate-fade-in-up">— Quem somos</p>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl leading-tight mb-6 bg-gradient-caramel bg-clip-text text-transparent">
-            Alma e Essência
-          </h2>
-          <div className="botanical-divider mb-6 max-w-[120px] ml-0">
-            <span className="text-4xl"></span>
-          </div>
-          <div className="space-y-4 text-base sm:text-lg md:text-xl leading-relaxed text-chocolate dark:text-caramel-deep font-medium">
-            <p>
-              Na Alma e Essência, cada produto é desenvolvido com carinho, dedicação e respeito ao bem-estar de quem usa.
-            </p>
-            <p>
-              Nossos sabonetes, velas aromáticas, difusores de ambiente, águas para lençóis, hidratantes, esfoliantes e geleias de banho são produzidos com ingredientes de origem vegana, enriquecidos com óleos essenciais, óleos vegetais e extratos naturais cuidadosamente selecionados.
-            </p>
-            <p className="text-lg sm:text-xl font-semibold text-[#8B4513] leading-relaxed">
-              Acreditamos que cuidar de si é um gesto pequeno, repetido todos os dias.
-            </p>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* FEATURED PRODUCTS */}
-      <section className="relative mx-auto max-w-[1600px] px-6 lg:px-10 pt-24 pb-20 sm:pt-28 sm:pb-24 animate-fade-in-up">
-        <div className="absolute inset-0 bg-gradient-to-b from-rose/10 via-transparent to-transparent pointer-events-none" />
-        <div className="relative rounded-[2.5rem] border border-border/60 bg-card/70 backdrop-blur-sm px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 shadow-soft">
-          <div className="relative text-center mb-12">
-            <div className="inline-flex items-center justify-center gap-3 mb-6">
-              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-              <div className="relative">
-                <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white font-semibold relative z-10">Destaques</p>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose/20 to-transparent blur-sm -z-0" />
-              </div>
-              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-            </div>
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 bg-gradient-caramel bg-clip-text text-transparent leading-tight">
-              Produtos favoritos
-            </h2>
-            <div className="botanical-divider mt-6 mb-6">
-              <span className="text-4xl inline-block animate-pulse"></span>
-            </div>
-            <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Selecionamos com carinho os produtos mais amados por vocês
-            </p>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-rose/5 via-caramel/5 to-rose/5 rounded-[2rem] blur-2xl -z-10" />
-            <FeaturedCarousel products={products} />
-          </div>
-          
-          {/* Signature */}
-          <div className="mt-16 flex flex-col items-center justify-center">
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-rose/10 via-caramel/10 to-rose/10 rounded-full blur-xl opacity-60" />
-              <p className="relative font-script text-5xl sm:text-6xl md:text-7xl text-caramel-deep dark:text-white italic">
-                Adriana Grillo
-              </p>
-            </div>
-            <div className="mt-4 flex items-center gap-3">
-              <span className="h-px w-12 bg-gradient-to-r from-transparent to-caramel-deep/40" />
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">Fundadora & Artesã</p>
-              <span className="h-px w-12 bg-gradient-to-l from-transparent to-caramel-deep/40" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BEST SELLERS */}
-      <section className="relative mx-auto max-w-[1600px] px-6 lg:px-10 pt-12 pb-24 animate-fade-in-up">
-        <div className="absolute inset-0 bg-gradient-to-b from-rose/10 via-transparent to-transparent pointer-events-none" />
-        <div className="relative rounded-[2.5rem] border border-border/60 bg-card/70 backdrop-blur-sm px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 shadow-soft">
-          <div className="relative text-center mb-12">
-            <div className="inline-flex items-center justify-center gap-3 mb-6">
-              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-              <div className="relative">
-                <p className="text-xs uppercase tracking-[0.3em] text-caramel-deep dark:text-white font-semibold relative z-10">Destaques</p>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose/20 to-transparent blur-sm -z-0" />
-              </div>
-              <span className="h-px w-16 bg-gradient-to-r from-transparent via-caramel-deep/60 to-transparent" />
-            </div>
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 bg-gradient-caramel bg-clip-text text-transparent leading-tight">
-              Mais vendidos
-            </h2>
-            <div className="botanical-divider mt-6 mb-6">
-              <span className="text-4xl inline-block animate-pulse"></span>
-            </div>
-            <p className="mt-2 text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Os produtos que fazem mais sucesso entre nossos clientes
-            </p>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-rose/5 via-caramel/5 to-rose/5 rounded-[2rem] blur-2xl -z-10" />
-            <BestSellersCarousel />
-          </div>
-          
-          {/* Signature */}
-          <div className="mt-16 flex flex-col items-center justify-center">
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-rose/10 via-caramel/10 to-rose/10 rounded-full blur-xl opacity-60" />
-              <p className="relative font-script text-5xl sm:text-6xl md:text-7xl text-caramel-deep dark:text-white italic">
-                Adriana Grillo
-              </p>
-            </div>
-            <div className="mt-4 flex items-center gap-3">
-              <span className="h-px w-12 bg-gradient-to-r from-transparent to-caramel-deep/40" />
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">Fundadora & Artesã</p>
-              <span className="h-px w-12 bg-gradient-to-l from-transparent to-caramel-deep/40" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* LOCATION */}
-      <section className="mx-auto max-w-[1600px] px-6 lg:px-10 pb-24 animate-fade-in-up">
-        <div className="rounded-[2.5rem] overflow-hidden border border-border bg-card shadow-soft grid md:grid-cols-2">
-          <div className="p-6 sm:p-10 md:p-14 flex flex-col justify-center">
-            <div className="inline-flex items-center gap-2 text-caramel-deep dark:text-white mb-6">
-              <Icons.MapPin className="h-6 w-6" />
-              <span className="text-sm uppercase tracking-[0.3em] font-bold">Visite-nos</span>
-            </div>
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl mb-6">Nos encontre</h2>
-            <div className="font-serif space-y-1 mb-4">
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-tight">
-                BAIRRO DE ICARAÍ
-              </p>
-              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-caramel-deep dark:text-white leading-tight">
-                FEIRA - CAMPO DE SÃO BENTO
-              </p>
-              <p className="text-base sm:text-lg md:text-xl font-medium text-foreground/80 leading-tight">
-                NITERÓI · RJ
-              </p>
-            </div>
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl px-4 py-3 mb-4">
-              <p className="text-sm sm:text-base text-amber-800 dark:text-amber-200 font-medium flex items-start gap-2">
-                <Icons.AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <span><span className="font-bold">Atenção:</span> <span className="font-bold">Somos visitantes</span> — feira temporária na maioria dos domingos, mas confirme presença pelo WhatsApp para evitar imprevistos.</span>
-              </p>
-            </div>
-            <p className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-caramel-deep dark:text-white">
-              Domingos · 09h às 15h
-            </p>
-          </div>
-          <div className="aspect-[4/3] md:aspect-auto">
-            <SimpleMap />
-          </div>
-        </div>
-      </section>
-
+      <About />
+      <Location />
       <Footer />
     </div>
   );
 }
 
-function FeaturedCarousel({ products }: { products: Product[] }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    align: "start",
-    slidesToScroll: 1,
-    loop: true,
-    dragFree: false,
-  });
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-    };
-  }, [emblaApi, onSelect]);
-
+function SectionTitle({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
   return (
-    <div className="relative">
-        <div className="overflow-hidden pb-1" ref={emblaRef}>
-          <div className="flex gap-7">
-            {products.map((p) => (
-              <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] lg:min-w-[calc(33.333%-1.75rem)] xl:min-w-[calc(25%-1.75rem)] 2xl:min-w-[calc(20%-1.75rem)]">
-                <ProductCard product={p} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-      {/* Navigation Buttons */}
-      <button
-        type="button"
-        onClick={scrollPrev}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
-        aria-label="Anterior"
-      >
-        <Icons.ChevronLeft className="h-6 w-6" />
-      </button>
-      <button
-        type="button"
-        onClick={scrollNext}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
-        aria-label="Próximo"
-      >
-        <Icons.ChevronRight className="h-6 w-6" />
-      </button>
+    <div className="mb-10 text-center">
+      <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-caramel-deep dark:text-caramel">{eyebrow}</p>
+      <h2 className="font-serif text-4xl text-foreground sm:text-5xl">{title}</h2>
+      {subtitle && <p className="mx-auto mt-3 max-w-xl text-base text-foreground/80 sm:text-lg">{subtitle}</p>}
     </div>
   );
 }
 
-const bestSellers = [
-  { name: "Velas", image: velasImg2, category: "Velas", price: 79.9, slug: "vela-aromatica-lavanda" },
-  { name: "Tubo de lata", image: tuboLataImg, category: "Kits", price: 89.9, slug: "kit-banho" },
-  { name: "Difusor", image: difusorLAImg, category: "Difusores", price: 119.0, slug: "difusor-baunilha" },
-  { name: "Wax melts", image: waltsMeltsImg, category: "Whalts Melts", price: 49.9, slug: "walts-melts" },
-];
-
-function BestSellersCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    slidesToScroll: 1,
-    loop: true,
-    dragFree: false,
-  });
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
-
+function useRotation(length: number, ms = 4500) {
+  const [index, setIndex] = useState(0);
   useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-    };
-  }, [emblaApi, onSelect]);
+    const timer = window.setInterval(() => setIndex((i) => (i + 1) % length), ms);
+    return () => window.clearInterval(timer);
+  }, [length, ms]);
+  return [index, setIndex] as const;
+}
 
+function Slides({ images, index, onSelect, alt, aspect }: { images: string[]; index: number; onSelect: (i: number) => void; alt: (i: number) => string; aspect: string }) {
   return (
-    <div className="relative">
-      <div className="overflow-hidden pb-1" ref={emblaRef}>
-        <div className="flex gap-10">
-          {bestSellers.map((item) => (
-            <div
-              key={item.name}
-              className="min-w-[calc(100%-2.5rem)] sm:min-w-[calc(50%-2.5rem)] lg:min-w-[calc(33.333%-2.5rem)] xl:min-w-[calc(25%-2.5rem)]"
+    <div className="relative overflow-hidden rounded-[2rem] shadow-soft">
+      <div className="flex transition-transform duration-700 ease-out" style={{ transform: `translateX(-${index * 100}%)` }}>
+        {images.map((image, i) => (
+          <img key={i} src={image} alt={alt(i)} loading={i === 0 ? "eager" : "lazy"} className={`w-full min-w-full object-cover ${aspect}`} />
+        ))}
+      </div>
+      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Mostrar foto ${i + 1}`}
+            onClick={() => onSelect(i)}
+            className={`h-2.5 w-2.5 rounded-full border border-white/80 transition ${index === i ? "scale-125 bg-white" : "bg-white/50 hover:bg-white/80"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Hero() {
+  const [index, setIndex] = useRotation(heroImages.length);
+  return (
+    <section className="relative">
+      <div className="absolute inset-0 bg-gradient-warm opacity-80" />
+      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-14 lg:grid-cols-2 lg:gap-14 lg:px-10 lg:pb-24 lg:pt-20">
+        <div className="space-y-6">
+          <span className="inline-flex items-center gap-2 rounded-full border border-caramel/30 bg-background/70 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-caramel-deep dark:text-white">
+            <Icons.Sparkles className="h-4 w-4" /> Artesanal · Feito à mão
+          </span>
+          <h1 className="font-serif text-5xl leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
+            Feito com <em className="font-script not-italic text-caramel-deep dark:text-white">amor</em>,<br />
+            sentido na pele.
+          </h1>
+          <p className="max-w-lg text-lg leading-relaxed text-foreground/80 sm:text-xl">
+            Velas, sabonetes, hidratantes, home sprays e difusores que transformam o ordinário em ritual. Pequenas pausas para respirar.
+          </p>
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+            <Link
+              to="/produtos"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-caramel px-8 py-4 text-lg font-semibold text-primary-foreground shadow-soft transition hover:bg-caramel/90"
             >
-              <article className="group relative rounded-3xl bg-card/95 border border-border/60 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-bloom h-full flex flex-col">
-                <div className="relative aspect-square overflow-hidden bg-secondary/40 flex-shrink-0">
-                  <Link
-                    to="/produtos/$slug"
-                    params={{ slug: item.slug }}
-                    className="block h-full w-full"
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      style={{ transform: 'translateZ(0)' }}
-                    />
-                  </Link>
-                </div>
-                <div className="p-4 sm:p-6 flex flex-col flex-1">
-                  <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 dark:text-white mb-1 text-center">
-                    {item.category}
-                  </p>
-                  <h3 className="font-serif text-xl sm:text-2xl leading-tight mb-2 text-center">{item.name}</h3>
-                  <span className="font-serif text-3xl sm:text-4xl font-semibold text-caramel-deep dark:text-white text-center mb-4 tracking-tight">
-                    R$ {item.price.toFixed(2).replace(".", ",")}
-                  </span>
-                  <div className="mt-auto">
-                    <Link
-                      to="/produtos/$slug"
-                      params={{ slug: item.slug }}
-                      className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8B4513] text-white text-sm py-3 font-medium transition-all hover:bg-[#6B3410] hover:shadow-lg"
-                    >
-                      <ShoppingBag className="h-4 w-4" /> COMPRAR
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            </div>
-          ))}
+              Ver produtos <Icons.ArrowRight className="h-5 w-5" />
+            </Link>
+            <Link
+              to="/quem-somos"
+              className="inline-flex items-center justify-center rounded-full border-2 border-foreground/15 px-8 py-4 text-lg font-semibold text-foreground transition hover:border-caramel hover:text-caramel-deep"
+            >
+              Nossa história
+            </Link>
+          </div>
+        </div>
+
+        <div className="relative">
+          <Slides
+            images={heroImages}
+            index={index}
+            onSelect={setIndex}
+            alt={(i) => `Barraca da ${site.name} na feira, foto ${i + 1}`}
+            aspect="aspect-[5/4]"
+          />
+          <div className="absolute -bottom-5 left-4 hidden rounded-2xl border border-border bg-card px-5 py-3 shadow-soft md:block">
+            <p className="font-script text-2xl leading-none text-caramel-deep">Feito à mão</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-foreground/70">em Niterói</p>
+          </div>
         </div>
       </div>
+    </section>
+  );
+}
 
-      <button
-        type="button"
-        onClick={scrollPrev}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
-        aria-label="Anterior"
-      >
-        <Icons.ChevronLeft className="h-6 w-6" />
-      </button>
-      <button
-        type="button"
-        onClick={scrollNext}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 rounded-full bg-card border border-border shadow-soft flex items-center justify-center text-foreground hover:bg-caramel hover:text-white hover:border-caramel transition-all"
-        aria-label="Próximo"
-      >
-        <Icons.ChevronRight className="h-6 w-6" />
-      </button>
-    </div>
+function TrustBar() {
+  const items: { icon: ReactNode; title: string; text: string }[] = [
+    { icon: <Icons.HandHeart className="h-6 w-6" />, title: "Feito à mão", text: "Produção artesanal em Niterói" },
+    { icon: <Icons.CreditCard className="h-6 w-6" />, title: "Pix ou cartão", text: "Pagamento seguro pelo site" },
+    { icon: <Icons.MapPin className="h-6 w-6" />, title: "Retirada grátis", text: "Na feira do Campo de São Bento" },
+    { icon: <Icons.MessageCircle className="h-6 w-6" />, title: "Atendimento", text: "Fale com a gente pelo WhatsApp" },
+  ];
+  return (
+    <section className="border-y border-border bg-card">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-6 px-4 py-7 sm:px-6 lg:grid-cols-4 lg:px-10">
+        {items.map((item) => (
+          <div key={item.title} className="flex items-start gap-3">
+            <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-caramel/15 text-caramel-deep dark:text-caramel">
+              {item.icon}
+            </span>
+            <div>
+              <p className="text-base font-semibold text-foreground">{item.title}</p>
+              <p className="text-sm text-foreground/75">{item.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function About() {
+  const [index, setIndex] = useRotation(aboutImages.length);
+  return (
+    <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-24">
+      <div className="mx-auto w-full max-w-[560px] lg:mx-0">
+        <Slides images={aboutImages} index={index} onSelect={setIndex} alt={(i) => `Produtos da ${site.name}, foto ${i + 1}`} aspect="aspect-square" />
+      </div>
+      <div className="max-w-2xl">
+        <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-caramel-deep dark:text-caramel">Quem somos</p>
+        <h2 className="mb-6 font-serif text-4xl text-foreground sm:text-5xl">{site.name}</h2>
+        <div className="space-y-4 text-lg leading-relaxed text-foreground/85 sm:text-xl">
+          <p>Na {site.name}, cada produto é desenvolvido com carinho, dedicação e respeito ao bem-estar de quem usa.</p>
+          <p>
+            Nossos sabonetes, velas aromáticas, difusores de ambiente, águas para lençóis, hidratantes, esfoliantes e geleias de banho são
+            produzidos com ingredientes de origem vegana, enriquecidos com óleos essenciais, óleos vegetais e extratos naturais cuidadosamente
+            selecionados.
+          </p>
+          <p className="font-semibold text-caramel-deep dark:text-white">Acreditamos que cuidar de si é um gesto pequeno, repetido todos os dias.</p>
+        </div>
+        <div className="mt-8">
+          <p className="font-script text-5xl text-caramel-deep dark:text-white sm:text-6xl">Adriana Grillo</p>
+          <p className="mt-1 text-sm font-semibold uppercase tracking-[0.25em] text-foreground/70">Fundadora & Artesã</p>
+        </div>
+        <Link to="/quem-somos" className="mt-8 inline-flex items-center gap-2 text-base font-semibold text-caramel-deep hover:underline dark:text-white">
+          Conheça nossa história <Icons.ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function Location() {
+  return (
+    <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-10">
+      <div className="grid overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft md:grid-cols-2">
+        <div className="flex flex-col justify-center p-6 sm:p-10 md:p-12">
+          <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-caramel-deep dark:text-caramel">
+            <Icons.MapPin className="h-5 w-5" /> Visite-nos
+          </p>
+          <h2 className="mb-5 font-serif text-4xl sm:text-5xl">Nos encontre</h2>
+          <p className="text-xl font-semibold text-foreground sm:text-2xl">Feira do Campo de São Bento</p>
+          <p className="mb-5 text-lg text-foreground/80">Icaraí · Niterói, RJ</p>
+          <p className="mb-5 font-serif text-2xl font-bold text-caramel-deep dark:text-white sm:text-3xl">Domingos · 9h às 15h</p>
+          <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-base text-amber-900 dark:border-amber-700/50 dark:bg-amber-900/20 dark:text-amber-200">
+            <Icons.AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
+            <span>
+              <strong>Somos visitantes:</strong> estamos na feira na maioria dos domingos. Confirme pelo WhatsApp antes de ir.
+            </span>
+          </p>
+        </div>
+        <div className="aspect-[4/3] md:aspect-auto">
+          <SimpleMap />
+        </div>
+      </div>
+    </section>
   );
 }
