@@ -4,7 +4,7 @@ import * as Icons from "lucide-react";
 import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { useCart } from "@/lib/cart";
+import { isDefaultSize, useCart } from "@/lib/cart";
 import { supabase } from "@/lib/supabase";
 import { site } from "@/config/site";
 import { createCardPayment, createPixPayment, getOrderStatus } from "@/lib/checkout/functions";
@@ -84,7 +84,7 @@ function CheckoutPage() {
   const checkout: CheckoutInput = {
     customer: { name, email, phone },
     delivery: deliveryType === "delivery" ? { type: "delivery", neighborhood, address } : { type: "pickup" },
-    items: items.map((i) => ({ slug: i.slug, size: i.size ?? null, quantity: i.quantity })),
+    items: items.map((i) => ({ slug: i.slug, size: i.size ?? null, scent: i.scent ?? null, quantity: i.quantity })),
   };
 
   const finish = (orderId: string) => {
@@ -295,10 +295,11 @@ function CheckoutPage() {
             <h2 className="mb-4 font-serif text-2xl">Resumo</h2>
             <ul className="mb-5 space-y-3 border-b border-border pb-5">
               {items.map((item) => (
-                <li key={`${item.slug}-${item.size ?? ""}`} className="flex justify-between gap-3 text-sm">
+                <li key={`${item.slug}-${item.size ?? ""}-${item.scent ?? ""}`} className="flex justify-between gap-3 text-sm">
                   <span>
                     {item.quantity}× {item.name}
-                    {item.size && <span className="text-muted-foreground"> · {item.size}</span>}
+                    {!isDefaultSize(item.size) && <span className="text-muted-foreground"> · {item.size}</span>}
+                    {item.scent && <span className="text-muted-foreground"> · {item.scent}</span>}
                   </span>
                   <span className="whitespace-nowrap font-medium">{brl(item.price * item.quantity)}</span>
                 </li>

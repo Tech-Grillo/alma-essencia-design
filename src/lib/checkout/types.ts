@@ -3,6 +3,7 @@
 export type CheckoutItemInput = {
   slug: string;
   size: string | null;
+  scent: string | null;
   quantity: number;
 };
 

@@ -19,6 +19,7 @@ type PricedItem = {
   slug: string;
   name: string;
   size: string | null;
+  scent: string | null;
   quantity: number;
   unitPrice: number;
   lineTotal: number;
@@ -62,7 +63,8 @@ function validate(input: CheckoutInput): CheckoutInput {
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
       throw new CheckoutError("Quantidade inválida no carrinho.");
     }
-    return { slug: String(item.slug), size: item.size ? String(item.size) : null, quantity };
+    const scent = item.scent ? String(item.scent).trim().slice(0, 60) : null;
+    return { slug: String(item.slug), size: item.size ? String(item.size) : null, scent: scent || null, quantity };
   });
 
   let delivery: CheckoutInput["delivery"];
@@ -86,7 +88,7 @@ async function quote(input: CheckoutInput): Promise<Quote> {
   const slugs = [...new Set(input.items.map((i) => i.slug))];
   const { data: products, error } = await db
     .from("products")
-    .select("slug, name, price, sizes")
+    .select("slug, name, price, sizes, scents")
     .in("slug", slugs);
   if (error) throw new Error(`Erro ao buscar produtos: ${error.message}`);
 
@@ -101,6 +103,14 @@ async function quote(input: CheckoutInput): Promise<Quote> {
       if (!size) throw new CheckoutError(`O tamanho "${item.size}" de ${product.name} não está mais disponível.`);
       unitPrice = Number(size.price);
     }
+    // Aroma precisa ser um dos aromas cadastrados no produto (se ele tiver aromas).
+    const scents = (Array.isArray(product.scents) ? product.scents : []) as string[];
+    let scent: string | null = null;
+    if (scents.length > 0) {
+      scent = item.scent && scents.includes(item.scent) ? item.scent : scents.length === 1 ? scents[0] : null;
+      if (!scent) throw new CheckoutError(`Escolha o aroma de ${product.name} na página do produto.`);
+    }
+
     if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
       throw new CheckoutError(`${product.name} está sem preço. Fale com a gente pelo WhatsApp.`);
     }
@@ -108,6 +118,7 @@ async function quote(input: CheckoutInput): Promise<Quote> {
       slug: product.slug,
       name: product.name,
       size: item.size,
+      scent,
       quantity: item.quantity,
       unitPrice: money(unitPrice),
       lineTotal: money(unitPrice * item.quantity),

@@ -93,7 +93,7 @@ function ProductPage() {
   const handleAddToCart = () => {
     if (!product) return;
 
-    addItem(productToCartItem(product, size), qty);
+    addItem(productToCartItem(product, size, 1, scent || null), qty);
     navigate({ to: "/carrinho" });
   };
 

@@ -124,19 +124,11 @@ export function Footer() {
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2.5 text-cream/70">
                   <Icons.Clock className="h-4 w-4 flex-shrink-0" />
-                  <span>Seg-Sex, 9h às 18h</span>
+                  <span>{site.hours}</span>
                 </div>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm text-cream/70">
-                <a href="/politica-de-privacidade" className="hover:text-rose transition">
-                  Política de Privacidade
-                </a>
-                <span className="hidden sm:inline">·</span>
-                <a href="/termos" className="hover:text-rose transition">
-                  Termos
-                </a>
-              </div>
+              {/* Links de Política de Privacidade e Termos voltam quando essas páginas existirem. */}
             </div>
           </div>
 
@@ -151,9 +143,9 @@ export function Footer() {
                   Feito à mão, com amor.
                 </p>
                 <div className="flex items-center gap-2.5">
-                  <img src={visaIcon} alt="Visa" className="h-6 p-1 rounded bg-cream/6" />
-                  <img src={mastercardIcon} alt="Mastercard" className="h-6 p-1 rounded bg-cream/6" />
-                  <img src={pixIcon} alt="PIX" className="h-6 p-1 rounded bg-cream/6" />
+                  <img src={visaIcon} alt="Visa" data-keep-color className="h-6 rounded" />
+                  <img src={mastercardIcon} alt="Mastercard" data-keep-color className="h-6 rounded" />
+                  <img src={pixIcon} alt="PIX" data-keep-color className="h-6 rounded" />
                 </div>
               </div>
             </div>
