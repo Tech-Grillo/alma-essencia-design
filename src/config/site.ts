@@ -12,7 +12,7 @@ export const site = {
   contact: {
     whatsapp: "5521987163045",
     whatsappDisplay: "(21) 98716-3045",
-    email: "almaeessencia36@gmail.com",
+    email: "almaeessencia87@gmail.com",
     instagram: "alma_e_essencia",
   },
   location: {
