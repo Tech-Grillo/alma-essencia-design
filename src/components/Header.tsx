@@ -46,14 +46,14 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 bg-header-bg shadow-md">
-        <div className="mx-auto flex h-14 max-w-[2000px] items-center justify-between gap-4 pl-1 pr-2 sm:h-16 sm:pl-2 sm:pr-4 md:pl-4 lg:pl-6 lg:pr-6">
+        <div className="mx-auto flex h-14 max-w-[2000px] items-center justify-between gap-4 pl-1 pr-2 sm:h-16 sm:pl-2 sm:pr-4 lg:pl-3 lg:pr-6">
           <div className="flex min-w-0 items-center gap-1 sm:gap-2">
             <button
               onClick={() => setOpen(true)}
               aria-label="Abrir menu"
               aria-expanded={open}
               aria-controls="menu-lateral"
-              className="rounded-full p-2 text-white transition-colors hover:bg-white/10 md:hidden"
+              className="rounded-full p-2 text-white transition-colors hover:bg-white/10"
             >
               <Icons.Menu className="h-6 w-6" />
             </button>
@@ -107,9 +107,9 @@ export function Header() {
         </div>
       </header>
 
-      {/* Menu lateral (celular) */}
+      {/* Menu lateral */}
       <div
-        className={`fixed inset-0 z-[60] transition-opacity duration-300 md:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[60] transition-opacity duration-300 ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
         aria-hidden={!open}
         inert={!open}
       >
