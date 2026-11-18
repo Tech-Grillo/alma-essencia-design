@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -122,6 +123,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+// WhatsApp flutuante e assistente só nas páginas da loja, não no painel admin.
+function PublicFloatingButtons() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  if (pathname.startsWith("/admin")) return null;
+  return (
+    <>
+      <FloatingWhatsApp />
+      <HelpBot />
+    </>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -130,8 +143,7 @@ function RootComponent() {
       <ThemeProvider>
         <CartProvider>
           <Outlet />
-          <FloatingWhatsApp />
-          <HelpBot />
+          <PublicFloatingButtons />
         </CartProvider>
       </ThemeProvider>
     </QueryClientProvider>

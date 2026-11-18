@@ -251,6 +251,7 @@ function ProductPage() {
                     </div>
                     <p className="text-base text-foreground leading-relaxed font-medium">{product.description}</p>
                   </div>
+                  {product.scents.length > 0 && (
                   <div>
                     <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Aroma</p>
                     <div className="flex flex-wrap gap-3">
@@ -269,7 +270,9 @@ function ProductPage() {
                       ))}
                     </div>
                   </div>
+                  )}
 
+                  {!(product.sizes.length === 1 && /^[uú]nico$/i.test(product.sizes[0].label)) && (
                   <div>
                     <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Tamanho</p>
                     <div className="flex flex-wrap gap-3">
@@ -288,6 +291,7 @@ function ProductPage() {
                       ))}
                     </div>
                   </div>
+                  )}
 
                   <div>
                     <p className="text-sm uppercase tracking-[0.18em] text-foreground/70 mb-3 font-semibold">Quantidade</p>
