@@ -15,6 +15,8 @@ export const site = {
     email: "almaeessencia87@gmail.com",
     instagram: "alma_e_essencia",
   },
+  /** Quando a loja atende presencialmente (feira). */
+  hours: "Domingos, 9h às 15h (feira)",
   location: {
     name: "Feira do Campo de São Bento, Icaraí",
     /** Texto buscado no Google Maps para posicionar o mapa. */

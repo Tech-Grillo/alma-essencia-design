@@ -8,13 +8,15 @@ export type CartItem = {
   image?: string;
   quantity: number;
   size?: string | null;
+  /** Aroma escolhido na página do produto. */
+  scent?: string | null;
 };
 
 type CartContextType = {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (slug: string, size?: string | null) => void;
-  updateQuantity: (slug: string, size: string | null, quantity: number) => void;
+  removeItem: (slug: string, size?: string | null, scent?: string | null) => void;
+  updateQuantity: (slug: string, size: string | null, quantity: number, scent?: string | null) => void;
   clearCart: () => void;
   getTotal: () => number;
   getCount: () => number;
@@ -24,6 +26,11 @@ type CartContextType = {
 };
 
 const CART_KEY = "cart_v1";
+
+/** Mesmo produto, tamanho e aroma = mesma linha do carrinho. */
+function sameLine(item: { slug: string; size?: string | null; scent?: string | null }, slug: string, size?: string | null, scent?: string | null) {
+  return item.slug === slug && (item.size ?? null) === (size ?? null) && (item.scent ?? null) === (scent ?? null);
+}
 
 const CartContext = React.createContext<CartContextType | undefined>(undefined);
 
@@ -63,7 +70,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addItem = React.useCallback(
     (item: Omit<CartItem, "quantity">, quantity = 1) => {
       setItems((prev) => {
-        const idx = prev.findIndex((p) => p.slug === item.slug && p.size === item.size);
+        const idx = prev.findIndex((p) => sameLine(p, item.slug, item.size, item.scent));
         if (idx >= 0) {
           const copy = [...prev];
           copy[idx] = { ...copy[idx], quantity: copy[idx].quantity + quantity };
@@ -75,16 +82,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const removeItem = React.useCallback((slug: string, size?: string | null) => {
-    setItems((prev) => prev.filter((i) => !(i.slug === slug && i.size === (size ?? null))));
+  const removeItem = React.useCallback((slug: string, size?: string | null, scent?: string | null) => {
+    setItems((prev) => prev.filter((i) => !sameLine(i, slug, size, scent)));
   }, []);
 
-  const updateQuantity = React.useCallback((slug: string, size: string | null, quantity: number) => {
+  const updateQuantity = React.useCallback((slug: string, size: string | null, quantity: number, scent?: string | null) => {
     setItems((prev) =>
       prev
-        .map((i) =>
-          i.slug === slug && i.size === size ? { ...i, quantity: Math.max(0, quantity) } : i
-        )
+        .map((i) => (sameLine(i, slug, size, scent) ? { ...i, quantity: Math.max(0, quantity) } : i))
         .filter((i) => i.quantity > 0)
     );
   }, []);
@@ -117,11 +122,14 @@ export function useCart() {
   return ctx;
 }
 
-export function productToCartItem(p: Product, size?: string, quantity = 1): Omit<CartItem, "quantity"> {
+export function productToCartItem(p: Product, size?: string, _quantity = 1, scent?: string | null): Omit<CartItem, "quantity"> {
   // find size price if available
   const sizeObj = p.sizes?.find((s: any) => s.label === size);
   const price = sizeObj ? sizeObj.price : p.price;
-  return { slug: p.slug, name: p.name, price, image: p.images?.[0] ?? "", size: size ?? null };
+  return { slug: p.slug, name: p.name, price, image: p.images?.[0] ?? "", size: size ?? null, scent: scent || null };
 }
+
+/** "Único" é o tamanho padrão de produto com preço único: não precisa aparecer para o cliente. */
+export const isDefaultSize = (size?: string | null) => !size || /^[uú]nico$/i.test(size.trim());
 
 export default CartProvider;

@@ -290,7 +290,8 @@ header #logo1 img {
   filter: brightness(0) invert(1);
 }
 
-footer img {
+/* Deixa o logo branco no rodapé escuro. Ícones de pagamento mantêm as cores. */
+footer img:not([data-keep-color]) {
   filter: brightness(0) invert(1);
   opacity: 1;
 }

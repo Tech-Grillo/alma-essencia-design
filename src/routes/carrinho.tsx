@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCart, productToCartItem } from "@/lib/cart";
+import { useCart, productToCartItem, isDefaultSize } from "@/lib/cart";
 import { whatsappLink } from "@/config/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -20,7 +20,8 @@ function RouteComponent() {
     
     items.forEach((item, index) => {
       message += `*${index + 1}. ${item.name}*\n`;
-      if (item.size) message += `   Tamanho: ${item.size}\n`;
+      if (!isDefaultSize(item.size)) message += `   Tamanho: ${item.size}\n`;
+      if (item.scent) message += `   Aroma: ${item.scent}\n`;
       message += `   Quantidade: ${item.quantity}\n`;
       message += `   Valor unitário: R$ ${item.price.toFixed(2).replace(".", ",")}\n`;
       message += `   Subtotal: R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}\n\n`;
@@ -66,7 +67,7 @@ function RouteComponent() {
             {/* Produtos */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
-                <div key={`${item.slug}-${item.size ?? "default"}`} className="rounded-2xl border border-border bg-card p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
+                <div key={`${item.slug}-${item.size ?? "default"}-${item.scent ?? ""}`} className="rounded-2xl border border-border bg-card p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
                   {item.image && (
                     <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-secondary/40">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -75,7 +76,10 @@ function RouteComponent() {
                   
                   <div className="flex-1">
                     <h3 className="font-serif text-lg mb-1">{item.name}</h3>
-                    {item.size && (
+                    {item.scent && (
+                      <p className="text-sm text-muted-foreground mb-1">Aroma: <span className="font-medium text-foreground">{item.scent}</span></p>
+                    )}
+                    {!isDefaultSize(item.size) && (
                       <p className="text-sm text-muted-foreground mb-3">Tamanho: <span className="font-medium text-foreground">{item.size}</span></p>
                     )}
                     
@@ -84,14 +88,14 @@ function RouteComponent() {
                         <span className="text-sm text-muted-foreground">Quantidade:</span>
                         <div className="inline-flex items-center rounded-full border border-border bg-secondary/50">
                           <button 
-                            onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity - 1)} 
+                            onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity - 1, item.scent)} 
                             className="p-2 hover:text-caramel-deep transition-colors"
                           >
                             <Icons.Minus className="h-4 w-4" />
                           </button>
                           <span className="w-8 text-center font-medium">{item.quantity}</span>
                           <button 
-                            onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity + 1)} 
+                            onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity + 1, item.scent)} 
                             className="p-2 hover:text-caramel-deep transition-colors"
                           >
                             <Icons.Plus className="h-4 w-4" />
@@ -107,7 +111,7 @@ function RouteComponent() {
                   </div>
 
                   <button 
-                    onClick={() => removeItem(item.slug, item.size ?? null)} 
+                    onClick={() => removeItem(item.slug, item.size ?? null, item.scent)} 
                     className="text-muted-foreground hover:text-destructive transition-colors p-2 rounded-full hover:bg-secondary"
                     aria-label="Remover"
                   >

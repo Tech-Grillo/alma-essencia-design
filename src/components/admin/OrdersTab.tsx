@@ -5,7 +5,7 @@ import { site } from "@/config/site";
 import type { OrderStatus } from "@/lib/checkout/types";
 import { Card, EmptyState, Notice, brl, inputClass } from "./ui";
 
-type OrderItem = { name: string; size: string | null; quantity: number; unitPrice: number; lineTotal: number };
+type OrderItem = { name: string; size: string | null; scent?: string | null; quantity: number; unitPrice: number; lineTotal: number };
 
 type Order = {
   id: string;
@@ -177,7 +177,8 @@ export function OrdersTab() {
                           <li key={i} className="flex justify-between gap-3">
                             <span>
                               {item.quantity}× {item.name}
-                              {item.size && <span className="text-muted-foreground"> · {item.size}</span>}
+                              {item.size && !/^[uú]nico$/i.test(item.size) && <span className="text-muted-foreground"> · {item.size}</span>}
+                              {item.scent && <span className="text-muted-foreground"> · {item.scent}</span>}
                             </span>
                             <span className="whitespace-nowrap">{brl(item.lineTotal)}</span>
                           </li>

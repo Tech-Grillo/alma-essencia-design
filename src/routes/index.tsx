@@ -393,7 +393,7 @@ function FeaturedCarousel({ products }: { products: Product[] }) {
 
   return (
     <div className="relative">
-        <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
+        <div className="overflow-hidden pb-1" ref={emblaRef}>
           <div className="flex gap-7">
             {products.map((p) => (
               <div key={p.slug} className="min-w-[calc(100%-1.75rem)] sm:min-w-[calc(50%-1.75rem)] lg:min-w-[calc(33.333%-1.75rem)] xl:min-w-[calc(25%-1.75rem)] 2xl:min-w-[calc(20%-1.75rem)]">
@@ -468,7 +468,7 @@ function BestSellersCarousel() {
 
   return (
     <div className="relative">
-      <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
+      <div className="overflow-hidden pb-1" ref={emblaRef}>
         <div className="flex gap-10">
           {bestSellers.map((item) => (
             <div

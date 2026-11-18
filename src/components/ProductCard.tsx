@@ -1,47 +1,88 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { type Product } from "@/lib/products";
+import { productToCartItem, useCart } from "@/lib/cart";
 import { useProductTracking } from "@/hooks/useProductTracking";
+import placeholderProduto from "@/assets/placeholder-produto.webp";
+
+const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export function ProductCard({ product }: { product: Product }) {
   const { handleClick } = useProductTracking(product.slug, product.name);
-  
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+
+  const sizes = product.sizes ?? [];
+  const scents = product.scents ?? [];
+  const lowest = sizes.length ? Math.min(...sizes.map((s) => s.price)) : product.price;
+  const hasOptions = sizes.length > 1 || scents.length > 1; // precisa escolher tamanho ou aroma na página
+
+  useEffect(() => {
+    if (!added) return;
+    const t = setTimeout(() => setAdded(false), 2000);
+    return () => clearTimeout(t);
+  }, [added]);
+
+  const quickAdd = () => {
+    addItem(productToCartItem(product, sizes[0]?.label, 1, scents[0] ?? null), 1);
+    setAdded(true);
+  };
+
   return (
-    <article className="group relative rounded-3xl bg-card border border-border/60 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-bloom h-full flex flex-col">
-      <div className="relative aspect-square overflow-hidden bg-secondary/40 flex-shrink-0">
+    <article className="group flex h-full flex-col">
+      <Link
+        to="/produtos/$slug"
+        params={{ slug: product.slug }}
+        onClick={handleClick}
+        className="relative block aspect-square overflow-hidden rounded-2xl bg-secondary/50"
+      >
+        <img
+          src={product.images?.[0] || placeholderProduto}
+          alt={product.name}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      </Link>
+
+      <div className="flex flex-1 flex-col pt-3">
+        <p className="mb-0.5 truncate text-[11px] text-muted-foreground sm:text-xs">{product.category}</p>
         <Link
           to="/produtos/$slug"
           params={{ slug: product.slug }}
           onClick={handleClick}
-          className="block h-full w-full"
+          className="line-clamp-2 text-sm font-medium leading-snug text-foreground hover:text-caramel-deep sm:text-base"
         >
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            style={{ transform: 'translateZ(0)' }}
-          />
+          {product.name}
         </Link>
-      </div>
-      <div className="p-4 sm:p-6 flex flex-col flex-1">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-caramel-deep/80 dark:text-white mb-1 text-center">
-          {product.category}
+        <p className="mt-1.5">
+          {sizes.length > 1 && <span className="mr-1 text-[11px] text-muted-foreground sm:text-xs">a partir de</span>}
+          <span className="text-base font-semibold text-caramel-deep dark:text-white sm:text-lg">{brl(lowest)}</span>
         </p>
-        <h3 className="font-serif text-xl sm:text-2xl leading-tight mb-2 text-center">{product.name}</h3>
-        <span className="font-serif text-3xl sm:text-4xl font-semibold text-caramel-deep dark:text-white text-center mb-4 tracking-tight">
-          R$ {Math.min(...product.sizes.map((s: any) => s.price)).toFixed(2).replace(".", ",")}
-        </span>
 
-        <div className="mt-auto">
-          <Link
-            to="/produtos/$slug"
-            params={{ slug: product.slug }}
-            onClick={handleClick}
-            className="w-full flex items-center justify-center gap-2 rounded-full bg-[#8B4513] text-white text-sm py-3 font-medium transition-all hover:bg-[#6B3410] hover:shadow-lg"
-          >
-            <Icons.ShoppingBag className="h-4 w-4" /> COMPRAR
-          </Link>
+        <div className="mt-auto pt-3">
+          {hasOptions ? (
+            <Link
+              to="/produtos/$slug"
+              params={{ slug: product.slug }}
+              onClick={handleClick}
+              className="flex w-full items-center justify-center gap-1.5 rounded-full border border-caramel/50 py-2 text-xs font-semibold text-caramel-deep transition hover:bg-caramel hover:text-primary-foreground dark:text-white sm:py-2.5 sm:text-sm"
+            >
+              Escolher opções
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={quickAdd}
+              className={`flex w-full items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition sm:py-2.5 sm:text-sm ${
+                added ? "bg-green-600 text-white" : "bg-caramel text-primary-foreground hover:bg-caramel/90"
+              }`}
+              aria-live="polite"
+            >
+              {added ? <Icons.Check className="h-4 w-4" /> : <Icons.ShoppingBag className="h-4 w-4" />}
+              {added ? "Adicionado" : "Adicionar"}
+            </button>
+          )}
         </div>
       </div>
     </article>
