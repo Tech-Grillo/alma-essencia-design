@@ -73,7 +73,8 @@ function Home() {
       return { title: "Mais vendidos", subtitle: "Os produtos que os clientes mais levam.", list: best.slice(0, 8) };
     }
     const newest = [...all].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
-    return { title: "Novidades", subtitle: "Os produtos que acabaram de chegar à loja.", list: newest.slice(0, 8) };
+    // Só os 4 cadastrados mais recentemente (uma linha no computador).
+    return { title: "Novidades", subtitle: "Os produtos que acabaram de chegar à loja.", list: newest.slice(0, 4) };
   }, [products, bestSlugs]);
 
   const categories = useMemo(() => {
@@ -101,7 +102,7 @@ function Home() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
         <SectionTitle eyebrow="Loja" title={title} subtitle={subtitle} />
         {!products ? (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="aspect-square rounded-2xl bg-secondary/70" />
@@ -111,7 +112,7 @@ function Home() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
             {list.map((p) => (
               <ProductCard key={p.slug} product={p} />
             ))}
