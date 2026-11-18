@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import * as Icons from "lucide-react";
 import { type Product } from "@/lib/products";
 import { productToCartItem, useCart } from "@/lib/cart";
@@ -11,22 +10,22 @@ const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", curren
 export function ProductCard({ product }: { product: Product }) {
   const { handleClick } = useProductTracking(product.slug, product.name);
   const { addItem } = useCart();
-  const [added, setAdded] = useState(false);
+  const navigate = useNavigate();
 
   const sizes = product.sizes ?? [];
   const scents = product.scents ?? [];
   const lowest = sizes.length ? Math.min(...sizes.map((s) => s.price)) : product.price;
-  const hasOptions = sizes.length > 1 || scents.length > 1; // precisa escolher tamanho ou aroma na página
+  const hasOptions = sizes.length > 1 || scents.length > 1; // precisa escolher tamanho ou aroma
 
-  useEffect(() => {
-    if (!added) return;
-    const t = setTimeout(() => setAdded(false), 2000);
-    return () => clearTimeout(t);
-  }, [added]);
-
-  const quickAdd = () => {
+  // Com tamanho ou aroma para escolher, "Comprar" abre o produto; sem opções, já vai para o carrinho.
+  const buy = () => {
+    handleClick();
+    if (hasOptions) {
+      navigate({ to: "/produtos/$slug", params: { slug: product.slug } });
+      return;
+    }
     addItem(productToCartItem(product, sizes[0]?.label, 1, scents[0] ?? null), 1);
-    setAdded(true);
+    navigate({ to: "/carrinho" });
   };
 
   return (
@@ -46,43 +45,30 @@ export function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="flex flex-1 flex-col pt-3">
-        <p className="mb-0.5 truncate text-[11px] text-muted-foreground sm:text-xs">{product.category}</p>
+        <p className="mb-1 truncate text-xs font-medium uppercase tracking-wide text-caramel-deep dark:text-caramel sm:text-sm">
+          {product.category}
+        </p>
         <Link
           to="/produtos/$slug"
           params={{ slug: product.slug }}
           onClick={handleClick}
-          className="line-clamp-2 text-sm font-medium leading-snug text-foreground hover:text-caramel-deep sm:text-base"
+          className="line-clamp-2 text-base font-semibold leading-snug text-foreground hover:text-caramel-deep sm:text-lg"
         >
           {product.name}
         </Link>
-        <p className="mt-1.5">
-          {sizes.length > 1 && <span className="mr-1 text-[11px] text-muted-foreground sm:text-xs">a partir de</span>}
-          <span className="text-base font-semibold text-caramel-deep dark:text-white sm:text-lg">{brl(lowest)}</span>
+        <p className="mt-2">
+          {sizes.length > 1 && <span className="mr-1 text-xs text-foreground/70 sm:text-sm">a partir de</span>}
+          <span className="text-lg font-bold text-caramel-deep dark:text-white sm:text-xl">{brl(lowest)}</span>
         </p>
 
         <div className="mt-auto pt-3">
-          {hasOptions ? (
-            <Link
-              to="/produtos/$slug"
-              params={{ slug: product.slug }}
-              onClick={handleClick}
-              className="flex w-full items-center justify-center gap-1.5 rounded-full border border-caramel/50 py-2 text-xs font-semibold text-caramel-deep transition hover:bg-caramel hover:text-primary-foreground dark:text-white sm:py-2.5 sm:text-sm"
-            >
-              Escolher opções
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={quickAdd}
-              className={`flex w-full items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition sm:py-2.5 sm:text-sm ${
-                added ? "bg-green-600 text-white" : "bg-caramel text-primary-foreground hover:bg-caramel/90"
-              }`}
-              aria-live="polite"
-            >
-              {added ? <Icons.Check className="h-4 w-4" /> : <Icons.ShoppingBag className="h-4 w-4" />}
-              {added ? "Adicionado" : "Adicionar"}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={buy}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-caramel py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-caramel/90 sm:py-3 sm:text-base"
+          >
+            <Icons.ShoppingBag className="h-4 w-4" /> Comprar
+          </button>
         </div>
       </div>
     </article>

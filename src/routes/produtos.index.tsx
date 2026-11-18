@@ -136,21 +136,20 @@ function ProductsList() {
         {categories.length > 1 && (
           <div className="-mx-4 mb-5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:overflow-visible sm:px-0">
             <div className="flex gap-2 sm:flex-wrap">
-              {[[ALL, products?.length ?? 0] as const, ...categories].map(([name, count]) => {
+              {[ALL, ...categories.map(([name]) => name)].map((name) => {
                 const active = category === name;
                 return (
                   <button
                     key={name}
                     onClick={() => selectCategory(name)}
                     aria-pressed={active}
-                    className={`flex-shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm transition ${
+                    className={`flex-shrink-0 whitespace-nowrap rounded-full border px-5 py-2.5 text-base font-medium transition ${
                       active
                         ? "border-caramel bg-caramel text-primary-foreground"
-                        : "border-border bg-background text-foreground hover:border-caramel/60"
+                        : "border-caramel/40 bg-background text-foreground hover:border-caramel"
                     }`}
                   >
                     {name}
-                    <span className={`ml-1.5 text-xs ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{count}</span>
                   </button>
                 );
               })}
