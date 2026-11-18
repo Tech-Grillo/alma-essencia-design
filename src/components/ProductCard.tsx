@@ -45,29 +45,29 @@ export function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="flex flex-1 flex-col pt-3">
-        <p className="mb-1 truncate text-xs font-medium uppercase tracking-wide text-caramel-deep dark:text-caramel sm:text-sm">
+        <p className="mb-1 truncate text-sm font-semibold uppercase tracking-wide text-caramel-deep dark:text-caramel sm:text-base">
           {product.category}
         </p>
         <Link
           to="/produtos/$slug"
           params={{ slug: product.slug }}
           onClick={handleClick}
-          className="line-clamp-2 text-base font-semibold leading-snug text-foreground hover:text-caramel-deep sm:text-lg"
+          className="line-clamp-2 text-lg font-semibold leading-snug text-foreground hover:text-caramel-deep sm:text-xl"
         >
           {product.name}
         </Link>
         <p className="mt-2">
-          {sizes.length > 1 && <span className="mr-1 text-xs text-foreground/70 sm:text-sm">a partir de</span>}
-          <span className="text-lg font-bold text-caramel-deep dark:text-white sm:text-xl">{brl(lowest)}</span>
+          {sizes.length > 1 && <span className="mr-1 text-sm text-foreground/80 sm:text-base">a partir de</span>}
+          <span className="text-xl font-bold text-caramel-deep dark:text-white sm:text-2xl">{brl(lowest)}</span>
         </p>
 
         <div className="mt-auto pt-3">
           <button
             type="button"
             onClick={buy}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-caramel py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-caramel/90 sm:py-3 sm:text-base"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-caramel py-3 text-base font-semibold text-primary-foreground transition hover:bg-caramel/90 sm:text-lg"
           >
-            <Icons.ShoppingBag className="h-4 w-4" /> Comprar
+            <Icons.ShoppingBag className="h-5 w-5" /> Comprar
           </button>
         </div>
       </div>

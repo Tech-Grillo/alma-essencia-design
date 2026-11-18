@@ -105,20 +105,20 @@ function ProductsList() {
         {/* Título e busca */}
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="font-serif text-4xl sm:text-5xl">Produtos</h1>
-            <p className="mt-1 text-sm text-muted-foreground sm:text-base">
+            <h1 className="font-serif text-5xl sm:text-6xl">Produtos</h1>
+            <p className="mt-2 text-base text-foreground/80 sm:text-lg">
               Velas, sabonetes, home sprays e difusores feitos à mão em Niterói.
             </p>
           </div>
           <div className="relative w-full md:max-w-sm">
-            <Icons.Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Icons.Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/60" />
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por nome ou aroma"
               aria-label="Buscar produtos"
-              className="w-full rounded-full border border-border bg-background py-3 pl-11 pr-10 text-sm outline-none transition focus:border-caramel focus:ring-2 focus:ring-caramel/20"
+              className="w-full rounded-full border border-border bg-background py-3.5 pl-12 pr-10 text-base outline-none transition focus:border-caramel focus:ring-2 focus:ring-caramel/20"
             />
             {search && (
               <button
@@ -159,7 +159,7 @@ function ProductsList() {
 
         {/* Contagem e ordenação */}
         <div className="mb-5 flex items-center justify-between gap-3 border-b border-border pb-3">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-foreground/80">
             {products ? `${shown.length} ${shown.length === 1 ? "produto" : "produtos"}` : "Carregando..."}
             {filtersActive && products && (
               <button onClick={clearFilters} className="ml-3 text-caramel-deep underline-offset-2 hover:underline">
@@ -167,13 +167,13 @@ function ProductsList() {
               </button>
             )}
           </p>
-          <label className="flex items-center gap-2 text-sm">
-            <span className="hidden text-muted-foreground sm:inline">Ordenar por</span>
+          <label className="flex items-center gap-2 text-base">
+            <span className="hidden text-foreground/80 sm:inline">Ordenar por</span>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as Sort)}
               aria-label="Ordenar produtos"
-              className="rounded-full border border-border bg-background px-3 py-1.5 text-sm outline-none focus:border-caramel"
+              className="rounded-full border border-border bg-background px-4 py-2 text-base outline-none focus:border-caramel"
             >
               {SORTS.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -199,8 +199,8 @@ function ProductsList() {
         ) : shown.length === 0 ? (
           <div className="mx-auto max-w-md py-16 text-center">
             <Icons.SearchX className="mx-auto mb-4 h-10 w-10 text-caramel-deep/50" />
-            <p className="font-serif text-2xl">Nenhum produto encontrado</p>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="font-serif text-3xl">Nenhum produto encontrado</p>
+            <p className="mt-2 text-base text-foreground/80">
               {search ? `Não achamos nada para “${search}”.` : "Ainda não temos produtos nesta categoria."} Procurando algo específico? Fale com a gente.
             </p>
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
