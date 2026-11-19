@@ -13,9 +13,19 @@ export type CheckoutCustomer = {
   phone: string;
 };
 
+export type ShippingAddress = {
+  street: string;
+  number: string;
+  complement: string;
+  district: string;
+  city: string;
+  state: string;
+};
+
 export type CheckoutDelivery =
   | { type: "pickup" }
-  | { type: "delivery"; neighborhood: string; address: string };
+  | { type: "delivery"; neighborhood: string; address: string }
+  | { type: "shipping"; postalCode: string; serviceId: string; address: ShippingAddress };
 
 export type CheckoutInput = {
   customer: CheckoutCustomer;

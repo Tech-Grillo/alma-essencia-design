@@ -2,7 +2,8 @@
 // mas o corpo de cada handler roda só no servidor. Os módulos de servidor são importados
 // dentro do handler para que a chave secreta e o Access Token nunca entrem no bundle do site.
 import { createServerFn } from "@tanstack/react-start";
-import type { CardData, CardResult, CheckoutInput, OrderSummary, PixResult } from "./types";
+import type { ShippingQuote } from "@/lib/shipping";
+import type { CardData, CardResult, CheckoutInput, CheckoutItemInput, OrderSummary, PixResult } from "./types";
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -45,4 +46,19 @@ export const getOrderStatus = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<OrderSummary | null> => {
     const { getOrderSummary } = await import("@/lib/server/orders");
     return getOrderSummary(String(data.orderId));
+  });
+
+/** Opções de frete por transportadora para o CEP. Usada no carrinho e no checkout. */
+export const getShippingOptions = createServerFn({ method: "POST" })
+  .inputValidator((data: { items: CheckoutItemInput[]; postalCode: string }) => data)
+  .handler(async ({ data }): Promise<Result<ShippingQuote>> => {
+    const { quoteShipping } = await import("@/lib/server/shipping");
+    const { CheckoutError } = await import("@/lib/server/errors");
+    try {
+      return { ok: true, data: await quoteShipping(data.items, data.postalCode) };
+    } catch (error) {
+      if (error instanceof CheckoutError) return { ok: false, error: error.message };
+      console.error("Erro ao calcular frete:", error);
+      return { ok: false, error: "Não foi possível calcular o frete agora. Tente de novo ou fale com a gente pelo WhatsApp." };
+    }
   });

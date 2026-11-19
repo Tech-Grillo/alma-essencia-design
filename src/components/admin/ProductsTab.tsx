@@ -4,6 +4,8 @@ import * as Icons from "lucide-react";
 import type { Product, SizeOption } from "@/lib/products-supabase";
 import { deleteProductFromDb, getAllCategories, getAllProducts, saveProduct, updateProductInDb } from "@/lib/products-supabase";
 import placeholderProduto from "@/assets/placeholder-produto.webp";
+import { site } from "@/config/site";
+import { SHIPPING_MODES, defaultShippingMode, shippingModeOf, type ProductShipping, type ShippingMode } from "@/lib/shipping";
 import { Button, Card, EmptyState, Field, MoneyInput, Notice, Sheet, brl, inputClass, useToast } from "./ui";
 
 const lowestPrice = (p: Product) => (p.sizes?.length ? Math.min(...p.sizes.map((s) => s.price)) : p.price);
@@ -193,6 +195,14 @@ function ProductEditor({
       ? product.sizes.map((s) => ({ label: s.label, unit: s.unit ?? "", price: s.price }))
       : [{ label: "Único", unit: "", price: product?.price ?? null }],
   );
+  // Envio: null = segue o padrão da categoria.
+  const [shippingMode, setShippingMode] = useState<ShippingMode | null>(product?.shipping?.mode ?? null);
+  const [pkg, setPkg] = useState({
+    weightGrams: product?.shipping?.weightGrams ?? null,
+    widthCm: product?.shipping?.widthCm ?? null,
+    heightCm: product?.shipping?.heightCm ?? null,
+    lengthCm: product?.shipping?.lengthCm ?? null,
+  } as Record<"weightGrams" | "widthCm" | "heightCm" | "lengthCm", number | null>);
   const [triedSave, setTriedSave] = useState(false);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -243,7 +253,12 @@ function ProductEditor({
       ...(s.unit.trim() ? { unit: s.unit.trim() } : {}),
       price: Number(s.price),
     }));
+    const shipping: ProductShipping = {
+      mode: shippingMode ?? defaultShippingMode(cat),
+      ...Object.fromEntries(Object.entries(pkg).filter(([, v]) => v != null && v > 0)),
+    };
     const data = {
+      shipping,
       name: name.trim(),
       category: cat,
       description: description.trim(),
@@ -491,6 +506,59 @@ function ProductEditor({
           <TagInput values={scents} onChange={setScents} placeholder="Digite um aroma e aperte Enter" />
           <p className="mt-1.5 text-xs text-muted-foreground">Opcional. O cliente escolhe um deles na página do produto.</p>
         </div>
+
+        {/* Envio por transportadora */}
+        <section className="rounded-xl border border-border p-4">
+          <p className="text-sm font-medium">Envio por transportadora</p>
+          <div className="mt-2 space-y-2">
+            {SHIPPING_MODES.map((m) => {
+              const current = shippingMode ?? shippingModeOf({ category: resolvedCategory });
+              return (
+                <label key={m.id} className="flex cursor-pointer items-start gap-2.5 text-sm">
+                  <input
+                    type="radio"
+                    name="shipping-mode"
+                    className="mt-0.5 accent-[var(--color-caramel)]"
+                    checked={current === m.id}
+                    onChange={() => setShippingMode(m.id)}
+                  />
+                  <span>
+                    <span className="font-medium">{m.label}</span>
+                    <span className="block text-xs text-muted-foreground">{m.description}</span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <p className="mb-1.5 mt-4 text-sm font-medium">Embalagem de 1 unidade</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {(
+              [
+                ["weightGrams", "Peso (g)", site.shipping.defaultPackage.weightGrams],
+                ["lengthCm", "Comprim. (cm)", site.shipping.defaultPackage.lengthCm],
+                ["widthCm", "Largura (cm)", site.shipping.defaultPackage.widthCm],
+                ["heightCm", "Altura (cm)", site.shipping.defaultPackage.heightCm],
+              ] as const
+            ).map(([key, label, fallback]) => (
+              <label key={key} className="text-xs text-muted-foreground">
+                {label}
+                <input
+                  className={`${inputClass} mt-1`}
+                  inputMode="numeric"
+                  placeholder={String(fallback)}
+                  value={pkg[key] ?? ""}
+                  onChange={(e) => {
+                    const n = Number(e.target.value.replace(",", "."));
+                    setPkg((prev) => ({ ...prev, [key]: e.target.value.trim() === "" || !Number.isFinite(n) ? null : n }));
+                  }}
+                />
+              </label>
+            ))}
+          </div>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Já embalado, como vai para a transportadora. Em branco, usa o valor cinza. Medidas certas evitam cobrança extra no envio.
+          </p>
+        </section>
       </div>
     </Sheet>
   );

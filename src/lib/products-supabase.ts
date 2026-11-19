@@ -5,6 +5,8 @@ import {
   updateProduct as updateProductLocal,
   deleteProduct as deleteProductLocal,
 } from './products';
+import type { ProductShipping } from "./shipping";
+
 export type SizeOption = { label: string; unit?: string; price: number };
 
 export type Product = { 
@@ -19,6 +21,8 @@ export type Product = {
   purchaseLink: string;
   scents: string[];
   sizes: SizeOption[];
+  /** Tipo de envio, peso e medidas (coluna criada em 004_shipping.sql). */
+  shipping?: ProductShipping | null;
   created_at?: string;
   updated_at?: string;
 };

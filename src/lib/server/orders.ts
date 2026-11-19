@@ -10,10 +10,13 @@ import type {
   OrderSummary,
   PixResult,
 } from "@/lib/checkout/types";
+import type { ShippingOption } from "@/lib/shipping";
 import { mpCreatePayment, mpGetPayment, type MpPayment } from "./mercadopago";
+import { quoteShipping } from "./shipping";
 import { supabaseAdmin } from "./supabase-admin";
 
-export class CheckoutError extends Error {}
+import { CheckoutError } from "./errors";
+export { CheckoutError };
 
 type PricedItem = {
   slug: string;
@@ -30,6 +33,8 @@ type Quote = {
   subtotal: number;
   deliveryFee: number;
   total: number;
+  /** Opção de transportadora escolhida (só quando delivery.type === "shipping"). */
+  shipping?: ShippingOption;
 };
 
 type OrderRow = {
@@ -74,6 +79,26 @@ function validate(input: CheckoutInput): CheckoutInput {
     if (!neighborhood) throw new CheckoutError("Escolha o bairro de entrega.");
     if (address.length < 5 || address.length > 200) throw new CheckoutError("Informe o endereço completo.");
     delivery = { type: "delivery", neighborhood, address };
+  } else if (input.delivery?.type === "shipping") {
+    const d = input.delivery;
+    const postalCode = String(d.postalCode ?? "").replace(/\D/g, "");
+    const a = d.address ?? ({} as Partial<typeof d.address>);
+    const clean = (v: unknown, max: number) => String(v ?? "").trim().slice(0, max);
+    const address = {
+      street: clean(a.street, 120),
+      number: clean(a.number, 20),
+      complement: clean(a.complement, 60),
+      district: clean(a.district, 80),
+      city: clean(a.city, 80),
+      state: clean(a.state, 2).toUpperCase(),
+    };
+    if (postalCode.length !== 8) throw new CheckoutError("Informe um CEP válido.");
+    if (!d.serviceId) throw new CheckoutError("Escolha uma opção de frete.");
+    if (address.street.length < 3) throw new CheckoutError("Informe a rua.");
+    if (!address.number) throw new CheckoutError("Informe o número (ou S/N).");
+    if (!address.district) throw new CheckoutError("Informe o bairro.");
+    if (!address.city || !/^[A-Z]{2}$/.test(address.state)) throw new CheckoutError("Informe a cidade e o estado (UF).");
+    delivery = { type: "shipping", postalCode, serviceId: String(d.serviceId), address };
   } else {
     delivery = { type: "pickup" };
   }
@@ -138,14 +163,50 @@ async function quote(input: CheckoutInput): Promise<Quote> {
     deliveryFee = money(Number(zone.fee));
   }
 
+  // Frete por transportadora: cota de novo aqui, para o valor não vir do navegador.
+  let shipping: ShippingOption | undefined;
+  if (input.delivery.type === "shipping") {
+    const result = await quoteShipping(input.items, input.delivery.postalCode);
+    if (result.blocked.length) {
+      throw new CheckoutError(`${result.blocked.join(", ")} não pode ser enviado por transportadora. Escolha retirada na feira.`);
+    }
+    const serviceId = input.delivery.serviceId;
+    shipping = result.options.find((o) => o.id === serviceId);
+    if (!shipping) throw new CheckoutError("A opção de frete escolhida não está mais disponível. Calcule o frete de novo.");
+    deliveryFee = shipping.price;
+  }
+
   const subtotal = money(items.reduce((sum, i) => sum + i.lineTotal, 0));
-  return { items, subtotal, deliveryFee, total: money(subtotal + deliveryFee) };
+  return { items, subtotal, deliveryFee, total: money(subtotal + deliveryFee), shipping };
 }
+
+const hasShipping = (q: Quote) => Boolean(q.shipping);
 
 function assertSameTotal(q: Quote, expectedTotal: number) {
   if (Math.abs(q.total - Number(expectedTotal)) > 0.009) {
-    throw new CheckoutError("Os preços foram atualizados. Recarregue a página para ver o novo total.");
+    throw new CheckoutError(
+      hasShipping(q)
+        ? "O valor do frete ou dos produtos mudou. Calcule o frete de novo para ver o total atualizado."
+        : "Os preços foram atualizados. Recarregue a página para ver o novo total.",
+    );
   }
+}
+
+function deliveryColumns(input: CheckoutInput, q: Quote) {
+  const d = input.delivery;
+  if (d.type === "delivery") return { neighborhood: d.neighborhood, address: d.address };
+  if (d.type === "shipping") {
+    const a = d.address;
+    return {
+      neighborhood: a.district,
+      address: `${a.street}, ${a.number}${a.complement ? ` - ${a.complement}` : ""} - ${a.district}, ${a.city}/${a.state}`,
+      postal_code: d.postalCode,
+      shipping_carrier: q.shipping?.carrier ?? null,
+      shipping_service: q.shipping?.service ?? null,
+      shipping_days: q.shipping?.days ?? null,
+    };
+  }
+  return { neighborhood: null, address: null };
 }
 
 async function insertOrder(input: CheckoutInput, q: Quote, method: "pix" | "card") {
@@ -157,8 +218,7 @@ async function insertOrder(input: CheckoutInput, q: Quote, method: "pix" | "card
       customer_email: input.customer.email,
       customer_phone: input.customer.phone,
       delivery_type: input.delivery.type,
-      neighborhood: input.delivery.type === "delivery" ? input.delivery.neighborhood : null,
-      address: input.delivery.type === "delivery" ? input.delivery.address : null,
+      ...deliveryColumns(input, q),
       delivery_fee: q.deliveryFee,
       items: q.items,
       subtotal: q.subtotal,

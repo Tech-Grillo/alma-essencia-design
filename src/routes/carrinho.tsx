@@ -4,6 +4,9 @@ import * as Icons from "lucide-react";
 import { useCart, isDefaultSize, type CartItem } from "@/lib/cart";
 import { reconcileCart } from "@/lib/cart-sync";
 import { getLiveCatalog } from "@/lib/products-supabase";
+import { getShippingOptions } from "@/lib/checkout/functions";
+import { formatCep, onlyDigits, saveCep, savedCep, type ShippingQuote } from "@/lib/shipping";
+import { ShippingOptions } from "@/components/ShippingOptions";
 import { site, whatsappLink } from "@/config/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -218,17 +221,15 @@ function CartPage() {
                     </dt>
                     <dd className="font-semibold tabular-nums">{brl(total)}</dd>
                   </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-foreground/75">Entrega</dt>
-                    <dd className="text-right font-medium">Calculada no checkout</dd>
-                  </div>
                 </dl>
+
+                <ShippingEstimator items={items} />
 
                 <div className="mt-5 flex items-baseline justify-between gap-4">
                   <span className="text-xl font-semibold">Total</span>
                   <span className="text-3xl font-bold tabular-nums text-caramel-deep dark:text-white">{brl(total)}</span>
                 </div>
-                <p className="mt-2 text-base text-foreground/70">Retirada grátis na feira ou entrega com taxa por bairro.</p>
+                <p className="mt-2 text-base text-foreground/70">Sem o frete. Retirada na feira é grátis; o envio você escolhe no checkout.</p>
 
                 <Link
                   to="/checkout"
@@ -275,6 +276,86 @@ function CartPage() {
       )}
 
       <Footer />
+    </div>
+  );
+}
+
+/** Simulação de frete pelo CEP. A escolha final (e a cobrança) é no checkout. */
+function ShippingEstimator({ items }: { items: CartItem[] }) {
+  const [cep, setCep] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [quote, setQuote] = useState<ShippingQuote | null>(null);
+  const itemsKey = JSON.stringify(items.map((i) => [i.slug, i.size, i.scent, i.quantity]));
+
+  useEffect(() => setCep(formatCep(savedCep())), []);
+  // Mudou o carrinho: a simulação anterior não vale mais.
+  useEffect(() => setQuote(null), [itemsKey]);
+
+  const calculate = async (value = cep) => {
+    const digits = onlyDigits(value);
+    if (digits.length !== 8) return setError("Informe um CEP com 8 números.");
+    setLoading(true);
+    setError("");
+    const result = await getShippingOptions({
+      data: {
+        postalCode: digits,
+        items: items.map((i) => ({ slug: i.slug, size: i.size ?? null, scent: i.scent ?? null, quantity: i.quantity })),
+      },
+    }).catch(() => null);
+    setLoading(false);
+    if (!result) return setError("Não foi possível calcular o frete agora. Tente de novo.");
+    if (!result.ok) return setError(result.error);
+    saveCep(digits);
+    setQuote(result.data);
+  };
+
+  return (
+    <div className="border-b border-border py-5">
+      <p className="mb-2 flex items-center gap-2 text-lg font-semibold">
+        <Icons.Truck className="h-5 w-5 text-caramel-deep dark:text-caramel" /> Calcular frete
+      </p>
+      <form
+        className="flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          calculate();
+        }}
+      >
+        <input
+          value={cep}
+          onChange={(e) => {
+            setCep(formatCep(e.target.value));
+            setError("");
+          }}
+          inputMode="numeric"
+          placeholder="Seu CEP"
+          aria-label="CEP"
+          autoComplete="postal-code"
+          className="min-w-0 flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-base outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded-full border border-caramel px-5 text-base font-semibold text-caramel-deep transition hover:bg-caramel/10 disabled:opacity-60 dark:text-caramel"
+        >
+          {loading ? <Icons.Loader2 className="h-5 w-5 animate-spin" /> : "OK"}
+        </button>
+      </form>
+      {error && <p className="mt-2 text-base text-rose">{error}</p>}
+      {quote && (
+        <div className="mt-3">
+          {quote.blocked.length > 0 ? (
+            <p className="text-base text-foreground/80">
+              <span className="font-semibold">{quote.blocked.join(", ")}</span> não pode ser enviado por transportadora. Só retirada na feira.
+            </p>
+          ) : quote.options.length === 0 ? (
+            <p className="text-base text-foreground/80">Nenhuma transportadora atende esse CEP. Fale com a gente pelo WhatsApp.</p>
+          ) : (
+            <ShippingOptions options={quote.options.slice(0, 4)} />
+          )}
+        </div>
+      )}
     </div>
   );
 }

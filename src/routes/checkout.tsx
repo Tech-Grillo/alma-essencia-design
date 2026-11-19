@@ -7,8 +7,10 @@ import { Footer } from "@/components/Footer";
 import { isDefaultSize, useCart } from "@/lib/cart";
 import { supabase } from "@/lib/supabase";
 import { site } from "@/config/site";
-import { createCardPayment, createPixPayment, getOrderStatus } from "@/lib/checkout/functions";
-import type { CheckoutInput, PixResult } from "@/lib/checkout/types";
+import { createCardPayment, createPixPayment, getOrderStatus, getShippingOptions } from "@/lib/checkout/functions";
+import type { CheckoutDelivery, CheckoutInput, PixResult } from "@/lib/checkout/types";
+import { formatCep, formatDays, lookupCep, onlyDigits, saveCep, savedCep, type ShippingQuote } from "@/lib/shipping";
+import { ShippingOptions } from "@/components/ShippingOptions";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: `Finalizar compra — ${site.name}` }, { name: "robots", content: "noindex" }] }),
@@ -22,7 +24,6 @@ const MP_PUBLIC_KEY = import.meta.env.VITE_MP_PUBLIC_KEY as string | undefined;
 let mpInitialized = false;
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const onlyDigits = (s: string) => s.replace(/\D/g, "");
 
 function formatPhone(value: string) {
   const d = onlyDigits(value).slice(0, 11);
@@ -32,8 +33,8 @@ function formatPhone(value: string) {
 }
 
 const inputClass =
-  "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-caramel focus:ring-2 focus:ring-caramel/20";
-const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground";
+  "w-full rounded-2xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none transition focus:border-caramel focus:ring-2 focus:ring-caramel/20";
+const labelClass = "mb-1.5 block text-sm font-semibold text-foreground/80";
 
 function CheckoutPage() {
   const navigate = useNavigate();
@@ -42,10 +43,23 @@ function CheckoutPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">("pickup");
+  const [deliveryType, setDeliveryType] = useState<CheckoutDelivery["type"]>("pickup");
   const [neighborhood, setNeighborhood] = useState("");
   const [address, setAddress] = useState("");
   const [zones, setZones] = useState<Zone[]>([]);
+  // Envio por transportadora
+  const [cep, setCep] = useState("");
+  const [street, setStreet] = useState("");
+  const [number, setNumber] = useState("");
+  const [complement, setComplement] = useState("");
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [uf, setUf] = useState("");
+  const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
+  const [quotedCep, setQuotedCep] = useState("");
+  const [quoting, setQuoting] = useState(false);
+  const [quoteError, setQuoteError] = useState("");
+  const [serviceId, setServiceId] = useState("");
   const [method, setMethod] = useState<Method>("pix");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -62,11 +76,59 @@ function CheckoutPage() {
       .eq("active", true)
       .order("neighborhood")
       .then(({ data }) => setZones((data ?? []).map((z) => ({ neighborhood: z.neighborhood, fee: Number(z.fee) }))));
+    setCep(formatCep(savedCep()));
   }, []);
+
+  const checkoutItems = items.map((i) => ({ slug: i.slug, size: i.size ?? null, scent: i.scent ?? null, quantity: i.quantity }));
+  const itemsKey = JSON.stringify(checkoutItems);
+
+  // Carrinho mudou: o frete calculado não vale mais.
+  useEffect(() => {
+    setShippingQuote(null);
+    setQuotedCep("");
+  }, [itemsKey]);
+
+  const calculateShipping = async (value = cep) => {
+    const digits = onlyDigits(value);
+    if (digits.length !== 8) return setQuoteError("Informe um CEP com 8 números.");
+    setQuoting(true);
+    setQuoteError("");
+    const [result, found] = await Promise.all([
+      getShippingOptions({ data: { items: checkoutItems, postalCode: digits } }).catch(() => null),
+      lookupCep(digits),
+    ]);
+    setQuoting(false);
+    if (found) {
+      setStreet(found.street);
+      setDistrict(found.district);
+      setCity(found.city);
+      setUf(found.state);
+    }
+    if (!result) return setQuoteError("Não foi possível calcular o frete agora. Tente de novo.");
+    if (!result.ok) return setQuoteError(result.error);
+    saveCep(digits);
+    setQuotedCep(digits);
+    setShippingQuote(result.data);
+    const options = result.data.options;
+    setServiceId((current) => (options.some((o) => o.id === current) ? current : options[0]?.id ?? ""));
+  };
+
+  // Ao escolher envio com um CEP já preenchido, calcula sozinho.
+  useEffect(() => {
+    if (deliveryType === "shipping" && !shippingQuote && !quoting && onlyDigits(cep).length === 8) calculateShipping();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deliveryType, shippingQuote]);
+
+  const shippingOption =
+    shippingQuote && quotedCep === onlyDigits(cep) ? shippingQuote.options.find((o) => o.id === serviceId) : undefined;
 
   const subtotal = getTotal();
   const deliveryFee =
-    deliveryType === "delivery" ? zones.find((z) => z.neighborhood === neighborhood)?.fee ?? 0 : 0;
+    deliveryType === "delivery"
+      ? zones.find((z) => z.neighborhood === neighborhood)?.fee ?? 0
+      : deliveryType === "shipping"
+        ? shippingOption?.price ?? 0
+        : 0;
   const total = Math.round((subtotal + deliveryFee) * 100) / 100;
 
   const formError = useMemo(() => {
@@ -78,14 +140,29 @@ function CheckoutPage() {
       if (!neighborhood) return "Escolha o bairro de entrega.";
       if (address.trim().length < 5) return "Informe o endereço completo.";
     }
+    if (deliveryType === "shipping") {
+      if (!shippingOption) return "Calcule o frete pelo CEP e escolha uma opção.";
+      if (street.trim().length < 3) return "Informe a rua.";
+      if (!number.trim()) return "Informe o número (ou S/N).";
+      if (!district.trim()) return "Informe o bairro.";
+      if (!city.trim() || !/^[A-Za-z]{2}$/.test(uf.trim())) return "Informe a cidade e o estado (UF).";
+    }
     return "";
-  }, [name, email, phone, deliveryType, neighborhood, address]);
+  }, [name, email, phone, deliveryType, neighborhood, address, shippingOption, street, number, district, city, uf]);
 
-  const checkout: CheckoutInput = {
-    customer: { name, email, phone },
-    delivery: deliveryType === "delivery" ? { type: "delivery", neighborhood, address } : { type: "pickup" },
-    items: items.map((i) => ({ slug: i.slug, size: i.size ?? null, scent: i.scent ?? null, quantity: i.quantity })),
-  };
+  const delivery: CheckoutDelivery =
+    deliveryType === "delivery"
+      ? { type: "delivery", neighborhood, address }
+      : deliveryType === "shipping"
+        ? {
+            type: "shipping",
+            postalCode: onlyDigits(cep),
+            serviceId,
+            address: { street, number, complement, district, city, state: uf.trim().toUpperCase() },
+          }
+        : { type: "pickup" };
+
+  const checkout: CheckoutInput = { customer: { name, email, phone }, delivery, items: checkoutItems };
 
   const finish = (orderId: string) => {
     clearCart();
@@ -173,16 +250,107 @@ function CheckoutPage() {
                     <Choice
                       checked={deliveryType === "pickup"}
                       onSelect={() => setDeliveryType("pickup")}
-                      title="Retirada — grátis"
+                      title="Retirada na feira — grátis"
                       description={site.checkout.pickup}
                     />
                     {zones.length > 0 && (
                       <Choice
                         checked={deliveryType === "delivery"}
                         onSelect={() => setDeliveryType("delivery")}
-                        title="Entrega"
+                        title="Entrega em Niterói"
                         description="Taxa fixa por bairro"
                       />
+                    )}
+                    <Choice
+                      checked={deliveryType === "shipping"}
+                      onSelect={() => setDeliveryType("shipping")}
+                      title="Envio por transportadora"
+                      description="Para todo o Brasil. O frete é calculado pelo CEP."
+                    />
+                    {deliveryType === "shipping" && (
+                      <div className="space-y-4 pt-2">
+                        <div>
+                          <span className={labelClass}>CEP</span>
+                          <div className="flex gap-2">
+                            <input
+                              className={`${inputClass} max-w-[12rem]`}
+                              inputMode="numeric"
+                              placeholder="00000-000"
+                              value={cep}
+                              onChange={(e) => {
+                                const next = formatCep(e.target.value);
+                                setCep(next);
+                                setQuoteError("");
+                                if (onlyDigits(next).length === 8 && onlyDigits(next) !== quotedCep) calculateShipping(next);
+                              }}
+                              autoComplete="postal-code"
+                              aria-label="CEP"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => calculateShipping()}
+                              disabled={quoting}
+                              className="rounded-2xl border border-caramel px-5 text-base font-semibold text-caramel-deep transition hover:bg-caramel/10 disabled:opacity-60 dark:text-caramel"
+                            >
+                              {quoting ? <Icons.Loader2 className="h-5 w-5 animate-spin" /> : "Calcular"}
+                            </button>
+                          </div>
+                          <a
+                            href="https://buscacepinter.correios.com.br/app/endereco/index.php"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-1.5 inline-block text-sm text-foreground/70 underline-offset-2 hover:underline"
+                          >
+                            Não sei meu CEP
+                          </a>
+                        </div>
+
+                        {quoteError && <p className="rounded-2xl border border-rose/20 bg-rose/10 px-4 py-3 text-base text-rose">{quoteError}</p>}
+
+                        {shippingQuote && quotedCep === onlyDigits(cep) && (
+                          shippingQuote.blocked.length > 0 ? (
+                            <p className="rounded-2xl border border-border bg-secondary/40 px-4 py-3 text-base">
+                              <span className="font-semibold">{shippingQuote.blocked.join(", ")}</span> não pode ser enviado por
+                              transportadora. Escolha a retirada na feira ou tire o item do carrinho.
+                            </p>
+                          ) : shippingQuote.options.length === 0 ? (
+                            <p className="rounded-2xl border border-border bg-secondary/40 px-4 py-3 text-base">
+                              Nenhuma transportadora atende esse CEP com estes produtos. Fale com a gente pelo WhatsApp que buscamos outra forma de envio.
+                            </p>
+                          ) : (
+                            <ShippingOptions options={shippingQuote.options} selected={serviceId} onSelect={setServiceId} />
+                          )
+                        )}
+
+                        {shippingOption && (
+                          <div className="grid gap-4 sm:grid-cols-6">
+                            <label className="sm:col-span-4">
+                              <span className={labelClass}>Rua</span>
+                              <input className={inputClass} value={street} onChange={(e) => setStreet(e.target.value)} autoComplete="address-line1" />
+                            </label>
+                            <label className="sm:col-span-2">
+                              <span className={labelClass}>Número</span>
+                              <input className={inputClass} value={number} onChange={(e) => setNumber(e.target.value)} placeholder="123 ou S/N" />
+                            </label>
+                            <label className="sm:col-span-6">
+                              <span className={labelClass}>Complemento (opcional)</span>
+                              <input className={inputClass} value={complement} onChange={(e) => setComplement(e.target.value)} placeholder="Apto, bloco, referência" autoComplete="address-line2" />
+                            </label>
+                            <label className="sm:col-span-2">
+                              <span className={labelClass}>Bairro</span>
+                              <input className={inputClass} value={district} onChange={(e) => setDistrict(e.target.value)} />
+                            </label>
+                            <label className="sm:col-span-3">
+                              <span className={labelClass}>Cidade</span>
+                              <input className={inputClass} value={city} onChange={(e) => setCity(e.target.value)} autoComplete="address-level2" />
+                            </label>
+                            <label className="sm:col-span-1">
+                              <span className={labelClass}>UF</span>
+                              <input className={inputClass} value={uf} maxLength={2} onChange={(e) => setUf(e.target.value.toUpperCase())} autoComplete="address-level1" />
+                            </label>
+                          </div>
+                        )}
+                      </div>
                     )}
                     {deliveryType === "delivery" && (
                       <div className="grid gap-4 pt-2 sm:grid-cols-2">
@@ -295,7 +463,7 @@ function CheckoutPage() {
             <h2 className="mb-4 font-serif text-2xl">Resumo</h2>
             <ul className="mb-5 space-y-3 border-b border-border pb-5">
               {items.map((item) => (
-                <li key={`${item.slug}-${item.size ?? ""}-${item.scent ?? ""}`} className="flex justify-between gap-3 text-sm">
+                <li key={`${item.slug}-${item.size ?? ""}-${item.scent ?? ""}`} className="flex justify-between gap-3 text-base">
                   <span>
                     {item.quantity}× {item.name}
                     {!isDefaultSize(item.size) && <span className="text-muted-foreground"> · {item.size}</span>}
@@ -305,12 +473,21 @@ function CheckoutPage() {
                 </li>
               ))}
             </ul>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-base">
               <Row label="Subtotal" value={brl(subtotal)} />
               <Row
-                label="Entrega"
-                value={deliveryType === "pickup" ? "Grátis" : neighborhood ? brl(deliveryFee) : "Escolha o bairro"}
+                label={deliveryType === "shipping" && shippingOption ? `Frete · ${shippingOption.carrier}` : "Entrega"}
+                value={
+                  deliveryType === "pickup"
+                    ? "Grátis"
+                    : deliveryType === "delivery"
+                      ? neighborhood ? brl(deliveryFee) : "Escolha o bairro"
+                      : shippingOption ? brl(deliveryFee) : "Informe o CEP"
+                }
               />
+              {deliveryType === "shipping" && shippingOption?.days && (
+                <p className="text-right text-sm text-muted-foreground">Chega em {formatDays(shippingOption.days)}</p>
+              )}
             </div>
             <div className="mt-4 flex items-baseline justify-between border-t border-border pt-4">
               <span className="font-serif text-xl">Total</span>
@@ -432,8 +609,8 @@ function Choice({ checked, onSelect, title, description }: { checked: boolean; o
     >
       <span className={`mt-0.5 h-5 w-5 flex-shrink-0 rounded-full border-2 ${checked ? "border-caramel bg-caramel shadow-[inset_0_0_0_3px_var(--color-card)]" : "border-border"}`} />
       <span>
-        <span className="block font-medium">{title}</span>
-        <span className="block text-sm text-muted-foreground">{description}</span>
+        <span className="block text-lg font-semibold">{title}</span>
+        <span className="block text-base text-foreground/75">{description}</span>
       </span>
     </button>
   );

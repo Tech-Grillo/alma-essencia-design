@@ -15,9 +15,13 @@ type Order = {
   customer_name: string;
   customer_email: string;
   customer_phone: string;
-  delivery_type: "pickup" | "delivery";
+  delivery_type: "pickup" | "delivery" | "shipping";
   neighborhood: string | null;
   address: string | null;
+  postal_code?: string | null;
+  shipping_carrier?: string | null;
+  shipping_service?: string | null;
+  shipping_days?: number | null;
   delivery_fee: number;
   items: OrderItem[];
   total: number;
@@ -141,6 +145,18 @@ export function OrdersTab() {
                           <>
                             <Icons.MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" /> Retirada na feira
                           </>
+                        ) : o.delivery_type === "shipping" ? (
+                          <>
+                            <Icons.Package className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+                            <span>
+                              <span className="font-medium text-foreground">
+                                {o.shipping_carrier} {o.shipping_service}
+                              </span>
+                              {o.shipping_days ? ` · até ${o.shipping_days} dias úteis` : ""}
+                              <br />
+                              {o.address} · CEP {o.postal_code?.replace(/^(\d{5})(\d{3})$/, "$1-$2")}
+                            </span>
+                          </>
                         ) : (
                           <>
                             <Icons.Truck className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" /> {o.address} — {o.neighborhood}
@@ -185,7 +201,7 @@ export function OrdersTab() {
                         ))}
                         {Number(o.delivery_fee) > 0 && (
                           <li className="flex justify-between text-muted-foreground">
-                            <span>Entrega</span>
+                            <span>{o.delivery_type === "shipping" ? "Frete" : "Entrega"}</span>
                             <span>{brl(o.delivery_fee)}</span>
                           </li>
                         )}
