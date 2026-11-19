@@ -126,7 +126,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
 // WhatsApp flutuante e assistente só nas páginas da loja, não no painel admin.
 function PublicFloatingButtons() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  if (pathname.startsWith("/admin")) return null;
+  // No admin não fazem sentido; no carrinho e no checkout cobririam os botões de compra.
+  if (pathname.startsWith("/admin") || pathname.startsWith("/carrinho") || pathname.startsWith("/checkout")) return null;
   return (
     <>
       <FloatingWhatsApp />

@@ -113,6 +113,16 @@ export async function getAllProducts(): Promise<Product[]> {
   }
 }
 
+/**
+ * Catálogo direto do banco, sem a lista local de reserva.
+ * Retorna null se o Supabase não estiver configurado; lança erro se o banco não responder.
+ * Usado pelo carrinho para conferir preços sem correr o risco de comparar com dados de exemplo.
+ */
+export async function getLiveCatalog(): Promise<Product[] | null> {
+  if (!isSupabaseConfigured()) return null;
+  return (await fetchProducts()) as Product[];
+}
+
 export function getAllCategories(): string[] {
   return categories;
 }

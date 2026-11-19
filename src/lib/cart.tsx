@@ -18,6 +18,8 @@ type CartContextType = {
   removeItem: (slug: string, size?: string | null, scent?: string | null) => void;
   updateQuantity: (slug: string, size: string | null, quantity: number, scent?: string | null) => void;
   clearCart: () => void;
+  /** Troca o carrinho inteiro (usado ao atualizar preços pelo catálogo). */
+  replaceItems: (items: CartItem[]) => void;
   getTotal: () => number;
   getCount: () => number;
   isInCart: (slug: string, size?: string | null) => boolean;
@@ -95,6 +97,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const clearCart = React.useCallback(() => setItems([]), []);
+  const replaceItems = React.useCallback((next: CartItem[]) => setItems(next), []);
 
   const getTotal = React.useCallback(
     () => items.reduce((s, i) => s + i.price * i.quantity, 0),
@@ -109,8 +112,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const value: CartContextType = React.useMemo(
-    () => ({ items, addItem, removeItem, updateQuantity, clearCart, getTotal, getCount, isInCart, ready }),
-    [items, addItem, removeItem, updateQuantity, clearCart, getTotal, getCount, isInCart, ready]
+    () => ({ items, addItem, removeItem, updateQuantity, clearCart, replaceItems, getTotal, getCount, isInCart, ready }),
+    [items, addItem, removeItem, updateQuantity, clearCart, replaceItems, getTotal, getCount, isInCart, ready]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

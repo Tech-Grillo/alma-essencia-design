@@ -1,196 +1,278 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCart, productToCartItem, isDefaultSize } from "@/lib/cart";
-import { whatsappLink } from "@/config/site";
+import { useEffect, useRef, useState } from "react";
+import * as Icons from "lucide-react";
+import { useCart, isDefaultSize, type CartItem } from "@/lib/cart";
+import { reconcileCart } from "@/lib/cart-sync";
+import { getLiveCatalog } from "@/lib/products-supabase";
+import { site, whatsappLink } from "@/config/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import * as Icons from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import placeholderProduto from "@/assets/placeholder-produto.webp";
 
 export const Route = createFileRoute("/carrinho")({
-  component: RouteComponent,
+  component: CartPage,
+  head: () => ({ meta: [{ title: `Carrinho — ${site.name}` }] }),
 });
 
-function RouteComponent() {
-  const { items, updateQuantity, removeItem, clearCart, getTotal, getCount, ready } = useCart();
+const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  const buildWhatsAppMessage = () => {
-    if (items.length === 0) return "";
-    
-    let message = "*Olá! Gostaria de fazer o seguinte pedido:*\n\n";
-    
-    items.forEach((item, index) => {
-      message += `*${index + 1}. ${item.name}*\n`;
-      if (!isDefaultSize(item.size)) message += `   Tamanho: ${item.size}\n`;
-      if (item.scent) message += `   Aroma: ${item.scent}\n`;
-      message += `   Quantidade: ${item.quantity}\n`;
-      message += `   Valor unitário: R$ ${item.price.toFixed(2).replace(".", ",")}\n`;
-      message += `   Subtotal: R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}\n\n`;
-    });
-    
-    message += `*TOTAL: R$ ${getTotal().toFixed(2).replace(".", ",")}*\n\n`;
-    message += "Por favor, confirme a disponibilidade e me envie mais informações sobre o envio. Obrigado!";
-    return message;
-  };
+/** "Lavanda · 250ml" — só o que o cliente escolheu. */
+const variantOf = (item: CartItem) => [item.scent, isDefaultSize(item.size) ? null : item.size].filter(Boolean).join(" · ");
+
+function buildWhatsAppMessage(items: CartItem[], total: number) {
+  const lines = ["*Olá! Gostaria de fazer este pedido:*", ""];
+  items.forEach((item, i) => {
+    lines.push(`*${i + 1}. ${item.name}*`);
+    if (item.scent) lines.push(`   Aroma: ${item.scent}`);
+    if (!isDefaultSize(item.size)) lines.push(`   Tamanho: ${item.size}`);
+    lines.push(`   ${item.quantity} × ${brl(item.price)} = ${brl(item.price * item.quantity)}`, "");
+  });
+  lines.push(`*Total: ${brl(total)}*`, "", "Pode confirmar a disponibilidade e a forma de entrega? Obrigado!");
+  return lines.join("\n");
+}
+
+function CartPage() {
+  const { items, updateQuantity, removeItem, clearCart, replaceItems, getTotal, getCount, ready } = useCart();
+  const [notice, setNotice] = useState<string | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const synced = useRef(false);
+
+  const total = getTotal();
+  const count = getCount();
+
+  // Ao abrir, confere preços, nomes e fotos com o catálogo atual.
+  // Se o banco não responder, mantém o carrinho como está (o checkout confere de novo no servidor).
+  useEffect(() => {
+    if (!ready || synced.current || items.length === 0) return;
+    synced.current = true;
+    getLiveCatalog()
+      .then((catalog) => {
+        if (!catalog) return;
+        const result = reconcileCart(items, catalog);
+        if (!result.changed) return;
+        replaceItems(result.items);
+        const parts: string[] = [];
+        if (result.removed.length) parts.push(
+            `${result.removed.join(", ")} ${result.removed.length === 1 ? "não está mais disponível e saiu" : "não estão mais disponíveis e saíram"} do carrinho.`,
+          );
+        if (result.repriced.length) parts.push(`O preço de ${result.repriced.join(", ")} foi atualizado.`);
+        if (parts.length) setNotice(parts.join(" "));
+      })
+      .catch((error) => console.error("Não foi possível conferir o carrinho:", error));
+  }, [ready, items, replaceItems]);
+
+  const loading = !ready;
+  const empty = ready && items.length === 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${items.length ? "pb-28 lg:pb-0" : ""}`}>
       <Header />
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-8 sm:py-10">
-        <div className="flex items-center gap-3 mb-8 sm:mb-10">
-          <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-caramel-deep">
-            <Icons.ChevronLeft className="h-4 w-4" /> Voltar
-          </Link>
-        </div>
-        
-
-        <h1 className="font-serif text-4xl sm:text-5xl mb-2">Meu Carrinho</h1>
-        <p className="text-muted-foreground mb-8">{getCount()} {getCount() === 1 ? "item" : "itens"}</p>
-
-        {!ready ? (
-          <p className="flex items-center gap-2 py-16 text-muted-foreground">
-            <Icons.Loader2 className="h-5 w-5 animate-spin" /> Carregando...
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        <h1 className="font-serif text-5xl font-semibold sm:text-6xl">Carrinho</h1>
+        {!empty && !loading && (
+          <p className="mt-2 text-lg text-foreground/75">
+            {count} {count === 1 ? "item" : "itens"}
           </p>
-        ) : items.length === 0 ? (
-          <div className="rounded-3xl border-2 border-dashed border-caramel/30 bg-gradient-to-b from-rose/5 to-transparent p-8 sm:p-12 text-center">
-            <Icons.ShoppingBag className="h-20 w-20 text-caramel-deep/40 mx-auto mb-6" />
-            <p className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-caramel-deep mb-4">Seu carrinho está vazio</p>
-            <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-md mx-auto">Explore nossos produtos e adicione algo especial!</p>
-            <Link to="/produtos" className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-caramel text-primary-foreground px-10 sm:px-12 py-4 sm:py-5 shadow-2xl hover:shadow-bloom hover:-translate-y-1.5 active:translate-y-0 transition-all text-base uppercase tracking-[0.5em] text-center font-bold">
-              <span className="relative z-10 flex items-center gap-2">
-                <Icons.ShoppingBag className="h-5 w-5" />
-                Ver produtos
-              </span>
+        )}
+
+        {notice && (
+          <div role="status" className="mt-6 flex items-start gap-3 rounded-2xl border border-caramel/40 bg-caramel/10 px-5 py-4 text-base text-foreground">
+            <Icons.Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-caramel-deep dark:text-caramel" />
+            <p className="flex-1">{notice}</p>
+            <button onClick={() => setNotice(null)} aria-label="Fechar aviso" className="rounded-full p-1 hover:bg-caramel/15">
+              <Icons.X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="mt-8 space-y-4">
+            {[0, 1].map((i) => (
+              <div key={i} className="flex animate-pulse gap-4 rounded-2xl border border-border p-4">
+                <div className="h-24 w-24 rounded-xl bg-secondary/70" />
+                <div className="flex-1 space-y-3 pt-1">
+                  <div className="h-5 w-2/3 rounded bg-secondary/70" />
+                  <div className="h-4 w-1/3 rounded bg-secondary/70" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : empty ? (
+          <div className="mx-auto mt-10 max-w-lg rounded-3xl border border-border bg-secondary/30 px-6 py-14 text-center">
+            <Icons.ShoppingBag className="mx-auto h-14 w-14 text-caramel-deep/50 dark:text-caramel/60" />
+            <p className="mt-5 font-serif text-4xl font-semibold">Seu carrinho está vazio</p>
+            <p className="mt-3 text-lg text-foreground/75">Velas, sabonetes e difusores feitos à mão esperando por você.</p>
+            <Link
+              to="/produtos"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-caramel px-8 py-4 text-lg font-semibold text-primary-foreground transition hover:bg-caramel/90"
+            >
+              Ver produtos <Icons.ArrowRight className="h-5 w-5" />
             </Link>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-6 sm:gap-10">
-            {/* Produtos */}
-            <div className="lg:col-span-2 space-y-4">
-              {items.map((item) => (
-                <div key={`${item.slug}-${item.size ?? "default"}-${item.scent ?? ""}`} className="rounded-2xl border border-border bg-card p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
-                  {item.image && (
-                    <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-secondary/40">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                  
-                  <div className="flex-1">
-                    <h3 className="font-serif text-lg mb-1">{item.name}</h3>
-                    {item.scent && (
-                      <p className="text-sm text-muted-foreground mb-1">Aroma: <span className="font-medium text-foreground">{item.scent}</span></p>
-                    )}
-                    {!isDefaultSize(item.size) && (
-                      <p className="text-sm text-muted-foreground mb-3">Tamanho: <span className="font-medium text-foreground">{item.size}</span></p>
-                    )}
-                    
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-muted-foreground">Quantidade:</span>
-                        <div className="inline-flex items-center rounded-full border border-border bg-secondary/50">
-                          <button 
-                            onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity - 1, item.scent)} 
-                            className="p-2 hover:text-caramel-deep transition-colors"
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-10">
+            {/* Itens */}
+            <section aria-label="Itens do carrinho">
+              <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
+                {items.map((item) => {
+                  const variant = variantOf(item);
+                  return (
+                    <li key={`${item.slug}|${item.size ?? ""}|${item.scent ?? ""}`} className="flex gap-3 p-4 sm:gap-6 sm:p-6">
+                      <Link
+                        to="/produtos/$slug"
+                        params={{ slug: item.slug }}
+                        className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-secondary/50 sm:h-28 sm:w-28"
+                      >
+                        <img src={item.image || placeholderProduto} alt={item.name} className="h-full w-full object-cover" />
+                      </Link>
+
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex items-start gap-2">
+                          <div className="min-w-0 flex-1">
+                            <Link
+                              to="/produtos/$slug"
+                              params={{ slug: item.slug }}
+                              className="line-clamp-2 text-lg font-semibold leading-snug text-foreground hover:text-caramel-deep sm:text-xl"
+                            >
+                              {item.name}
+                            </Link>
+                            {variant && <p className="mt-1 text-base text-foreground/75">{variant}</p>}
+                            <p className="mt-1 text-base text-foreground/75">{brl(item.price)} cada</p>
+                          </div>
+                          <button
+                            onClick={() => removeItem(item.slug, item.size ?? null, item.scent)}
+                            aria-label={`Remover ${item.name}`}
+                            className="-mr-2 -mt-1 rounded-full p-2 text-foreground/60 transition-colors hover:bg-secondary hover:text-destructive"
                           >
-                            <Icons.Minus className="h-4 w-4" />
-                          </button>
-                          <span className="w-8 text-center font-medium">{item.quantity}</span>
-                          <button 
-                            onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity + 1, item.scent)} 
-                            className="p-2 hover:text-caramel-deep transition-colors"
-                          >
-                            <Icons.Plus className="h-4 w-4" />
+                            <Icons.Trash2 className="h-5 w-5" />
                           </button>
                         </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground mb-1">R$ {item.price.toFixed(2).replace(".", ",")}</p>
-                        <p className="font-serif text-2xl font-semibold text-caramel-deep dark:text-white">R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  <button 
-                    onClick={() => removeItem(item.slug, item.size ?? null, item.scent)} 
-                    className="text-muted-foreground hover:text-destructive transition-colors p-2 rounded-full hover:bg-secondary"
-                    aria-label="Remover"
-                  >
-                    <Icons.Trash2 className="h-5 w-5" />
+                        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-3">
+                          <div className="inline-flex items-center rounded-full border border-border" role="group" aria-label={`Quantidade de ${item.name}`}>
+                            <button
+                              onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity - 1, item.scent)}
+                              disabled={item.quantity <= 1}
+                              aria-label="Diminuir quantidade"
+                              className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+                            >
+                              <Icons.Minus className="h-4 w-4" />
+                            </button>
+                            <span className="w-9 text-center text-lg font-semibold tabular-nums" aria-live="polite">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(item.slug, item.size ?? null, item.quantity + 1, item.scent)}
+                              aria-label="Aumentar quantidade"
+                              className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-secondary"
+                            >
+                              <Icons.Plus className="h-4 w-4" />
+                            </button>
+                          </div>
+                          <p className="text-xl font-bold tabular-nums text-foreground sm:text-2xl">{brl(item.price * item.quantity)}</p>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+                <Link to="/produtos" className="inline-flex items-center gap-2 text-base font-semibold text-caramel-deep hover:underline dark:text-caramel">
+                  <Icons.ArrowLeft className="h-5 w-5" /> Continuar comprando
+                </Link>
+                {confirmClear ? (
+                  <span className="flex items-center gap-3 text-base">
+                    Tirar todos os itens?
+                    <button
+                      onClick={() => {
+                        clearCart();
+                        setConfirmClear(false);
+                      }}
+                      className="font-semibold text-destructive hover:underline"
+                    >
+                      Sim, esvaziar
+                    </button>
+                    <button onClick={() => setConfirmClear(false)} className="font-semibold text-foreground/70 hover:underline">
+                      Não
+                    </button>
+                  </span>
+                ) : (
+                  <button onClick={() => setConfirmClear(true)} className="text-base text-foreground/70 hover:text-destructive hover:underline">
+                    Esvaziar carrinho
                   </button>
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            </section>
 
             {/* Resumo */}
-            <div className="lg:col-span-1">
-              <div className="rounded-3xl border-2 border-rose/20 bg-rose/5 p-6 sm:p-8 lg:sticky lg:top-24">
-                <h2 className="font-serif text-2xl mb-6">Resumo do pedido</h2>
-                
-                <div className="space-y-3 mb-6 pb-6 border-b border-border">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">R$ {getTotal().toFixed(2).replace(".", ",")}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Frete</span>
-                    <span className="font-medium">Calculado no checkout</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Desconto</span>
-                    <span className="font-medium text-rose">-</span>
-                  </div>
-                </div>
+            <aside aria-label="Resumo do pedido" className="lg:sticky lg:top-24 lg:self-start">
+              <div className="rounded-2xl border border-border bg-secondary/40 p-6 sm:p-7">
+                <h2 className="font-serif text-3xl font-semibold">Resumo</h2>
 
-                <div className="mb-6">
-                  <div className="flex justify-between mb-3">
-                    <span className="font-serif text-xl">Total</span>
-                    <span className="font-serif text-3xl font-semibold text-caramel-deep dark:text-white">R$ {getTotal().toFixed(2).replace(".", ",")}</span>
+                <dl className="mt-5 space-y-3 border-b border-border pb-5 text-lg">
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-foreground/75">
+                      Subtotal ({count} {count === 1 ? "item" : "itens"})
+                    </dt>
+                    <dd className="font-semibold tabular-nums">{brl(total)}</dd>
                   </div>
-                  <p className="text-xs text-muted-foreground">Retirada grátis na feira ou entrega com taxa por bairro</p>
-                </div>
-
-                <div className="space-y-3">
-                  <Link
-                    to="/checkout"
-                    className="w-full flex items-center justify-center gap-2 rounded-full bg-caramel text-primary-foreground py-4 font-semibold hover:bg-caramel/90 transition shadow-soft hover:shadow-bloom"
-                  >
-                    <Icons.Lock className="h-5 w-5" />
-                    Finalizar compra
-                  </Link>
-                  <p className="text-xs text-center text-muted-foreground">Pix ou cartão de crédito · pagamento seguro</p>
-                  <div className="flex items-center gap-3 py-1 text-xs text-muted-foreground">
-                    <span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" />
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-foreground/75">Entrega</dt>
+                    <dd className="text-right font-medium">Calculada no checkout</dd>
                   </div>
-                  <a
-                    href={whatsappLink(buildWhatsAppMessage())}
-                    target="_blank" rel="noreferrer"
-                    className="w-full flex items-center justify-center gap-2 rounded-full bg-whatsapp text-white py-4 font-medium hover:opacity-90 transition-opacity shadow-soft hover:shadow-bloom"
-                  >
-                    <WhatsAppIcon className="h-5 w-5" />
-                    Comprar pelo WhatsApp
-                  </a>
-                  <p className="text-xs text-center text-muted-foreground">Atendimento personalizado · Resposta em minutos</p>
-                </div>
+                </dl>
 
-                <button
-                  onClick={() => clearCart()}
-                  className="w-full mt-4 py-3 rounded-full border border-border text-foreground hover:bg-secondary transition-colors font-medium"
+                <div className="mt-5 flex items-baseline justify-between gap-4">
+                  <span className="text-xl font-semibold">Total</span>
+                  <span className="text-3xl font-bold tabular-nums text-caramel-deep dark:text-white">{brl(total)}</span>
+                </div>
+                <p className="mt-2 text-base text-foreground/70">Retirada grátis na feira ou entrega com taxa por bairro.</p>
+
+                <Link
+                  to="/checkout"
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-caramel py-4 text-lg font-semibold text-primary-foreground shadow-soft transition hover:bg-caramel/90"
                 >
-                  Limpar carrinho
-                </button>
+                  <Icons.Lock className="h-5 w-5" /> Finalizar compra
+                </Link>
+                <p className="mt-3 text-center text-sm text-foreground/70">Pix ou cartão · pagamento seguro pelo Mercado Pago</p>
+
+                <div className="my-5 flex items-center gap-3 text-sm text-foreground/60">
+                  <span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <a
+                  href={whatsappLink(buildWhatsAppMessage(items, total))}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-whatsapp py-3.5 text-lg font-semibold text-whatsapp transition hover:bg-whatsapp hover:text-white"
+                >
+                  <WhatsAppIcon className="h-5 w-5" /> Pedir pelo WhatsApp
+                </a>
               </div>
-            </div>
+            </aside>
           </div>
         )}
+      </main>
 
-        {items.length > 0 && (
-          <div className="mt-12">
-            <Link to="/produtos" className="inline-flex items-center gap-2 text-caramel-deep hover:text-caramel-deep/80 font-medium">
-              <Icons.ArrowLeft className="h-4 w-4" /> Continuar comprando
+      {/* Barra fixa no celular: total sempre à vista */}
+      {ready && items.length > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-6xl items-center gap-4">
+            <div className="min-w-0">
+              <p className="text-sm text-foreground/70">Total</p>
+              <p className="text-2xl font-bold tabular-nums leading-tight">{brl(total)}</p>
+            </div>
+            <Link
+              to="/checkout"
+              className="ml-auto flex items-center gap-2 whitespace-nowrap rounded-full bg-caramel px-5 py-3.5 text-lg font-semibold text-primary-foreground transition hover:bg-caramel/90"
+            >
+              Finalizar compra <Icons.ArrowRight className="h-5 w-5" />
             </Link>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <Footer />
     </div>
