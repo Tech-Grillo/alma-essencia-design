@@ -342,7 +342,7 @@ function ShippingEstimator({ items }: { items: CartItem[] }) {
           {loading ? <Icons.Loader2 className="h-5 w-5 animate-spin" /> : "OK"}
         </button>
       </form>
-      {error && <p className="mt-2 text-base text-rose">{error}</p>}
+      {error && <p className="mt-2 text-base font-medium text-red-700 dark:text-red-300">{error}</p>}
       {quote && (
         <div className="mt-3">
           {quote.blocked.length > 0 ? (

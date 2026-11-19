@@ -305,7 +305,7 @@ function CheckoutPage() {
                           </a>
                         </div>
 
-                        {quoteError && <p className="rounded-2xl border border-rose/20 bg-rose/10 px-4 py-3 text-base text-rose">{quoteError}</p>}
+                        {quoteError && <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-base font-medium text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">{quoteError}</p>}
 
                         {shippingQuote && quotedCep === onlyDigits(cep) && (
                           shippingQuote.blocked.length > 0 ? (
@@ -392,7 +392,7 @@ function CheckoutPage() {
                   </div>
 
                   {error && (
-                    <p className="mb-4 rounded-2xl border border-rose/20 bg-rose/10 px-4 py-3 text-sm text-rose">{error}</p>
+                    <p className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-base font-medium text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">{error}</p>
                   )}
 
                   {method === "pix" ? (
@@ -554,7 +554,7 @@ function PixPanel({ pix, onPaid }: { pix: PixResult; onPaid: () => void }) {
       <p className="mb-6 text-sm text-muted-foreground">Pedido #{pix.orderId.slice(0, 8)}</p>
 
       {expired ? (
-        <p className="mx-auto max-w-sm rounded-2xl border border-rose/20 bg-rose/10 px-4 py-3 text-sm text-rose">
+        <p className="mx-auto max-w-sm rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-base font-medium text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">
           Este Pix expirou. Volte ao carrinho e gere um novo.
         </p>
       ) : (
