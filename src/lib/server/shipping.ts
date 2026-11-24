@@ -141,5 +141,21 @@ export async function quoteShipping(rawItems: CheckoutItemInput[], postalCode: s
     if (res.status === 422) throw new CheckoutError("Não encontramos esse CEP. Confira e tente de novo.");
     throw new Error(`Melhor Envio respondeu ${res.status}`);
   }
-  return { options: toOptions(body as MeService[], mode), blocked: [] };
+  const services = body as MeService[];
+  const options = toOptions(services, mode);
+  if (options.length === 0) {
+    // Ajuda a entender por que nada apareceu (erro da transportadora ou filtro de produto com álcool).
+    console.warn(
+      `Frete sem opções para o CEP ${to} (tipo de envio: ${mode}):\n` +
+        services
+          .map((s) => {
+            const name = `${s.company?.name ?? "?"} ${s.name}`;
+            if (s.error) return `  - ${name}: ${s.error}`;
+            const allowed = s.company?.name ? carrierAllowed(s.company.name, mode) : false;
+            return `  - ${name}: R$ ${s.custom_price ?? s.price}${allowed ? "" : " (bloqueada para este tipo de produto)"}`;
+          })
+          .join("\n"),
+    );
+  }
+  return { options, blocked: [] };
 }
