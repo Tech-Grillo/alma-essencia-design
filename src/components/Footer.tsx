@@ -143,6 +143,10 @@ export function Footer() {
 
           {/* Bottom bar */}
           <div className="border-t border-cream/10 pt-6">
+            {/* Identificação do vendedor (Decreto 7.962/2013) */}
+            <p className="mb-4 text-center text-xs font-light leading-relaxed text-cream/60 sm:text-left">
+              {site.name} · {site.seller.name} · {site.seller.document} · {site.seller.address} · {site.contact.email}
+            </p>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
               <p className="text-xs font-light tracking-wide text-cream/50">
                 © {new Date().getFullYear()} Alma e Essência — Todos os direitos reservados

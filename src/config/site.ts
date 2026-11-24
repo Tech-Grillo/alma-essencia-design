@@ -15,6 +15,15 @@ export const site = {
     email: "almaeessencia87@gmail.com",
     instagram: "alma_e_essencia",
   },
+  /**
+   * Quem vende (Decreto 7.962/2013: nome, documento e endereço visíveis no site).
+   * Ao abrir MEI/CNPJ, troque por razão social, CNPJ e endereço da empresa.
+   */
+  seller: {
+    name: "Rafael Grillo",
+    document: "CPF 218.***.***-73",
+    address: "Atendimento: Feira do Campo de São Bento, Icaraí, Niterói/RJ",
+  },
   /** Quando a loja atende presencialmente (feira). */
   hours: "Domingos, 9h às 15h (feira)",
   location: {
