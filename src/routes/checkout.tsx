@@ -496,6 +496,12 @@ function CheckoutPage() {
             <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
               <Icons.Lock className="h-3.5 w-3.5" /> Pagamento processado com segurança pelo Mercado Pago.
             </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Veja as políticas de{" "}
+              <Link to="/trocas-e-devolucoes" className="underline underline-offset-2 hover:text-foreground">trocas</Link>,{" "}
+              <Link to="/envio-e-entrega" className="underline underline-offset-2 hover:text-foreground">envio</Link> e{" "}
+              <Link to="/privacidade" className="underline underline-offset-2 hover:text-foreground">privacidade</Link>.
+            </p>
           </aside>
         </div>
       </div>

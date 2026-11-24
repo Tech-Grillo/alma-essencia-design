@@ -263,7 +263,7 @@ function TrustBar() {
     { icon: <Icons.HandHeart className="h-6 w-6" />, title: "Feito à mão", text: "Produção artesanal em Niterói" },
     { icon: <Icons.CreditCard className="h-6 w-6" />, title: "Pix ou cartão", text: "Pagamento seguro pelo site" },
     { icon: <Icons.MapPin className="h-6 w-6" />, title: "Retirada grátis", text: "Na feira do Campo de São Bento" },
-    { icon: <Icons.MessageCircle className="h-6 w-6" />, title: "Atendimento", text: "Fale com a gente pelo WhatsApp" },
+    { icon: <Icons.Leaf className="h-6 w-6" />, title: "100% vegano", text: "Ingredientes de origem vegana" },
   ];
   return (
     <section className="border-y border-border bg-card">

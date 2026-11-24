@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { categories } from "@/lib/products";
 import { site, instagramUrl, whatsappLink } from "@/config/site";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { POLICIES } from "@/lib/policies";
 import logo from "@/assets/imagens_inicio/logo-da-marca-sem-fundo.webp";
 import visaIcon from "@/assets/icons/visa.svg";
 import mastercardIcon from "@/assets/icons/mastercard.svg";
@@ -128,7 +129,15 @@ export function Footer() {
                 </div>
               </div>
 
-              {/* Links de Política de Privacidade e Termos voltam quando essas páginas existirem. */}
+              <ul className="mt-6 space-y-2 text-sm font-light">
+                {POLICIES.map((p) => (
+                  <li key={p.to}>
+                    <Link to={p.to} className="hover:text-rose transition">
+                      {p.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
